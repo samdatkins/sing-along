@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "sing-along"
+version = "0.1.0"
+description = ""
+authors = ["sam atkins <sam.d.atkins@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = "^3.2.9"
+psycopg2-binary = "^2.9.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core=1.1.11"]
+build-backend = "poetry.core.masonry.api"
