@@ -3,6 +3,7 @@ FROM python:3
 ENV PYTHONUNBUFFERED=1
 
 # System deps:
+RUN apt-get update && apt-get install -y gcc musl-dev python3-dev libffi-dev cargo rustc
 RUN pip install "poetry==1.1.11"
 
 # Copy only requirements to cache them in docker layer
