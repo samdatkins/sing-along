@@ -16,7 +16,7 @@ services:
       retries: 5
   web:
     build: .
-    command: poetry run python manage.py runserver 0.0.0.0:8000
+    command: sh -c "./docker-entrypoint.sh"
     volumes:
       - .:/code
     ports:

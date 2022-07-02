@@ -8,7 +8,7 @@ RUN pip install "poetry==1.1.13"
 
 # Copy only requirements to cache them in docker layer
 WORKDIR /code
-COPY poetry.lock pyproject.toml /code/
+COPY poetry.lock pyproject.toml docker-entrypoint.sh /code/
 
 # Project initialization:
 RUN poetry config virtualenvs.create false \
