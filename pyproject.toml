@@ -9,8 +9,11 @@ python = "^3.9"
 Django = "^3.2.9"
 psycopg2-binary = "^2.9.2"
 channels = "^3.0.4"
+waitress = "^2.1.2"
+debugpy = "^1.6.0"
 
 [tool.poetry.dev-dependencies]
+black = "^22.6.0"
 
 [build-system]
 requires = ["poetry-core=1.1.11"]

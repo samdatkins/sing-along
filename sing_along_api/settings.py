@@ -15,6 +15,16 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# insert these lines after the definition of BASE_DIR
+BACKEND_DIR = BASE_DIR  # rename variable for clarity
+FRONTEND_DIR = BASE_DIR / "frontend"
+
+# modify the definition of DEBUG and ALLOWED_HOSTS
+import os
+
+DEBUG = os.environ.get("DJANGO_ENV") == "development"
+ALLOWED_HOSTS = ["localhost"]
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -55,7 +65,7 @@ ROOT_URLCONF = "sing_along_api.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [FRONTEND_DIR / "build"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
