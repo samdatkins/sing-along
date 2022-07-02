@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
-FROM python:3
+FROM python:3.10-buster
 ENV PYTHONUNBUFFERED=1
 
 # System deps:
 RUN apt-get update && apt-get install -y gcc musl-dev python3-dev libffi-dev cargo rustc
-RUN pip install "poetry==1.1.11"
+RUN pip install "poetry==1.1.13"
 
 # Copy only requirements to cache them in docker layer
 WORKDIR /code

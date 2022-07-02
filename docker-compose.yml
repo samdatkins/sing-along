@@ -2,13 +2,18 @@ version: "3.9"
 
 services:
   db:
-    image: postgres
+    image: postgres:13-alpine
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   web:
     build: .
     command: poetry run python manage.py runserver 0.0.0.0:8000
