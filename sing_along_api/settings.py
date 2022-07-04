@@ -46,12 +46,17 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
     "channels",
 ]
 
+if not DEBUG:
+    INSTALLED_APPS.append(
+        "django.contrib.staticfiles",
+    )
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -132,7 +137,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = "/static/"
+if not DEBUG:
+    STATICFILES_DIRS = [FRONTEND_DIR / "build" / "static"]
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    STATIC_ROOT = BACKEND_DIR / "static"
+    STATIC_URL = "/static/"  # already declared in the default settings
+    WHITENOISE_ROOT = FRONTEND_DIR / "build" / "root"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

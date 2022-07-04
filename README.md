@@ -31,3 +31,8 @@ https://profy.dev/article/react-tech-stack#1-most-popular-react-libraries
 ## App design
 
 Standard web server w/ db, when songs are requested search the db to see if they already exist. If they don’t exist, fire off a request to the async server which can go out and locate the song, then hit a webhook on the web server with the result
+
+# References
+
+- [Docker tutorial for python](https://docs.docker.com/samples/django/)
+- [Building a hybrid python/react app](https://fractalideas.com/blog/making-react-and-django-play-well-together-hybrid-app-model/)
