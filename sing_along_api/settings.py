@@ -32,9 +32,6 @@ ALLOWED_HOSTS = ["localhost"]
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-p@)42jg)9u6-yr)id+kv5j5kdmmxu+&u8((y_4=&hg4g_ebe9j"
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -46,13 +43,8 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "channels",
+    "django.contrib.staticfiles",
 ]
-
-if not DEBUG:
-    INSTALLED_APPS.append(
-        "django.contrib.staticfiles",
-    )
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -92,9 +84,9 @@ WSGI_APPLICATION = "sing_along_api.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
+        "NAME": os.environ.get("POSTGRES_NAME"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": "db",
         "PORT": 5432,
     }
@@ -137,12 +129,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-if not DEBUG:
-    STATICFILES_DIRS = [FRONTEND_DIR / "build" / "static"]
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    STATIC_ROOT = BACKEND_DIR / "static"
-    STATIC_URL = "/static/"  # already declared in the default settings
-    WHITENOISE_ROOT = FRONTEND_DIR / "build" / "root"
+STATICFILES_DIRS = [FRONTEND_DIR / "build" / "static"]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATIC_ROOT = BACKEND_DIR / "static"
+STATIC_URL = "/static/"  # already declared in the default settings
+WHITENOISE_ROOT = FRONTEND_DIR / "build" / "root"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

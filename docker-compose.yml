@@ -19,8 +19,12 @@ services:
     command: sh -c "./docker-entrypoint.sh"
     volumes:
       - .:/code
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
-      - "8000:8000"
+      - "8080:8080"
       - "5678:5678"
     depends_on:
       - db

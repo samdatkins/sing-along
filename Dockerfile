@@ -1,5 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM python:3.10-buster
+ARG YOUR_ENV
+
+ENV YOUR_ENV=${YOUR_ENV}
 ENV PYTHONUNBUFFERED=1
 
 # System deps:
@@ -8,7 +11,7 @@ RUN pip install "poetry==1.1.13"
 
 # Copy only requirements to cache them in docker layer
 WORKDIR /code
-COPY poetry.lock pyproject.toml docker-entrypoint.sh /code/
+COPY poetry.lock pyproject.toml docker-entrypoint.sh docker-entrypoint.dev.sh docker-entrypoint.prod.sh /code/
 
 # Project initialization:
 RUN poetry config virtualenvs.create false \

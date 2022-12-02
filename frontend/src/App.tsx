@@ -1,29 +1,15 @@
-import React, { useEffect, useState } from "react";
-import logo from "./logo.svg";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import "./App.css";
-
-const chatSocket = new WebSocket("ws://localhost:8000/ws/test/");
 
 function App() {
   const [song, setSong] = useState<string>();
   useEffect(() => {
-    chatSocket.onopen = () => {
-      console.log("WebSocket Client Connected");
-      chatSocket.send(JSON.stringify({ type: "getSong" }));
-    };
-
-    chatSocket.onmessage = (message) => {
-      const jsonData = JSON.parse(message.data);
-      if (jsonData.song !== undefined) {
-        setSong(jsonData.song);
-      } else {
-        console.error("no song found!");
-      }
-    };
-
-    return function cleanup() {
-      chatSocket.close();
-    };
+    async function getTest() {
+      const test = await axios.get("/api/test");
+      setSong(test.data.msg);
+    }
+    getTest();
   }, []);
   return (
     <div className="App">
