@@ -6,7 +6,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sing_along_api.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sing_along.settings")
 
     from django.conf import settings
 
