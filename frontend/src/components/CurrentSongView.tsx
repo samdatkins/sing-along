@@ -12,20 +12,18 @@ import {
   Link,
   Skeleton,
   SkeletonText,
-  Spinner,
   Text,
   useColorMode,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { Song } from "../models/song";
 import { useAsync } from "react-async-hook";
+import { Song } from "../models/song";
 
 function CurrentSongView() {
   const { colorMode, toggleColorMode } = useColorMode();
   const asyncSong = useAsync(
     async () => await axios.get<Song>("/live/sams-test/current"),
-    []
+    [],
   );
   const splitTab =
     !asyncSong.loading &&
