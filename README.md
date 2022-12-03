@@ -5,7 +5,8 @@
 - Backend
   - Install [Docker Desktop](https://www.docker.com/products/docker-desktop)
   - Install poetry
-    - `pip3 install "poetry==1.1.13"`
+    - `curl -sSL https://install.python-poetry.org | python3 -`
+    - The command will tell you to run a command that looks something like this `export PATH="/Users/{your username}/.local/bin:$PATH"`, so do that.
   - Run `docker-compose up`
 - Frontend
   - Install NPM
@@ -37,6 +38,7 @@ Use SSE to push data to clients to keep them up to date. SSE loop can check memc
 ## User Stories
 
 ### Data/Events on sing-along page
+
 - Data
   - Song contents
   - Timer
