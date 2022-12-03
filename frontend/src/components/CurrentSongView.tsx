@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Song } from "../models/song";
+import {
+  ArrowBackIcon,
+  ArrowForwardIcon,
+  MoonIcon,
+  SunIcon,
+} from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -9,10 +12,14 @@ import {
   Link,
   Spinner,
   Text,
+  useColorMode,
 } from "@chakra-ui/react";
-import { ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Song } from "../models/song";
 
 function CurrentSongView() {
+  const { colorMode, toggleColorMode } = useColorMode();
   const [currentSong, setCurrentSong] = useState<Song>();
   const splitTab =
     currentSong &&
@@ -37,16 +44,25 @@ function CurrentSongView() {
       ) : (
         <Flex padding="1rem" flexDir="column">
           <Flex flexDir="row" w="100%" justifyContent="space-between">
-            <Button colorScheme="blue">
+            <Button colorScheme="blue" onClick={() => alert("PREV")}>
               <ArrowBackIcon />
             </Button>
-            <Heading as="h2" display="inline-block" fontSize="2xl">
-              <Link href={currentSong.tabUrl}>
-                "{currentSong.title}" by {currentSong.artist}
-              </Link>{" "}
-              ({currentSong.current} of {currentSong.total})
-            </Heading>
-            <Button colorScheme="blue">
+            <span>
+              <Heading as="h2" display="inline-block" fontSize="2xl">
+                <Link href={currentSong.tabUrl}>
+                  "{currentSong.title}" by {currentSong.artist}
+                </Link>{" "}
+                ({currentSong.current} of {currentSong.total})
+              </Heading>
+              <Button
+                marginLeft="1rem"
+                colorScheme="blue"
+                onClick={toggleColorMode}
+              >
+                {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+              </Button>
+            </span>
+            <Button colorScheme="blue" onClick={() => alert("NEXT")}>
               <ArrowForwardIcon />
             </Button>
           </Flex>
@@ -56,7 +72,7 @@ function CurrentSongView() {
               {splitTab?.map((tabLine) => {
                 if (tabLine.includes("[ch]")) {
                   return (
-                    <Text color="blue">
+                    <Text color="cyan.500">
                       {tabLine.replaceAll("[ch]", "").replaceAll("[/ch]", "")}
                     </Text>
                   );
