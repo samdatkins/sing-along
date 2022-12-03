@@ -10,6 +10,8 @@ import {
   Flex,
   Heading,
   Link,
+  Skeleton,
+  SkeletonText,
   Spinner,
   Text,
   useColorMode,
@@ -17,56 +19,69 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Song } from "../models/song";
+import { useAsync } from "react-async-hook";
 
 function CurrentSongView() {
   const { colorMode, toggleColorMode } = useColorMode();
-  const [currentSong, setCurrentSong] = useState<Song>();
+  const asyncSong = useAsync(
+    async () => await axios.get<Song>("/live/sams-test/current"),
+    []
+  );
   const splitTab =
-    currentSong &&
-    currentSong.tab
+    !asyncSong.loading &&
+    !asyncSong.error &&
+    asyncSong.result?.data?.tab
       .replaceAll("[tab]", "")
       .replaceAll("[/tab]", "")
       .split("\n");
-
-  useEffect(() => {
-    async function getCurrentSong() {
-      const curSong = await axios.get<Song>("/live/sams-test/current");
-      setCurrentSong(curSong.data);
-    }
-
-    getCurrentSong();
-  }, []);
+  const currentSong =
+    !asyncSong.loading && !asyncSong.error && asyncSong.result?.data;
 
   return (
     <>
-      {!currentSong ? (
-        <Spinner />
-      ) : (
-        <Flex padding="1rem" flexDir="column">
-          <Flex flexDir="row" w="100%" justifyContent="space-between">
-            <Button colorScheme="blue" onClick={() => alert("PREV")}>
-              <ArrowBackIcon />
-            </Button>
-            <span>
-              <Heading as="h2" display="inline-block" fontSize="2xl">
-                <Link href={currentSong.tabUrl}>
-                  "{currentSong.title}" by {currentSong.artist}
-                </Link>{" "}
-                ({currentSong.current} of {currentSong.total})
-              </Heading>
-              <Button
-                marginLeft="1rem"
-                colorScheme="blue"
-                onClick={toggleColorMode}
-              >
-                {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-              </Button>
-            </span>
-            <Button colorScheme="blue" onClick={() => alert("NEXT")}>
-              <ArrowForwardIcon />
+      <Flex padding="1rem" flexDir="column">
+        <Flex flexDir="row" w="100%" justifyContent="space-between">
+          <Button colorScheme="blue" onClick={() => alert("PREV")}>
+            <ArrowBackIcon />
+          </Button>
+          <Flex minWidth="24rem">
+            <Skeleton isLoaded={!asyncSong.loading} flex="1" height="2rem" />
+            <Heading as="h2" display="inline-block" fontSize="2xl">
+              {currentSong && (
+                <>
+                  <Link href={currentSong?.tabUrl}>
+                    "{currentSong.title}" by {currentSong.artist}
+                  </Link>{" "}
+                  ({currentSong.current} of {currentSong.total})
+                </>
+              )}
+            </Heading>
+            <Button
+              marginLeft="1rem"
+              colorScheme="blue"
+              onClick={toggleColorMode}
+              data-testid="darkMode"
+            >
+              {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
             </Button>
           </Flex>
-          <Box mt="1rem" p="1rem" style={{ columnCount: 2, columnGap: "1rem" }}>
+          <Button colorScheme="blue" onClick={() => alert("NEXT")}>
+            <ArrowForwardIcon />
+          </Button>
+        </Flex>
+        <Box
+          mt="1rem"
+          p="1rem"
+          style={{ columnCount: 2, columnGap: "1rem" }}
+          width="100%"
+          height="100%"
+        >
+          <SkeletonText
+            noOfLines={80}
+            isLoaded={!asyncSong.loading}
+            spacing="4"
+          />
+          {splitTab && (
             <pre style={{ fontSize: "1.25rem", fontFamily: "Ubuntu Mono" }}>
               Tab:{" "}
               {splitTab?.map((tabLine) => {
@@ -81,9 +96,9 @@ function CurrentSongView() {
                 }
               })}
             </pre>
-          </Box>
-        </Flex>
-      )}
+          )}
+        </Box>
+      </Flex>
     </>
   );
 }
