@@ -14,6 +14,13 @@
   - Install Yarn
     - `npm install --global yarn`
 
+## Loading seed data
+
+- Connect to the web docker instance
+  - From the root of the project: `docker-compose run web bash`
+- Load the seed data into the database
+  - `python manage.py loaddata api/seed/0001_initial.json`
+
 ## Stack Brainstorming
 
 - Web server
