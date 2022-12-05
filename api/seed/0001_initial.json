@@ -1,0 +1,58 @@
+[
+{
+    "model": "api.songbook",
+    "pk": 1,
+    "fields": {
+        "deleted": null,
+        "deleted_by_cascade": false,
+        "session_key": "sams-test",
+        "current_song_timestamp": "2022-12-05T00:22:20Z",
+        "max_active_songs": 60,
+        "title": "Sam's test hour",
+        "last_nav_action_taken_at": "2022-12-05T00:24:09Z",
+        "is_noodle_mode": false
+    }
+},
+{
+    "model": "api.song",
+    "pk": 1,
+    "fields": {
+        "deleted": null,
+        "deleted_by_cascade": false,
+        "artist": "Weezer",
+        "title": "Say It Aint So",
+        "url": "https://tabs.ultimate-guitar.com/tab/weezer/say-it-aint-so-chords-1006422",
+        "content": "[Intro]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x2\r\n\r\n[ch]Am[/ch]       [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]\r\nOh yeah.\r\n[ch]Am[/ch]       [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]\r\nAll right.\r\n\r\n\r\n[Verse 1]\r\n\r\n[ch]Am[/ch]         [ch]E[/ch]         [ch]F[/ch]           [ch]C[/ch]\r\nSomebody's Heine' is crowdin' my icebox\r\n[ch]Am[/ch]         [ch]E[/ch]           [ch]F[/ch]         [ch]C[/ch]\r\nSomebody's cold one is givin' me chills\r\n[ch]Am[/ch]              [ch]E[/ch]        [ch]F[/ch]    [ch]C[/ch]\r\nGuess I'll just close my eyes\r\n\r\n\r\n[Interlude]\r\n\r\n   [ch]Am[/ch]   [ch]E[/ch]    [ch]F[/ch]     [ch]C[/ch]\r\nOh yeah,   alright\r\n      [ch]Am[/ch]   [ch]E[/ch]    [ch]F[/ch]   [ch]C[/ch]\r\nFeels good,  inside\r\n\r\n\r\n[Verse 2]\r\n\r\n[ch]Am[/ch]          [ch]E[/ch]      [ch]F[/ch]            [ch]C[/ch]\r\nFlip on the tele', wrestle with Jimmy\r\n[ch]Am[/ch]           [ch]E[/ch]        [ch]F[/ch]         [ch]C[/ch]\r\nSomething is bubbling behind my back\r\n    [ch]Am[/ch]        [ch]E[/ch]        [ch]F[/ch]     [ch]C[/ch]\r\nThe bottle is ready to blow\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]         [ch]F[/ch]        [ch]C[/ch]\r\n   Your drug is a heartbreaker\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]       [ch]F[/ch]      [ch]C[/ch]\r\n   My love is a lifetaker\r\n\r\n\r\n[Interlude]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x2\r\n\r\n\r\n[Verse 3]\r\n\r\n[ch]Am[/ch]         [ch]E[/ch]          [ch]F[/ch]       [ch]C[/ch]\r\nI can't confront you, I never could do\r\n[ch]Am[/ch]               [ch]E[/ch]            [ch]F[/ch]          [ch]C[/ch]\r\nThat which might hurt you, so try and be cool\r\n          [ch]Am[/ch]      [ch]E[/ch]        [ch]F[/ch]                            [ch]C[/ch]\r\nWhen I say - This way is a waterslide away from me that takes you further every\r\n[ch]Am[/ch]   [ch]E[/ch]           [ch]F[/ch]     [ch]C[/ch]\r\nday (hey), so be cool\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]         [ch]F[/ch]        [ch]C[/ch]\r\n   Your drug is a heartbreaker\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]       [ch]F[/ch]      [ch]C[/ch]\r\n   My love is a lifetaker\r\n\r\n\r\n[Bridge]\r\n\r\n[ch]G[/ch]            [ch]G/F#[/ch]           [ch]C[/ch]            [ch]Eb[/ch]\r\n   Dear Daddy,   I write you in spite of years of silence.\r\n[ch]G[/ch]                    [ch]G/F#[/ch]           [ch]C[/ch]                [ch]Eb[/ch]\r\n   You've cleaned up,   found Jesus, things are good or so I hear.\r\n[ch]G[/ch]             [ch]G/F#[/ch]           [ch]C[/ch]         [ch]Eb[/ch]\r\n   This bottle   of Steven's   awakens ancient feelings.\r\n[ch]G[/ch]              [ch]G/F#[/ch]          [ch]C[/ch]             [ch]Eb[/ch]              [ch]Am[/ch]   [ch]E[/ch]\r\n   Like father,   stepfather,   the son is drowning in the floooooood\r\n[ch]F[/ch]                  [ch]C[/ch]\r\n   Yeah, yeah yeah, yeah yeah.\r\n\r\n\r\n[Solo]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x3\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]         [ch]F[/ch]        [ch]C[/ch]\r\n   Your drug is a heartbreaker\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]       [ch]F[/ch]      [ch]C[/ch]\r\n   My love is a lifetaker\r\n\r\n\r\n[Outro]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x2"
+    }
+},
+{
+    "model": "api.song",
+    "pk": 2,
+    "fields": {
+        "deleted": null,
+        "deleted_by_cascade": false,
+        "artist": "Weezer",
+        "title": "Hash Pipe",
+        "url": "https://tabs.ultimate-guitar.com/tab/weezer/hash-pipe-chords-1009559",
+        "content": "Hash Pipe- Weezer\r\n\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch] (Single notes)\r\nI can’t help my feelings\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI’ll go out of my mind\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nThese players come to get me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\n’Cause they’d like my behind\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI can’t love my business\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nIf I can’t get a trick\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nDown on Santa Monica\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nWhere tricks are for kicks\r\n\r\n[ch]D[/ch] (5 Times)\r\nOh, come on and kick me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]  (4 times)                       \r\n[ch]D[/ch]                      [ch]F[/ch]\r\nOh, come on and kick me\r\n                         [ch]E[/ch]\r\n(Oh.) Come on and kick me\r\n                              [ch]D[/ch]                     \r\n(Oh.) You’ve got your problems\r\n                          [ch]C[/ch]        \r\n(Oh.) I’ve got my ass wipe\r\n                       [ch]B[/ch]\r\nYou got your big cheese\r\n(No chord)\r\nI got my hash pipe\r\n\r\n[ch]A[/ch]/ [ch]B[/ch]  [ch]C[/ch] (6 times)\r\n\r\n[ch]A[/ch]/ [ch]B[/ch]  [ch]C[/ch] (same for each line)\r\nI can’t help my boogies\r\nThey get out of control\r\nI know that you don’t care\r\nBut I want you to know\r\nThe knee-stocking flavor\r\nIs a favorite treat\r\nOf men that don’t bother\r\nWith the taste of a teat\r\n\r\n[ch]D[/ch] (5 Times)\r\nOh, come on and kick me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]  (4 times)                       \r\n[ch]D[/ch]                      [ch]F[/ch]\r\nOh, come on and kick me\r\n                         [ch]E[/ch]\r\n(Oh.) Come on and kick me\r\n                              [ch]D[/ch]                     \r\n(Oh.) You’ve got your problems\r\n                          [ch]C[/ch]        \r\n(Oh.) I’ve got my ass wipe\r\n                       [ch]B[/ch]\r\nYou got your big cheese\r\n(No chord)          [ch]G[/ch]\r\nI got my hash pipe\r\n[ch]B[/ch]-[ch]C[/ch] (Single notes on [ch]G[/ch] string)\r\nI’ve got my hash pipe\r\n\r\nSolo\r\n\r\n[ch]D[/ch] (5 Times)\r\nOh, come on and kick me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]  (4 times)                       \r\n[ch]D[/ch]                      [ch]F[/ch]\r\nOh, come on and kick me\r\n                         [ch]E[/ch]\r\n(Oh.) Come on and kick me\r\n                              [ch]D[/ch]                     \r\n(Oh.) You’ve got your problems\r\n                          [ch]C[/ch]        \r\n(Oh.) I’ve got my ass wipe\r\n                       [ch]B[/ch]\r\nYou got your big cheese\r\n(No chord)         [ch]G[/ch]\r\nI got my hash pipe\r\n[ch]B[/ch]-[ch]C[/ch] (Single notes on [ch]G[/ch] string)\r\nI got my hash pipe\r\n\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch] (6 times)                       \r\n\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI’ve got my hash pipe\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI've got my hash pipe\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI've got my hash pipe\r\nChorded by Kenny Perry, not sure if all the lyrics are correct, hard to tell what \r\nhe's saying. Play along with the song you'll get it."
+    }
+},
+{
+    "model": "api.songentry",
+    "pk": 1,
+    "fields": {
+        "songbook": 1,
+        "song": 1,
+        "play_time": null
+    }
+},
+{
+    "model": "api.songentry",
+    "pk": 2,
+    "fields": {
+        "songbook": 1,
+        "song": 2,
+        "play_time": null
+    }
+}
+]
