@@ -18,6 +18,7 @@ import {
 import axios from "axios";
 import { useAsync } from "react-async-hook";
 import { Song } from "../models/song";
+import Timer from "./Timer";
 
 function CurrentSongView() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -42,6 +43,9 @@ function CurrentSongView() {
           <Button colorScheme="blue" onClick={() => alert("PREV")}>
             <ArrowBackIcon />
           </Button>
+          <Flex>
+            <Timer />
+          </Flex>
           <Flex minWidth="24rem">
             <Skeleton isLoaded={!asyncSong.loading} flex="1" height="2rem" />
             <Heading as="h2" display="inline-block" fontSize="2xl">
