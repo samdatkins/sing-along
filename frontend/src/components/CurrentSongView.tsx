@@ -22,13 +22,13 @@ import { Song } from "../models/song";
 function CurrentSongView() {
   const { colorMode, toggleColorMode } = useColorMode();
   const asyncSong = useAsync(
-    async () => await axios.get<Song>("/live/sams-test/current"),
-    [],
+    async () => await axios.get<Song>("/api/songs/1"),
+    []
   );
   const splitTab =
     !asyncSong.loading &&
     !asyncSong.error &&
-    asyncSong.result?.data?.tab
+    asyncSong.result?.data?.content
       .replaceAll("[tab]", "")
       .replaceAll("[/tab]", "")
       .split("\n");
@@ -47,10 +47,10 @@ function CurrentSongView() {
             <Heading as="h2" display="inline-block" fontSize="2xl">
               {currentSong && (
                 <>
-                  <Link href={currentSong?.tabUrl}>
+                  <Link href={currentSong?.content}>
                     "{currentSong.title}" by {currentSong.artist}
                   </Link>{" "}
-                  ({currentSong.current} of {currentSong.total})
+                  {/* ({currentSong.current} of {currentSong.total}) */}
                 </>
               )}
             </Heading>
