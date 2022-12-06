@@ -6,8 +6,7 @@
   - Install [Docker Desktop](https://www.docker.com/products/docker-desktop)
   - Install poetry
     - `curl -sSL https://install.python-poetry.org | python3 -`
-    - The command will tell you to run a command that looks something like this `export PATH="/Users/{your username}/.local/bin:$PATH"`, so do that.
-  - Run `docker-compose up`
+    - The command will tell you to run a command that looks something like this: `export PATH="/Users/{your username}/.local/bin:$PATH"`, so add that to the end of your `~/.zshrc` file and re-open your terminal
 - Frontend
   - Install NPM
     - `brew install node`
@@ -20,6 +19,17 @@
   - From the root of the project: `docker-compose run web bash`
 - Load the seed data into the database
   - `python manage.py loaddata api/seed/0001_initial.json`
+
+## Running the project
+
+- Backend
+  - Run `docker-compose up` from the root of the project
+  - To access the backend api, go to `localhost:8080/api` in a browser
+  - To access the Django Admin, go to `localhost:8080/admin` in a browser
+- Frontend
+  - Go to the `frontend` folder in a terminal
+  - Run `yarn install && yarn start`
+  - To view the web application, go to `localhost:3000` in a browser
 
 ## Stack Brainstorming
 
