@@ -1,8 +1,6 @@
 export type Song = {
   artist: string;
-  current: number;
-  tab: string;
-  tabUrl: string;
+  content: string;
+  url: string;
   title: string;
-  total: number;
 };

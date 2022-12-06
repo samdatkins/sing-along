@@ -1,7 +1,10 @@
 from django.urls import path, re_path
+from rest_framework import routers
 
-from . import views
+from api.views.song import SongViewSet
 
-urlpatterns = [
-    re_path(r"", views.test_view),
-]
+router = routers.DefaultRouter()
+
+router.register(r"songs", SongViewSet)
+
+urlpatterns = router.urls
