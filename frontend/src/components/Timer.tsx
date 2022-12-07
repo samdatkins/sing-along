@@ -1,44 +1,58 @@
 import Countdown from "react-countdown";
-import { Text, Box, keyframes } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Text, keyframes } from "@chakra-ui/react";
+import { useState } from "react";
 
-export default function Timer() {
-  const [styles, setStyles] = useState({ color: "#FAEBD7", fontSize: "6xl" });
+interface TimerThings {
+  startTime: number;
+  startDrink: () => void;
+}
+
+export default function Timer({ startTime, startDrink }: TimerThings) {
+  // state to manage styles and animation, allows for "warning" styling on timer when nearly expired (<= 5 secs)
+  const [styles, setStyles] = useState({
+    color: "#FAEBD7",
+    animation: "",
+    fontWeight: "",
+  });
 
   const animationKeyframes = keyframes`
-  0% { transform: scale(1) rotate(0); }
-  25% { transform: scale(1.5) rotate(0); }
-  30% { transform: scale(1.5) }
-  35% { transform: scale(1.5) }
-  50% { transform: scale(1) rotate(0); }
+  0% { transform: scale(1); }
+  25% { transform: scale(1.5) }
+  50% { transform: scale(1); }
 `;
 
-  const animation = `${animationKeyframes} 1s ease-in-out infinite`;
-
   return (
-    <Box>
-      <Text
-        // as={styles.color === "tomato" ? motion.div : ""}
-        animation={styles.color === "tomato" ? animation : ""}
-        bgClip="text"
-        fontSize={styles.fontSize}
-        fontWeight="extrabold"
-        color={styles.color}
-      >
-        <Countdown
-          date={Date.now() + 60000}
-          intervalDelay={0}
-          renderer={(props) => (
-            <div>{props.total > 0 ? props.total / 1000 : ""}</div>
-          )}
-          onTick={(props) => {
-            if (props.total / 1000 === 5) {
-              setStyles({ color: "tomato", fontSize: "8xl" });
-            }
-          }}
-          onComplete={() => window.location.reload()}
-        />
-      </Text>
-    </Box>
+    <Text
+      vertical-align="top"
+      animation={styles.animation}
+      bgClip="text"
+      fontSize="2.5em"
+      fontWeight={styles.fontWeight}
+      color={styles.color}
+    >
+      <Countdown
+        text-align="top"
+        date={startTime}
+        intervalDelay={0}
+        // displays the whole second time until expiration
+        renderer={(props) => (
+          <div>{props.total > 0 ? props.total / 1000 : ""}</div>
+        )}
+        // triggers the change in styling
+        onTick={(props) => {
+          const remainingSeconds = props.total / 1000;
+          if (remainingSeconds === 5) {
+            setStyles({
+              color: "tomato",
+              // time is calibrated to emulate the hearbeat effect
+              animation: `${animationKeyframes} .95s ease-in-out infinite`,
+              fontWeight: "extrabold",
+            });
+          }
+        }}
+        // when expired, we run the startDrink function, passed in as a prop
+        onComplete={startDrink}
+      />
+    </Text>
   );
 }
