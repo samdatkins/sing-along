@@ -7,6 +7,7 @@
   - Install poetry
     - `curl -sSL https://install.python-poetry.org | python3 -`
     - The command will tell you to run a command that looks something like this: `export PATH="/Users/{your username}/.local/bin:$PATH"`, so add that to the end of your `~/.zshrc` file and re-open your terminal
+  - run `poetry config virtualenvs.in-project true`
 - Frontend
   - Install NPM
     - `brew install node`
@@ -23,7 +24,8 @@
 ## Running the project
 
 - Backend
-  - Run `docker-compose up` from the root of the project
+  - Run `poetry install` from the root of the project
+  - Run `docker-compose up --build` from the root of the project
   - To access the backend api, go to `localhost:8080/api` in a browser
   - To access the Django Admin, go to `localhost:8080/admin` in a browser
 - Frontend
