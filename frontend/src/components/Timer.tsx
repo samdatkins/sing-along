@@ -4,10 +4,10 @@ import { useState } from "react";
 
 interface TimerThings {
   startTime: number;
-  startDrink: () => void;
+  startAction: () => void;
 }
 
-export default function Timer({ startTime, startDrink }: TimerThings) {
+export default function Timer({ startTime, startAction }: TimerThings) {
   // state to manage styles and animation, allows for "warning" styling on timer when nearly expired (<= 5 secs)
   const [styles, setStyles] = useState({
     color: "#FAEBD7",
@@ -45,13 +45,13 @@ export default function Timer({ startTime, startDrink }: TimerThings) {
             setStyles({
               color: "tomato",
               // time is calibrated to emulate the hearbeat effect
-              animation: `${animationKeyframes} .95s ease-in-out infinite`,
+              animation: `${animationKeyframes} 1s ease-in-out infinite`,
               fontWeight: "extrabold",
             });
           }
         }}
-        // when expired, we run the startDrink function, passed in as a prop
-        onComplete={startDrink}
+        // when expired, we run the startDoAction function, passed in as a prop
+        onComplete={startAction}
       />
     </Text>
   );

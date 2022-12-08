@@ -20,15 +20,17 @@ import axios from "axios";
 import { useState } from "react";
 import { useAsync } from "react-async-hook";
 import { Song } from "../models/song";
-import Drink from "./Drink";
+import Action from "./Action";
 import Timer from "./Timer";
 
 function CurrentSongView() {
   const { colorMode, toggleColorMode } = useColorMode();
-  // state for showing Drink component
-  const [drink, setDrink] = useState(false);
+  // state for showing Action component
+  const [doAction, setDoAction] = useState(false);
+  // global action variable
+  const globalActionSetting = "DANCE";
   // length of time for each song
-  const songIntervalLength = Date.now() + 60000;
+  const songIntervalLength = Date.now() + 6000;
   const asyncSong = useAsync(
     async () => await axios.get<Song>("/api/songs/1"),
     []
@@ -78,12 +80,12 @@ function CurrentSongView() {
           <Flex w="15%" justifyContent="space-between">
             <Flex>
               {/* Only show timer if running, hide when expired */}
-              {!drink && (
+              {!doAction && (
                 <Timer
                   startTime={songIntervalLength}
                   // this function will be where we set off the song transition when that is ready, a redirect instead of reload
-                  startDrink={() => {
-                    setDrink(true);
+                  startAction={() => {
+                    setDoAction(true);
                     setInterval(() => {
                       window.location.reload();
                     }, 1500);
@@ -96,11 +98,11 @@ function CurrentSongView() {
             </Button>
           </Flex>
         </Flex>
-        {/* hide lyrics when time to drink */}
-        {drink ? (
+        {/* hide lyrics when time to do action */}
+        {doAction ? (
           <Flex width="100%" height="100%" justify="center" marginTop="25%">
             <Center>
-              <Drink />
+              <Action actionText={globalActionSetting} />
             </Center>
           </Flex>
         ) : (

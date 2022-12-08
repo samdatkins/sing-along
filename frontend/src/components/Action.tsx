@@ -1,6 +1,10 @@
 import { Text, keyframes } from "@chakra-ui/react";
 
-export default function Drink() {
+interface ActionThings {
+  actionText: string;
+}
+
+export default function Action({ actionText }: ActionThings) {
   const animationKeyframes = keyframes`
   from { transform: scale(1) }
   to { transform: scale(3) rotate(360deg) }
@@ -14,7 +18,7 @@ export default function Drink() {
       fontWeight="extrabold"
       color="periwinkle"
     >
-      DRINK!
+      {actionText}!
     </Text>
   );
 }
