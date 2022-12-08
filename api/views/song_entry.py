@@ -6,7 +6,7 @@ from api.serializers.song_entry import SongEntrySerializer
 
 class SongEntryViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows all standard interactions with SongEntrys.
+    API endpoint that allows all standard interactions with SongEntries.
     """
 
     queryset = SongEntry.objects.all()
