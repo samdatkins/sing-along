@@ -2,12 +2,12 @@ import Countdown from "react-countdown";
 import { Text, keyframes } from "@chakra-ui/react";
 import { useState } from "react";
 
-interface TimerThings {
+interface TimerProps {
   startTime: number;
-  startAction: () => void;
+  startActionPrompt: () => void;
 }
 
-export default function Timer({ startTime, startAction }: TimerThings) {
+export default function Timer({ startTime, startActionPrompt }: TimerProps) {
   // state to manage styles and animation, allows for "warning" styling on timer when nearly expired (<= 5 secs)
   const [styles, setStyles] = useState({
     color: "#FAEBD7",
@@ -51,7 +51,7 @@ export default function Timer({ startTime, startAction }: TimerThings) {
           }
         }}
         // when expired, we run the startDoAction function, passed in as a prop
-        onComplete={startAction}
+        onComplete={startActionPrompt}
       />
     </Text>
   );

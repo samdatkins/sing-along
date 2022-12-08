@@ -1,10 +1,10 @@
 import { Text, keyframes } from "@chakra-ui/react";
 
-interface ActionThings {
-  actionText: string;
+interface ActionPromptProps {
+  actionPromptText: string;
 }
 
-export default function Action({ actionText }: ActionThings) {
+export default function Action({ actionPromptText }: ActionPromptProps) {
   const animationKeyframes = keyframes`
   from { transform: scale(1) }
   to { transform: scale(3) rotate(360deg) }
@@ -18,7 +18,7 @@ export default function Action({ actionText }: ActionThings) {
       fontWeight="extrabold"
       color="periwinkle"
     >
-      {actionText}!
+      {actionPromptText}!
     </Text>
   );
 }
