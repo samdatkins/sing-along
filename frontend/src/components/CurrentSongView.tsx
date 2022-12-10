@@ -46,7 +46,7 @@ function CurrentSongView() {
       .split("\n");
   const currentSong =
     !asyncSong.loading && !asyncSong.error && asyncSong.result?.data;
-
+  const addSongUrl = window.location.origin + "/addSong";
   return (
     <>
       <Flex padding="1rem" flexDir="column">
@@ -57,8 +57,8 @@ function CurrentSongView() {
             </Button>
           </Flex>
           <div style={{ background: "white", padding: "16px" }}>
-            <a href={window.location.origin + "/addSong"} target="_blank">
-              <QRCode size={56} value={window.location.origin + "/addSong"} />
+            <a href={addSongUrl} target="_blank" rel="noreferrer">
+              <QRCode size={56} value={addSongUrl} />
             </a>
           </div>
           <Flex>
