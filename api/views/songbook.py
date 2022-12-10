@@ -36,7 +36,7 @@ class SongbookViewSet(viewsets.ModelViewSet):
         url_path="previous-song",
         url_name="previous-song",
     )
-    def prev_song(self, request, session_key=None):
+    def previous_song(self, request, session_key=None):
         instance = self.get_object()
         previous_song_entry = instance.get_previous_song_entry()
         if previous_song_entry is None:
