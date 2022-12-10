@@ -20,6 +20,8 @@ import axios from "axios";
 import { useState } from "react";
 import { useAsync } from "react-async-hook";
 import { Song } from "../models/song";
+
+import QRCode from "react-qr-code";
 import ActionPrompt from "./ActionPrompt";
 import Timer from "./Timer";
 
@@ -33,7 +35,7 @@ function CurrentSongView() {
   const songIntervalLength = Date.now() + 60000;
   const asyncSong = useAsync(
     async () => await axios.get<Song>("/api/songs/1"),
-    []
+    [],
   );
   const splitTab =
     !asyncSong.loading &&
@@ -54,6 +56,11 @@ function CurrentSongView() {
               <ArrowBackIcon />
             </Button>
           </Flex>
+          <div style={{ background: "white", padding: "16px" }}>
+            <a href={window.location.origin + "/addSong"} target="_blank">
+              <QRCode size={56} value={window.location.origin + "/addSong"} />
+            </a>
+          </div>
           <Flex>
             <Flex minWidth="24rem">
               <Skeleton isLoaded={!asyncSong.loading} flex="1" height="2rem" />
