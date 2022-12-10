@@ -23,6 +23,8 @@ import { Song } from "../models/song";
 import ActionPrompt from "./ActionPrompt";
 import Timer from "./Timer";
 
+import { useCallback, useEffect } from "react";
+
 function CurrentSongView() {
   const { colorMode, toggleColorMode } = useColorMode();
   // state for showing Action component
@@ -33,7 +35,7 @@ function CurrentSongView() {
   const songIntervalLength = Date.now() + 60000;
   const asyncSong = useAsync(
     async () => await axios.get<Song>("/api/songs/1"),
-    []
+    [],
   );
   const splitTab =
     !asyncSong.loading &&
@@ -44,6 +46,33 @@ function CurrentSongView() {
       .split("\n");
   const currentSong =
     !asyncSong.loading && !asyncSong.error && asyncSong.result?.data;
+
+  // handle what happens on key press
+  const handleKeyPress = useCallback((event: any) => {
+    if (event.code === "Delete") {
+      alert(`This deletes the current song and advances to the next song.`);
+    } else if (event.code === "Space") {
+      alert(`This pauses the timer on the current song.`);
+    } else if (event.code === "ArrowLeft") {
+      alert(`This sets the previous song to be the current song.`);
+    } else if (event.code === "ArrowRight") {
+      alert(`This sets the next song to be the current song.`);
+    } else if (event.code === "KeyR") {
+      alert(`This resets the timer back to its initial count.`);
+    } else if (event.code === "KeyF") {
+      alert(`This cancels the tab view truncation AND pauses the timer.`);
+    }
+  }, []);
+
+  useEffect(() => {
+    // attach the event listener
+    document.addEventListener("keydown", handleKeyPress);
+
+    // remove the event listener
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [handleKeyPress]);
 
   return (
     <>
