@@ -1,58 +1,93 @@
 [
-{
+  {
     "model": "api.songbook",
     "pk": 1,
     "fields": {
-        "deleted": null,
-        "deleted_by_cascade": false,
-        "session_key": "sams-test",
-        "current_song_timestamp": "2022-12-05T00:22:20Z",
-        "max_active_songs": 60,
-        "title": "Sam's test hour",
-        "last_nav_action_taken_at": "2022-12-05T00:24:09Z",
-        "is_noodle_mode": false
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "session_key": "sams-test",
+      "current_song_timestamp": "2022-12-05T00:23:20Z",
+      "max_active_songs": 60,
+      "title": "Sam's test hour",
+      "last_nav_action_taken_at": "2022-12-05T00:24:09Z",
+      "is_noodle_mode": false,
+      "created_at": "2022-12-05T00:22:20Z",
+      "updated_at": "2022-12-05T00:22:20Z"
     }
-},
-{
+  },
+  {
     "model": "api.song",
     "pk": 1,
     "fields": {
-        "deleted": null,
-        "deleted_by_cascade": false,
-        "artist": "Weezer",
-        "title": "Say It Aint So",
-        "url": "https://tabs.ultimate-guitar.com/tab/weezer/say-it-aint-so-chords-1006422",
-        "content": "[Intro]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x2\r\n\r\n[ch]Am[/ch]       [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]\r\nOh yeah.\r\n[ch]Am[/ch]       [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]\r\nAll right.\r\n\r\n\r\n[Verse 1]\r\n\r\n[ch]Am[/ch]         [ch]E[/ch]         [ch]F[/ch]           [ch]C[/ch]\r\nSomebody's Heine' is crowdin' my icebox\r\n[ch]Am[/ch]         [ch]E[/ch]           [ch]F[/ch]         [ch]C[/ch]\r\nSomebody's cold one is givin' me chills\r\n[ch]Am[/ch]              [ch]E[/ch]        [ch]F[/ch]    [ch]C[/ch]\r\nGuess I'll just close my eyes\r\n\r\n\r\n[Interlude]\r\n\r\n   [ch]Am[/ch]   [ch]E[/ch]    [ch]F[/ch]     [ch]C[/ch]\r\nOh yeah,   alright\r\n      [ch]Am[/ch]   [ch]E[/ch]    [ch]F[/ch]   [ch]C[/ch]\r\nFeels good,  inside\r\n\r\n\r\n[Verse 2]\r\n\r\n[ch]Am[/ch]          [ch]E[/ch]      [ch]F[/ch]            [ch]C[/ch]\r\nFlip on the tele', wrestle with Jimmy\r\n[ch]Am[/ch]           [ch]E[/ch]        [ch]F[/ch]         [ch]C[/ch]\r\nSomething is bubbling behind my back\r\n    [ch]Am[/ch]        [ch]E[/ch]        [ch]F[/ch]     [ch]C[/ch]\r\nThe bottle is ready to blow\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]         [ch]F[/ch]        [ch]C[/ch]\r\n   Your drug is a heartbreaker\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]       [ch]F[/ch]      [ch]C[/ch]\r\n   My love is a lifetaker\r\n\r\n\r\n[Interlude]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x2\r\n\r\n\r\n[Verse 3]\r\n\r\n[ch]Am[/ch]         [ch]E[/ch]          [ch]F[/ch]       [ch]C[/ch]\r\nI can't confront you, I never could do\r\n[ch]Am[/ch]               [ch]E[/ch]            [ch]F[/ch]          [ch]C[/ch]\r\nThat which might hurt you, so try and be cool\r\n          [ch]Am[/ch]      [ch]E[/ch]        [ch]F[/ch]                            [ch]C[/ch]\r\nWhen I say - This way is a waterslide away from me that takes you further every\r\n[ch]Am[/ch]   [ch]E[/ch]           [ch]F[/ch]     [ch]C[/ch]\r\nday (hey), so be cool\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]         [ch]F[/ch]        [ch]C[/ch]\r\n   Your drug is a heartbreaker\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]       [ch]F[/ch]      [ch]C[/ch]\r\n   My love is a lifetaker\r\n\r\n\r\n[Bridge]\r\n\r\n[ch]G[/ch]            [ch]G/F#[/ch]           [ch]C[/ch]            [ch]Eb[/ch]\r\n   Dear Daddy,   I write you in spite of years of silence.\r\n[ch]G[/ch]                    [ch]G/F#[/ch]           [ch]C[/ch]                [ch]Eb[/ch]\r\n   You've cleaned up,   found Jesus, things are good or so I hear.\r\n[ch]G[/ch]             [ch]G/F#[/ch]           [ch]C[/ch]         [ch]Eb[/ch]\r\n   This bottle   of Steven's   awakens ancient feelings.\r\n[ch]G[/ch]              [ch]G/F#[/ch]          [ch]C[/ch]             [ch]Eb[/ch]              [ch]Am[/ch]   [ch]E[/ch]\r\n   Like father,   stepfather,   the son is drowning in the floooooood\r\n[ch]F[/ch]                  [ch]C[/ch]\r\n   Yeah, yeah yeah, yeah yeah.\r\n\r\n\r\n[Solo]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x3\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]         [ch]F[/ch]        [ch]C[/ch]\r\n   Your drug is a heartbreaker\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]       [ch]F[/ch]      [ch]C[/ch]\r\n   My love is a lifetaker\r\n\r\n\r\n[Outro]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x2"
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "artist": "Weezer",
+      "title": "Say It Aint So",
+      "url": "https://tabs.ultimate-guitar.com/tab/weezer/say-it-aint-so-chords-1006422",
+      "content": "[Intro]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x2\r\n\r\n[ch]Am[/ch]       [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]\r\nOh yeah.\r\n[ch]Am[/ch]       [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]\r\nAll right.\r\n\r\n\r\n[Verse 1]\r\n\r\n[ch]Am[/ch]         [ch]E[/ch]         [ch]F[/ch]           [ch]C[/ch]\r\nSomebody's Heine' is crowdin' my icebox\r\n[ch]Am[/ch]         [ch]E[/ch]           [ch]F[/ch]         [ch]C[/ch]\r\nSomebody's cold one is givin' me chills\r\n[ch]Am[/ch]              [ch]E[/ch]        [ch]F[/ch]    [ch]C[/ch]\r\nGuess I'll just close my eyes\r\n\r\n\r\n[Interlude]\r\n\r\n   [ch]Am[/ch]   [ch]E[/ch]    [ch]F[/ch]     [ch]C[/ch]\r\nOh yeah,   alright\r\n      [ch]Am[/ch]   [ch]E[/ch]    [ch]F[/ch]   [ch]C[/ch]\r\nFeels good,  inside\r\n\r\n\r\n[Verse 2]\r\n\r\n[ch]Am[/ch]          [ch]E[/ch]      [ch]F[/ch]            [ch]C[/ch]\r\nFlip on the tele', wrestle with Jimmy\r\n[ch]Am[/ch]           [ch]E[/ch]        [ch]F[/ch]         [ch]C[/ch]\r\nSomething is bubbling behind my back\r\n    [ch]Am[/ch]        [ch]E[/ch]        [ch]F[/ch]     [ch]C[/ch]\r\nThe bottle is ready to blow\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]         [ch]F[/ch]        [ch]C[/ch]\r\n   Your drug is a heartbreaker\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]       [ch]F[/ch]      [ch]C[/ch]\r\n   My love is a lifetaker\r\n\r\n\r\n[Interlude]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x2\r\n\r\n\r\n[Verse 3]\r\n\r\n[ch]Am[/ch]         [ch]E[/ch]          [ch]F[/ch]       [ch]C[/ch]\r\nI can't confront you, I never could do\r\n[ch]Am[/ch]               [ch]E[/ch]            [ch]F[/ch]          [ch]C[/ch]\r\nThat which might hurt you, so try and be cool\r\n          [ch]Am[/ch]      [ch]E[/ch]        [ch]F[/ch]                            [ch]C[/ch]\r\nWhen I say - This way is a waterslide away from me that takes you further every\r\n[ch]Am[/ch]   [ch]E[/ch]           [ch]F[/ch]     [ch]C[/ch]\r\nday (hey), so be cool\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]         [ch]F[/ch]        [ch]C[/ch]\r\n   Your drug is a heartbreaker\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]       [ch]F[/ch]      [ch]C[/ch]\r\n   My love is a lifetaker\r\n\r\n\r\n[Bridge]\r\n\r\n[ch]G[/ch]            [ch]G/F#[/ch]           [ch]C[/ch]            [ch]Eb[/ch]\r\n   Dear Daddy,   I write you in spite of years of silence.\r\n[ch]G[/ch]                    [ch]G/F#[/ch]           [ch]C[/ch]                [ch]Eb[/ch]\r\n   You've cleaned up,   found Jesus, things are good or so I hear.\r\n[ch]G[/ch]             [ch]G/F#[/ch]           [ch]C[/ch]         [ch]Eb[/ch]\r\n   This bottle   of Steven's   awakens ancient feelings.\r\n[ch]G[/ch]              [ch]G/F#[/ch]          [ch]C[/ch]             [ch]Eb[/ch]              [ch]Am[/ch]   [ch]E[/ch]\r\n   Like father,   stepfather,   the son is drowning in the floooooood\r\n[ch]F[/ch]                  [ch]C[/ch]\r\n   Yeah, yeah yeah, yeah yeah.\r\n\r\n\r\n[Solo]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x3\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]         [ch]F[/ch]        [ch]C[/ch]\r\n   Your drug is a heartbreaker\r\n[ch]Am[/ch] [ch]E[/ch]  [ch]F[/ch]            [ch]C[/ch]\r\n      Say it ain't so\r\n[ch]Am[/ch]      [ch]E[/ch]       [ch]F[/ch]      [ch]C[/ch]\r\n   My love is a lifetaker\r\n\r\n\r\n[Outro]\r\n\r\n[ch]Am[/ch]  [ch]E[/ch]  [ch]F[/ch]  [ch]C[/ch]  x2",
+      "created_at": "2022-12-05T00:22:20Z",
+      "updated_at": "2022-12-05T00:22:20Z"
     }
-},
-{
+  },
+  {
     "model": "api.song",
     "pk": 2,
     "fields": {
-        "deleted": null,
-        "deleted_by_cascade": false,
-        "artist": "Weezer",
-        "title": "Hash Pipe",
-        "url": "https://tabs.ultimate-guitar.com/tab/weezer/hash-pipe-chords-1009559",
-        "content": "Hash Pipe- Weezer\r\n\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch] (Single notes)\r\nI can’t help my feelings\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI’ll go out of my mind\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nThese players come to get me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\n’Cause they’d like my behind\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI can’t love my business\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nIf I can’t get a trick\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nDown on Santa Monica\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nWhere tricks are for kicks\r\n\r\n[ch]D[/ch] (5 Times)\r\nOh, come on and kick me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]  (4 times)                       \r\n[ch]D[/ch]                      [ch]F[/ch]\r\nOh, come on and kick me\r\n                         [ch]E[/ch]\r\n(Oh.) Come on and kick me\r\n                              [ch]D[/ch]                     \r\n(Oh.) You’ve got your problems\r\n                          [ch]C[/ch]        \r\n(Oh.) I’ve got my ass wipe\r\n                       [ch]B[/ch]\r\nYou got your big cheese\r\n(No chord)\r\nI got my hash pipe\r\n\r\n[ch]A[/ch]/ [ch]B[/ch]  [ch]C[/ch] (6 times)\r\n\r\n[ch]A[/ch]/ [ch]B[/ch]  [ch]C[/ch] (same for each line)\r\nI can’t help my boogies\r\nThey get out of control\r\nI know that you don’t care\r\nBut I want you to know\r\nThe knee-stocking flavor\r\nIs a favorite treat\r\nOf men that don’t bother\r\nWith the taste of a teat\r\n\r\n[ch]D[/ch] (5 Times)\r\nOh, come on and kick me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]  (4 times)                       \r\n[ch]D[/ch]                      [ch]F[/ch]\r\nOh, come on and kick me\r\n                         [ch]E[/ch]\r\n(Oh.) Come on and kick me\r\n                              [ch]D[/ch]                     \r\n(Oh.) You’ve got your problems\r\n                          [ch]C[/ch]        \r\n(Oh.) I’ve got my ass wipe\r\n                       [ch]B[/ch]\r\nYou got your big cheese\r\n(No chord)          [ch]G[/ch]\r\nI got my hash pipe\r\n[ch]B[/ch]-[ch]C[/ch] (Single notes on [ch]G[/ch] string)\r\nI’ve got my hash pipe\r\n\r\nSolo\r\n\r\n[ch]D[/ch] (5 Times)\r\nOh, come on and kick me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]  (4 times)                       \r\n[ch]D[/ch]                      [ch]F[/ch]\r\nOh, come on and kick me\r\n                         [ch]E[/ch]\r\n(Oh.) Come on and kick me\r\n                              [ch]D[/ch]                     \r\n(Oh.) You’ve got your problems\r\n                          [ch]C[/ch]        \r\n(Oh.) I’ve got my ass wipe\r\n                       [ch]B[/ch]\r\nYou got your big cheese\r\n(No chord)         [ch]G[/ch]\r\nI got my hash pipe\r\n[ch]B[/ch]-[ch]C[/ch] (Single notes on [ch]G[/ch] string)\r\nI got my hash pipe\r\n\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch] (6 times)                       \r\n\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI’ve got my hash pipe\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI've got my hash pipe\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI've got my hash pipe\r\nChorded by Kenny Perry, not sure if all the lyrics are correct, hard to tell what \r\nhe's saying. Play along with the song you'll get it."
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "artist": "Weezer",
+      "title": "Hash Pipe",
+      "url": "https://tabs.ultimate-guitar.com/tab/weezer/hash-pipe-chords-1009559",
+      "content": "Hash Pipe- Weezer\r\n\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch] (Single notes)\r\nI can’t help my feelings\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI’ll go out of my mind\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nThese players come to get me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\n’Cause they’d like my behind\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI can’t love my business\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nIf I can’t get a trick\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nDown on Santa Monica\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nWhere tricks are for kicks\r\n\r\n[ch]D[/ch] (5 Times)\r\nOh, come on and kick me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]  (4 times)                       \r\n[ch]D[/ch]                      [ch]F[/ch]\r\nOh, come on and kick me\r\n                         [ch]E[/ch]\r\n(Oh.) Come on and kick me\r\n                              [ch]D[/ch]                     \r\n(Oh.) You’ve got your problems\r\n                          [ch]C[/ch]        \r\n(Oh.) I’ve got my ass wipe\r\n                       [ch]B[/ch]\r\nYou got your big cheese\r\n(No chord)\r\nI got my hash pipe\r\n\r\n[ch]A[/ch]/ [ch]B[/ch]  [ch]C[/ch] (6 times)\r\n\r\n[ch]A[/ch]/ [ch]B[/ch]  [ch]C[/ch] (same for each line)\r\nI can’t help my boogies\r\nThey get out of control\r\nI know that you don’t care\r\nBut I want you to know\r\nThe knee-stocking flavor\r\nIs a favorite treat\r\nOf men that don’t bother\r\nWith the taste of a teat\r\n\r\n[ch]D[/ch] (5 Times)\r\nOh, come on and kick me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]  (4 times)                       \r\n[ch]D[/ch]                      [ch]F[/ch]\r\nOh, come on and kick me\r\n                         [ch]E[/ch]\r\n(Oh.) Come on and kick me\r\n                              [ch]D[/ch]                     \r\n(Oh.) You’ve got your problems\r\n                          [ch]C[/ch]        \r\n(Oh.) I’ve got my ass wipe\r\n                       [ch]B[/ch]\r\nYou got your big cheese\r\n(No chord)          [ch]G[/ch]\r\nI got my hash pipe\r\n[ch]B[/ch]-[ch]C[/ch] (Single notes on [ch]G[/ch] string)\r\nI’ve got my hash pipe\r\n\r\nSolo\r\n\r\n[ch]D[/ch] (5 Times)\r\nOh, come on and kick me\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]  (4 times)                       \r\n[ch]D[/ch]                      [ch]F[/ch]\r\nOh, come on and kick me\r\n                         [ch]E[/ch]\r\n(Oh.) Come on and kick me\r\n                              [ch]D[/ch]                     \r\n(Oh.) You’ve got your problems\r\n                          [ch]C[/ch]        \r\n(Oh.) I’ve got my ass wipe\r\n                       [ch]B[/ch]\r\nYou got your big cheese\r\n(No chord)         [ch]G[/ch]\r\nI got my hash pipe\r\n[ch]B[/ch]-[ch]C[/ch] (Single notes on [ch]G[/ch] string)\r\nI got my hash pipe\r\n\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch] (6 times)                       \r\n\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI’ve got my hash pipe\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI've got my hash pipe\r\n[ch]A[/ch]/ [ch]B[/ch] [ch]C[/ch]\r\nI've got my hash pipe\r\nChorded by Kenny Perry, not sure if all the lyrics are correct, hard to tell what \r\nhe's saying. Play along with the song you'll get it.",
+      "created_at": "2022-12-05T00:22:20Z",
+      "updated_at": "2022-12-05T00:22:20Z"
     }
-},
-{
+  },
+  {
+    "model": "api.song",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "artist": "Weezer",
+      "title": "El Scorcho",
+      "url": "https://tabs.ultimate-guitar.com/tab/weezer/el-scorcho-chords-711065",
+      "content": "This is a good song for only 1 guitar. But, if you want a 2nd guitar, have them strum \r\nopen chords during the choruses and bridge and you pick the verses and choruses and strum \r\nbarred chords during the bridge\r\n\r\n\r\nDuring the Verse and Chorus, these chords are picked\r\n      [ch]A[/ch]                 [ch]D[/ch]              [ch]E[/ch]\r\ne|----------|      |----------|   |----------|\r\nB|----------|      |-----7v---|   |----------|\r\nG|-----6v---|      |-------7--|   |----------|\r\nD|-------7--|      |---7------|   |----------|\r\nA|---7------|      |-5--------|   |-7-5------|\r\nE|-5--------|      |----------|   |-----9-7--|\r\n\r\n\r\nDuring Bridge, these chords are strummed\r\n   [ch]A[/ch]           [ch]D[/ch]          [ch]Bm[/ch]          [ch]E[/ch]\r\nE: 5        E: 5       E: 7        E: 7\r\nB: 5        B: 7       B: 7        B: 9\r\nG: 6        G: 7       G: 7        G: 9\r\nD: 7        D: 7       D: 9        D: 9\r\nA: 7        A: 5       A: 9        A: 7\r\nE: 5        E: X       E: 7        E: X\r\n\r\n\r\n[Intro]\r\n\r\n[ch]A[/ch] [ch]D[/ch] [ch]A[/ch] [ch]D[/ch] [ch]A[/ch] [ch]D[/ch] [ch]A[/ch]\r\n\r\n\r\n[Verse 1]\r\n\r\n      [ch]D[/ch]            [ch]A[/ch]              [ch]D[/ch]\r\nWell, Goddamn you half-Japanese girls\r\n[ch]A[/ch]                   [ch]D[/ch]\r\nDo it to me every time\r\n     [ch]A[/ch]                    [ch]D[/ch]\r\nOh, the redhead said you shred the cello\r\n     [ch]A[/ch]          [ch]D[/ch]\r\nAnd I'm jello, baby\r\n     [ch]A[/ch]               [ch]D[/ch]\r\nBut you won't talk, won't look, won't think of me\r\n[ch]A[/ch]                [ch]D[/ch]\r\nI'm the epitome of Public Enemy\r\n\r\n\r\nWhy you wanna go and do me like that?\r\nCome down on the street and dance with me\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]A[/ch]   [ch]D[/ch]      [ch]A[/ch]        [ch]D[/ch]        [ch]A[/ch]      [ch]D[/ch]         [ch]A[/ch]         [ch]E[/ch]\r\nI'm a lot like you so please Hello, I'm here, I'm waiting\r\n[ch]A[/ch]  [ch]D[/ch]           [ch]A[/ch]    [ch]D[/ch]        [ch]A[/ch]        [ch]D[/ch]           [ch]A[/ch]     [ch]E[/ch]\r\nI think I'd be good for you and you'd be good for me\r\n\r\n\r\n[Verse 2]\r\n\r\n               [ch]A[/ch]                   [ch]D[/ch]\r\nI asked you to go to the Green Day concert\r\n    [ch]A[/ch]                       [ch]D[/ch]\r\nYou said you never heard of them\r\n    [ch]A[/ch]\r\nHow cool is that??\r\n   [ch]D[/ch]                       [ch]A[/ch]             [ch]D[/ch]\r\nSo I went to your room and read your diary:\r\n [ch]A[/ch]                        [ch]D[/ch]                    [ch]A[/ch]\r\n\"\"watching Grunge leg-drop New-Jack trough presstable...\"\"\r\n    [ch]D[/ch]\r\nand then my heart stopped:\r\n\r\n\"\"listening to Cio-Cio San\r\nfall in love all over again.\"\"\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]A[/ch]   [ch]D[/ch]      [ch]A[/ch]        [ch]D[/ch]        [ch]A[/ch]      [ch]D[/ch]         [ch]A[/ch]         [ch]E[/ch]\r\nI'm a lot like you so please Hello, I'm here, I'm waiting\r\n[ch]A[/ch]  [ch]D[/ch]           [ch]A[/ch]    [ch]D[/ch]        [ch]A[/ch]        [ch]D[/ch]           [ch]A[/ch]     [ch]E[/ch]\r\nI think I'd be good for you and you'd be good for me\r\n\r\n\r\n[Bridge]\r\n\r\n(Chords are strummed at double time[count 1,&amp;,2,&amp;,3,&amp;,4,&amp; for each strum], not finger \r\nlike in the verses and chorus)\r\n\r\n    [ch]A[/ch]                     [ch]D[/ch]\r\nHow stupid is it? I can't talk about it\r\n        [ch]Bm[/ch]                       [ch]E[/ch]\r\nI gotta sing about it and make a record of (my heart)\r\n    [ch]A[/ch]                       [ch]D[/ch]\r\nHow stupid is it? won't you gimme a minute\r\n       [ch]Bm[/ch]               [ch]E[/ch]\r\njust come up to me and say \"\"hello\"\" to (my heart)\r\n\r\n(Chords are now strummed at regular time [count 1,2,3,4 for each strum])\r\n\r\n     [ch]A[/ch]             [ch]D[/ch]              [ch]Bm[/ch]\r\nHow stupid is it? For all I know you want me too\r\n    [ch]E[/ch]                          [ch]A[/ch]\r\nAnd maybe you just don't know what to do\r\n    [ch]D[/ch]            [ch]Bm[/ch]             [ch]E[/ch]\r\nOr maybe you're scared to say: \"\"I'm falling for you\"\"\r\n\r\n\r\n[Solo]\r\n\r\ne|--------------------------------------------------------|\r\nB|-------------------------11--9--8h9----13-----9--11h13--|\r\nG|--------------------9--8--------------------------------|\r\nD|----8--10-----6--8-------------------------13-----------|\r\nA|-----------7--------------------------------------------|\r\nE|--------------------------------------------------------|\r\n\r\n\r\n[Verse 3]\r\n\r\n                [ch]A[/ch]                 [ch]D[/ch]\r\nI wish I could get my head out of the sand\r\n       [ch]A[/ch]                      [ch]D[/ch]\r\n'Cuz I think we'd make a good team\r\n               [ch]A[/ch]                   [ch]D[/ch]\r\nAnd you would keep my fingernails clean\r\n     [ch]A[/ch]                          [ch]D[/ch]\r\nBut that's just a stupid dream that I won't realize\r\n  [ch]A[/ch]                [ch]D[/ch]                [ch]A[/ch]                    [ch]D[/ch]\r\n'Cuz I can't even look in your eyes Without shakin', and I ain't fakin'\r\n[ch]A[/ch]                             [ch]D[/ch]\r\nI'll bring home the turkey if you bring home the bacon\r\n\r\n\r\n[Chorus]\r\n\r\n[ch]A[/ch]   [ch]D[/ch]      [ch]A[/ch]        [ch]D[/ch]        [ch]A[/ch]      [ch]D[/ch]         [ch]A[/ch]         [ch]E[/ch]\r\nI'm a lot like you so please Hello, I'm here, I'm waiting\r\n[ch]A[/ch]  [ch]D[/ch]           [ch]A[/ch]    [ch]D[/ch]        [ch]A[/ch]        [ch]D[/ch]           [ch]A[/ch]     [ch]E[/ch]\r\nI think I'd be good for you and you'd be good for me\r\n\r\n[ch]A[/ch]   [ch]D[/ch]      [ch]A[/ch]        [ch]D[/ch]        [ch]A[/ch]      [ch]D[/ch]         [ch]A[/ch]         [ch]E[/ch]\r\nI'm a lot like you so please Hello, I'm here, I'm waiting\r\n[ch]A[/ch]  [ch]D[/ch]           [ch]A[/ch]    [ch]D[/ch]        [ch]A[/ch]        [ch]D[/ch]           [ch]A[/ch]     [ch]E[/ch]\r\nI think I'd be good for you and you'd be good for me\r\n\r\n\r\n\r\n************************************\r\n\r\n| h  Hammer-on\r\n| v  Vibrato\r\n\r\n************************************",
+      "created_at": "2022-12-05T00:22:20Z",
+      "updated_at": "2022-12-05T00:22:20Z"
+    }
+  },
+  {
     "model": "api.songentry",
     "pk": 1,
     "fields": {
-        "songbook": 1,
-        "song": 1,
-        "play_time": null
+      "songbook": 1,
+      "song": 1,
+      "play_time": null,
+      "created_at": "2022-12-05T00:22:20Z",
+      "updated_at": "2022-12-05T00:22:20Z"
     }
-},
-{
+  },
+  {
     "model": "api.songentry",
     "pk": 2,
     "fields": {
-        "songbook": 1,
-        "song": 2,
-        "play_time": null
+      "songbook": 1,
+      "song": 2,
+      "play_time": null,
+      "created_at": "2022-12-05T00:23:20Z",
+      "updated_at": "2022-12-05T00:23:20Z"
     }
-}
+  },
+  {
+    "model": "api.songentry",
+    "pk": 3,
+    "fields": {
+      "songbook": 1,
+      "song": 3,
+      "play_time": null,
+      "created_at": "2022-12-05T00:24:20Z",
+      "updated_at": "2022-12-05T00:24:20Z"
+    }
+  }
 ]
