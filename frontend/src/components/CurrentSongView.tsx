@@ -1,8 +1,13 @@
 import {
+  AddIcon,
   ArrowBackIcon,
   ArrowForwardIcon,
+  ArrowUpDownIcon,
+  DeleteIcon,
+  HamburgerIcon,
   MoonIcon,
   SunIcon,
+  TimeIcon,
 } from "@chakra-ui/icons";
 import {
   Box,
@@ -10,7 +15,12 @@ import {
   Center,
   Flex,
   Heading,
+  IconButton,
   Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Skeleton,
   SkeletonText,
   Text,
@@ -77,15 +87,50 @@ function CurrentSongView() {
   }, [handleKeyPress]);
 
   const addSongUrl = window.location.origin + "/addSong";
+  const isSongbookOwner = true;
 
   return (
     <>
       <Flex padding="1rem" flexDir="column">
         <Flex flexDir="row" w="100%" justifyContent="space-between">
           <Flex>
-            <Button colorScheme="blue" onClick={() => alert("PREV")}>
-              <ArrowBackIcon />
-            </Button>
+            {/*hamburger menu starts here */}
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label="Options"
+                icon={<HamburgerIcon />}
+                variant="outline"
+              />
+              <MenuList>
+                {isSongbookOwner && (
+                  <Flex justifyContent="space-between" mx="1rem" my=".5rem">
+                    <Button colorScheme="blue" onClick={() => alert("PREV")}>
+                      <ArrowBackIcon />
+                    </Button>
+                    <Button colorScheme="blue" onClick={() => alert("PAUSE")}>
+                      <TimeIcon />
+                    </Button>
+                    <Button colorScheme="blue" onClick={() => alert("NEXT")}>
+                      <ArrowForwardIcon />
+                    </Button>
+                  </Flex>
+                )}
+                <MenuItem
+                  icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                  onClick={toggleColorMode}
+                >
+                  {colorMode === "light" ? "Night Mode" : "Day Mode"}
+                </MenuItem>
+                {isSongbookOwner && (
+                  <MenuItem icon={<ArrowUpDownIcon />}>Fullscreen</MenuItem>
+                )}
+                {isSongbookOwner && (
+                  <MenuItem icon={<DeleteIcon />}>Delete Song</MenuItem>
+                )}
+              </MenuList>
+            </Menu>
+            {/* old nav is here */}
           </Flex>
           <div style={{ background: "white", padding: "16px" }}>
             <a href={addSongUrl} target="_blank" rel="noreferrer">
@@ -105,14 +150,6 @@ function CurrentSongView() {
                   </>
                 )}
               </Heading>
-              <Button
-                marginLeft="1rem"
-                colorScheme="blue"
-                onClick={toggleColorMode}
-                data-testid="darkMode"
-              >
-                {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-              </Button>
             </Flex>
           </Flex>
           <Flex w="15%" justifyContent="space-between">
@@ -131,8 +168,8 @@ function CurrentSongView() {
                 />
               )}
             </Flex>
-            <Button colorScheme="blue" onClick={() => alert("NEXT")}>
-              <ArrowForwardIcon />
+            <Button colorScheme="blue" onClick={() => alert("Add Song")}>
+              <AddIcon />
             </Button>
           </Flex>
         </Flex>
