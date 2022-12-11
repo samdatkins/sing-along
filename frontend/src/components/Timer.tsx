@@ -1,13 +1,16 @@
 import Countdown from "react-countdown";
 import { Text, keyframes } from "@chakra-ui/react";
-import { useState } from "react";
+import { forwardRef, useState } from "react";
 
 interface TimerProps {
-  startTime: number;
   startActionPrompt: () => void;
+  reference: any;
+  key: number;
 }
 
-export default function Timer({ startTime, startActionPrompt }: TimerProps) {
+function Timer({ startActionPrompt, reference, key }: TimerProps) {
+  // length of time for timer
+  const [expTime, setExpTime] = useState(Date.now() + 60000);
   // state to manage styles and animation, allows for "warning" styling on timer when nearly expired (<= 5 secs)
   const [styles, setStyles] = useState({
     color: "#FAEBD7",
@@ -23,20 +26,24 @@ export default function Timer({ startTime, startActionPrompt }: TimerProps) {
 
   return (
     <Text
-      vertical-align="top"
+      key={key}
       animation={styles.animation}
       bgClip="text"
       fontSize="2.5em"
+      mx="1rem"
+      my=".5rem"
       fontWeight={styles.fontWeight}
       color={styles.color}
     >
       <Countdown
+        ref={reference}
+        key={key}
         text-align="top"
-        date={startTime}
+        date={expTime}
         intervalDelay={0}
         // displays the whole second time until expiration
         renderer={(props) => (
-          <div>{props.total > 0 ? props.total / 1000 : ""}</div>
+          <div key={key}>{props.total > 0 ? props.total / 1000 : ""}</div>
         )}
         // triggers the change in styling
         onTick={(props) => {
@@ -56,3 +63,5 @@ export default function Timer({ startTime, startActionPrompt }: TimerProps) {
     </Text>
   );
 }
+
+export default forwardRef(Timer);
