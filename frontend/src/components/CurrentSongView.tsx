@@ -1,13 +1,9 @@
 import {
   AddIcon,
-  ArrowBackIcon,
-  ArrowForwardIcon,
-  ArrowUpDownIcon,
   DeleteIcon,
   HamburgerIcon,
   MoonIcon,
   SunIcon,
-  TimeIcon,
 } from "@chakra-ui/icons";
 import {
   Box,
@@ -15,6 +11,7 @@ import {
   Center,
   Flex,
   Heading,
+  Icon,
   IconButton,
   Link,
   Menu,
@@ -26,8 +23,16 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
+import {
+  FaExpandAlt,
+  FaFastBackward,
+  FaFastForward,
+  FaPause,
+  FaPlay,
+  FaUndoAlt,
+} from "react-icons/fa";
 import axios from "axios";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { Song } from "../models/song";
 
@@ -38,16 +43,21 @@ import Timer from "./Timer";
 import { useCallback, useEffect } from "react";
 
 function CurrentSongView() {
+  // state for toggling night/day modes
   const { colorMode, toggleColorMode } = useColorMode();
-  // state for showing Action component
+  // state for showing ActionPrompt component instead of lyrics
   const [doActionPrompt, setDoActionPrompt] = useState(false);
+  // state for triggering refresh in Timer component when restart is clicked
+  const [timerKey, setTimerKey] = useState(1);
+  // state for whether time is running or not
+  const [isLive, setIsLive] = useState(true);
   // global action variable
   const globalActionSetting = "DANCE";
-  // length of time for each song
-  const songIntervalLength = Date.now() + 60000;
+  // ref for controlling the timer from parent component
+  const timerRef = useRef<any>();
   const asyncSong = useAsync(
     async () => await axios.get<Song>("/api/songs/1"),
-    [],
+    []
   );
   const splitTab =
     !asyncSong.loading &&
@@ -104,16 +114,46 @@ function CurrentSongView() {
               />
               <MenuList>
                 {isSongbookOwner && (
-                  <Flex justifyContent="space-between" mx="1rem" my=".5rem">
-                    <Button colorScheme="blue" onClick={() => alert("PREV")}>
-                      <ArrowBackIcon />
-                    </Button>
-                    <Button colorScheme="blue" onClick={() => alert("PAUSE")}>
-                      <TimeIcon />
-                    </Button>
-                    <Button colorScheme="blue" onClick={() => alert("NEXT")}>
-                      <ArrowForwardIcon />
-                    </Button>
+                  <Flex direction="column">
+                    <Flex justifyContent="space-between" mx="1rem" my=".5rem">
+                      <Button
+                        colorScheme="blue"
+                        onClick={() => {
+                          alert("PREV");
+                        }}
+                      >
+                        <Icon as={FaFastBackward} />
+                      </Button>
+                      <Button
+                        colorScheme="blue"
+                        onClick={() => {
+                          if (timerRef?.current?.api?.isPaused()) {
+                            timerRef?.current?.api?.start();
+                            setIsLive(true);
+                          } else {
+                            timerRef.current.api?.pause();
+                            setIsLive(false);
+                          }
+                        }}
+                      >
+                        <Icon as={isLive ? FaPause : FaPlay} />
+                      </Button>
+                      <Button colorScheme="blue" onClick={() => alert("NEXT")}>
+                        <Icon as={FaFastForward} />
+                      </Button>
+                    </Flex>
+                    <Flex flex="space-between" mx="1rem" my=".5rem">
+                      <Button
+                        flex="1"
+                        colorScheme="blue"
+                        onClick={() => {
+                          setTimerKey(timerKey * -1);
+                          setIsLive(true);
+                        }}
+                      >
+                        <Icon as={FaUndoAlt} />
+                      </Button>
+                    </Flex>
                   </Flex>
                 )}
                 <MenuItem
@@ -123,7 +163,7 @@ function CurrentSongView() {
                   {colorMode === "light" ? "Night Mode" : "Day Mode"}
                 </MenuItem>
                 {isSongbookOwner && (
-                  <MenuItem icon={<ArrowUpDownIcon />}>Fullscreen</MenuItem>
+                  <MenuItem icon={<Icon as={FaExpandAlt}/>}>Fullscreen</MenuItem>
                 )}
                 {isSongbookOwner && (
                   <MenuItem icon={<DeleteIcon />}>Delete Song</MenuItem>
@@ -157,7 +197,8 @@ function CurrentSongView() {
               {/* Only show timer if running, hide when expired */}
               {!doActionPrompt && (
                 <Timer
-                  startTime={songIntervalLength}
+                  reference={timerRef}
+                  key={timerKey}
                   // this function will be where we set off the song transition when that is ready, a redirect instead of reload
                   startActionPrompt={() => {
                     setDoActionPrompt(true);
