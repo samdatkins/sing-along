@@ -1,18 +1,15 @@
 name: Test
-
 on: [push]
-  pull_request:
-
 jobs:
   test-backend:
     name: Test backend
     runs-on: ubuntu-latest
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
     steps:
-    - uses: actions/checkout@v3
-    - name: Build and Start Containers
-      run: docker-compose up --build
-    - name: Run Backend Tests
-      run: docker-compose run web bash -c "./manage.py test"
+      - uses: actions/checkout@v3
+      - name: Build and Start Containers
+        run: docker-compose up --build
+      - name: Run Backend Tests
+        run: docker-compose run web bash -c "./manage.py test"
