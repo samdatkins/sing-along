@@ -12,4 +12,4 @@ jobs:
       - name: Build and Start Containers
         run: docker-compose up --build
       - name: Run Backend Tests
-        run: docker-compose run web bash -c "./manage.py test"
+        run: scripts/test-backend.sh
