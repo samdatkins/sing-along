@@ -16,7 +16,7 @@ services:
       retries: 5
   web:
     build: .
-    command: sh -c "./scripts/docker-entrypoint.sh"
+    command: sh -c "./scripts/docker-cicd-entrypoint.sh"
     volumes:
       - .:/code
     environment:
