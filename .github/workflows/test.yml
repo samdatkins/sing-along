@@ -9,7 +9,5 @@ jobs:
       id-token: "write"
     steps:
       - uses: actions/checkout@v3
-      - name: Build and Start Containers
-        run: docker-compose up --build
       - name: Run Backend Tests
         run: scripts/test-backend.sh
