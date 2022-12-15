@@ -10,7 +10,7 @@ interface TimerProps {
 
 function Timer({ startActionPrompt, reference, key }: TimerProps) {
   // length of time for timer
-  const [expTime, setExpTime] = useState(Date.now() + 10000);
+  const [expTime, setExpTime] = useState(Date.now() + 60000);
   // state to manage styles and animation, allows for "warning" styling on timer when nearly expired (<= 5 secs)
   const [styles, setStyles] = useState({
     color: "#FAEBD7",
