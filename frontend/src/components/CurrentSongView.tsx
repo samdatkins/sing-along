@@ -31,16 +31,47 @@ import {
   FaPlay,
   FaUndoAlt,
 } from "react-icons/fa";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { useRef, useState } from "react";
-import { useAsync } from "react-async-hook";
-import { Song } from "../models/song";
+import { useAsync, UseAsyncReturn } from "react-async-hook";
+import { Song, Songbook } from "../models/song";
 
 import QRCode from "react-qr-code";
 import ActionPrompt from "./ActionPrompt";
 import Timer from "./Timer";
 
 import { useCallback, useEffect } from "react";
+import { useParams } from "react-router-dom";
+
+async function nextSongbookSong(
+  sessionKey: string | undefined,
+  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>
+) {
+  if (!sessionKey) return;
+  const result = await axios.patch<Songbook>(
+    `/api/songbooks/${sessionKey}/next-song/`
+  );
+  if (result.status !== 200) {
+    console.error("Couldn't get next song");
+  } else {
+    asyncSongbook.execute();
+  }
+}
+
+async function prevSongbookSong(
+  sessionKey: string | undefined,
+  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>
+) {
+  if (!sessionKey) return;
+  const result = await axios.patch<Songbook>(
+    `/api/songbooks/${sessionKey}/previous-song/`
+  );
+  if (result.status !== 200) {
+    console.error("Couldn't get previous song");
+  } else {
+    asyncSongbook.execute();
+  }
+}
 
 function CurrentSongView() {
   // state for toggling night/day modes
@@ -54,20 +85,27 @@ function CurrentSongView() {
   // global action variable
   const globalActionSetting = "DANCE";
   // ref for controlling the timer from parent component
+  const { sessionKey } = useParams();
   const timerRef = useRef<any>();
-  const asyncSong = useAsync(
-    async () => await axios.get<Song>("/api/songs/1"),
+  const asyncSongbook = useAsync(
+    async () => await axios.get<Songbook>(`/api/songbooks/${sessionKey}/`),
     []
   );
   const splitTab =
-    !asyncSong.loading &&
-    !asyncSong.error &&
-    asyncSong.result?.data?.content
+    !asyncSongbook.loading &&
+    !asyncSongbook.error &&
+    asyncSongbook.result?.data?.current_song_entry?.song?.content
       .replaceAll("[tab]", "")
       .replaceAll("[/tab]", "")
       .split("\n");
+  const currentSongbook =
+    !asyncSongbook.loading &&
+    !asyncSongbook.error &&
+    asyncSongbook.result?.data;
   const currentSong =
-    !asyncSong.loading && !asyncSong.error && asyncSong.result?.data;
+    !asyncSongbook.loading &&
+    !asyncSongbook.error &&
+    asyncSongbook?.result?.data?.current_song_entry?.song;
   const timerControls = {
     playPauseToggle: () => {
       if (timerRef?.current?.api?.isPaused()) {
@@ -93,9 +131,9 @@ function CurrentSongView() {
       // prevents scrolling from spacebar
       event.preventDefault();
     } else if (event.code === "ArrowLeft") {
-      alert(`This sets the previous song to be the current song.`);
+      prevSongbookSong(sessionKey, asyncSongbook);
     } else if (event.code === "ArrowRight") {
-      alert(`This sets the next song to be the current song.`);
+      nextSongbookSong(sessionKey, asyncSongbook);
     } else if (event.code === "KeyR") {
       timerControls.refresh();
     } else if (event.code === "KeyF") {
@@ -136,7 +174,7 @@ function CurrentSongView() {
                       <Button
                         colorScheme="blue"
                         onClick={() => {
-                          alert("PREV");
+                          prevSongbookSong(sessionKey, asyncSongbook);
                         }}
                       >
                         <Icon as={FaFastBackward} />
@@ -147,7 +185,12 @@ function CurrentSongView() {
                       >
                         <Icon as={isLive ? FaPause : FaPlay} />
                       </Button>
-                      <Button colorScheme="blue" onClick={() => alert("NEXT")}>
+                      <Button
+                        colorScheme="blue"
+                        onClick={() =>
+                          nextSongbookSong(sessionKey, asyncSongbook)
+                        }
+                      >
                         <Icon as={FaFastForward} />
                       </Button>
                     </Flex>
@@ -195,18 +238,25 @@ function CurrentSongView() {
             </a>
           </div>
           <Flex>
-            <Flex minWidth="24rem">
-              <Skeleton isLoaded={!asyncSong.loading} flex="1" height="2rem" />
-              <Heading as="h2" display="inline-block" fontSize="2xl">
-                {currentSong && (
-                  <>
-                    <Link href={currentSong?.content}>
+            <Flex minWidth="24rem" direction="column">
+              <Skeleton
+                isLoaded={!asyncSongbook.loading}
+                flex="1"
+                height="2rem"
+              />
+
+              {currentSongbook && currentSong && (
+                <>
+                  <Heading as="h2" display="inline-block" fontSize="2xl">
+                    <Link href={currentSongbook?.current_song_entry.song.url}>
                       "{currentSong.title}" by {currentSong.artist}
                     </Link>{" "}
-                    {/* ({currentSong.current} of {currentSong.total}) */}
-                  </>
-                )}
-              </Heading>
+                    ({currentSongbook.current_song_position} of{" "}
+                    {currentSongbook.total_songs})
+                  </Heading>
+                  <Text>{currentSongbook.title}</Text>
+                </>
+              )}
             </Flex>
           </Flex>
           <Flex w="15%" justifyContent="space-between">
@@ -220,9 +270,7 @@ function CurrentSongView() {
                     // this function will be where we set off the song transition when that is ready, a redirect instead of reload
                     startActionPrompt={() => {
                       setDoActionPrompt(true);
-                      setInterval(() => {
-                        window.location.reload();
-                      }, 1500);
+                      nextSongbookSong(sessionKey, asyncSongbook);
                     }}
                   />
                   {!isLive && <div>PAUSED</div>}
@@ -251,7 +299,7 @@ function CurrentSongView() {
           >
             <SkeletonText
               noOfLines={80}
-              isLoaded={!asyncSong.loading}
+              isLoaded={!asyncSongbook.loading}
               spacing="4"
             />
             {splitTab && (
