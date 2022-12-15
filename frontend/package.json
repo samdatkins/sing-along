@@ -54,7 +54,8 @@
   },
   "proxy": "http://localhost:8080/",
   "resolutions": {
-    "jest": "29.2.x"
+    "jest": "29.2.x",
+    "react-scripts/@svgr/webpack/@svgr/plugin-svgo/svgo/css-select/nth-check": "^2.0.1"
   },
   "devDependencies": {
     "@types/react-cookies": "^0.1.0",

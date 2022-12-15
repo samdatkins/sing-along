@@ -14,9 +14,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    ports:
+      - 5432
   web:
     build: .
-    command: sh -c "./scripts/docker-entrypoint.sh"
+    command: sh -c "scripts/docker-cicd-entrypoint.sh"
     volumes:
       - .:/code
     environment:
