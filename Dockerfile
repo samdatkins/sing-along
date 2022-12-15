@@ -6,7 +6,7 @@ ENV YOUR_ENV=${YOUR_ENV}
 ENV PYTHONUNBUFFERED=1
 
 # System deps:
-RUN apt-get update && apt-get install -y gcc musl-dev python3-dev libffi-dev cargo rustc
+RUN apt-get update && apt-get install -y gcc musl-dev python3-dev libffi-dev cargo rustc postgresql-client
 RUN pip install "poetry==1.1.13"
 
 # Copy only requirements to cache them in docker layer
