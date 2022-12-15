@@ -1,9 +1,9 @@
 #!/bin/bash
 
-until psql "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_USER" -c '\l'; do
-  echo >&2 "postgres is unavailable - sleeping"
-  sleep 1
-done
+# until psql "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_USER" -c '\l'; do
+#   echo >&2 "postgres is unavailable - sleeping"
+#   sleep 1
+# done
 
 echo "Collect static files"
 python manage.py collectstatic --noinput
