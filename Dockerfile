@@ -6,12 +6,12 @@ ENV YOUR_ENV=${YOUR_ENV}
 ENV PYTHONUNBUFFERED=1
 
 # System deps:
-RUN apt-get update && apt-get install -y gcc musl-dev python3-dev libffi-dev cargo rustc
+RUN apt-get update && apt-get install -y gcc musl-dev python3-dev libffi-dev cargo rustc postgresql-client
 RUN pip install "poetry==1.2.2"
 
 # Copy only requirements to cache them in docker layer
 WORKDIR /code
-COPY poetry.lock pyproject.toml docker-entrypoint.sh docker-entrypoint.dev.sh docker-entrypoint.prod.sh /code/
+COPY poetry.lock pyproject.toml /scripts/ /code/
 
 # Project initialization:
 RUN poetry config virtualenvs.create false \

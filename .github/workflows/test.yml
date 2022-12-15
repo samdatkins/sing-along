@@ -1,0 +1,13 @@
+name: Test
+on: [push]
+jobs:
+  test-backend:
+    name: Test backend
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Backend Tests
+        run: scripts/test-backend.sh
