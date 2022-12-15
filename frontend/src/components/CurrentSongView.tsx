@@ -48,7 +48,7 @@ function CurrentSongView() {
   // state for showing ActionPrompt component instead of lyrics
   const [doActionPrompt, setDoActionPrompt] = useState(false);
   // state for triggering refresh in Timer component when restart is clicked
-  const [timerKey, setTimerKey] = useState(1);
+  const [timerKey, setTimerKey] = useState(Date.now());
   // state for whether time is running or not
   const [isLive, setIsLive] = useState(true);
   // global action variable
@@ -68,19 +68,36 @@ function CurrentSongView() {
       .split("\n");
   const currentSong =
     !asyncSong.loading && !asyncSong.error && asyncSong.result?.data;
+  const timerControls = {
+    playPauseToggle: () => {
+      if (timerRef?.current?.api?.isPaused()) {
+        timerRef?.current?.api?.start();
+        setIsLive(true);
+      } else {
+        timerRef.current.api?.pause();
+        setIsLive(false);
+      }
+    },
+    refresh: () => {
+      setTimerKey(Date.now());
+      setIsLive(true);
+    },
+  };
 
   // handle what happens on key press
   const handleKeyPress = useCallback((event: any) => {
     if (event.code === "Delete") {
       alert(`This deletes the current song and advances to the next song.`);
     } else if (event.code === "Space") {
-      alert(`This pauses the timer on the current song.`);
+      timerControls.playPauseToggle();
+      // prevents scrolling from spacebar
+      event.preventDefault();
     } else if (event.code === "ArrowLeft") {
       alert(`This sets the previous song to be the current song.`);
     } else if (event.code === "ArrowRight") {
       alert(`This sets the next song to be the current song.`);
     } else if (event.code === "KeyR") {
-      alert(`This resets the timer back to its initial count.`);
+      timerControls.refresh();
     } else if (event.code === "KeyF") {
       alert(`This cancels the tab view truncation AND pauses the timer.`);
     }
@@ -126,15 +143,7 @@ function CurrentSongView() {
                       </Button>
                       <Button
                         colorScheme="blue"
-                        onClick={() => {
-                          if (timerRef?.current?.api?.isPaused()) {
-                            timerRef?.current?.api?.start();
-                            setIsLive(true);
-                          } else {
-                            timerRef.current.api?.pause();
-                            setIsLive(false);
-                          }
-                        }}
+                        onClick={timerControls.playPauseToggle}
                       >
                         <Icon as={isLive ? FaPause : FaPlay} />
                       </Button>
@@ -146,10 +155,7 @@ function CurrentSongView() {
                       <Button
                         flex="1"
                         colorScheme="blue"
-                        onClick={() => {
-                          setTimerKey(timerKey * -1);
-                          setIsLive(true);
-                        }}
+                        onClick={timerControls.refresh}
                       >
                         <Icon as={FaUndoAlt} />
                       </Button>
@@ -163,7 +169,18 @@ function CurrentSongView() {
                   {colorMode === "light" ? "Night Mode" : "Day Mode"}
                 </MenuItem>
                 {isSongbookOwner && (
-                  <MenuItem icon={<Icon as={FaExpandAlt}/>}>Fullscreen</MenuItem>
+                  <MenuItem
+                    icon={<Icon as={FaExpandAlt} />}
+                    onClick={() => {
+                      if (!document.fullscreenElement) {
+                        document.body.requestFullscreen();
+                      } else {
+                        document.exitFullscreen();
+                      }
+                    }}
+                  >
+                    Toggle Fullscreen
+                  </MenuItem>
                 )}
                 {isSongbookOwner && (
                   <MenuItem icon={<DeleteIcon />}>Delete Song</MenuItem>
@@ -196,17 +213,20 @@ function CurrentSongView() {
             <Flex>
               {/* Only show timer if running, hide when expired */}
               {!doActionPrompt && (
-                <Timer
-                  reference={timerRef}
-                  key={timerKey}
-                  // this function will be where we set off the song transition when that is ready, a redirect instead of reload
-                  startActionPrompt={() => {
-                    setDoActionPrompt(true);
-                    setInterval(() => {
-                      window.location.reload();
-                    }, 1500);
-                  }}
-                />
+                <div>
+                  <Timer
+                    reference={timerRef}
+                    key={timerKey}
+                    // this function will be where we set off the song transition when that is ready, a redirect instead of reload
+                    startActionPrompt={() => {
+                      setDoActionPrompt(true);
+                      setInterval(() => {
+                        window.location.reload();
+                      }, 1500);
+                    }}
+                  />
+                  {!isLive && <div>PAUSED</div>}
+                </div>
               )}
             </Flex>
             <Button colorScheme="blue" onClick={() => alert("Add Song")}>
