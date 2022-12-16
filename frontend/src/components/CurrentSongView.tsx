@@ -23,6 +23,9 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
+import axios, { AxiosResponse } from "axios";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useAsync, UseAsyncReturn } from "react-async-hook";
 import {
   FaExpandAlt,
   FaFastBackward,
@@ -31,25 +34,21 @@ import {
   FaPlay,
   FaUndoAlt,
 } from "react-icons/fa";
-import axios, { AxiosResponse } from "axios";
-import { useRef, useState } from "react";
-import { useAsync, UseAsyncReturn } from "react-async-hook";
-import { Song, Songbook } from "../models/song";
+import { Songbook } from "../models/song";
 
 import QRCode from "react-qr-code";
 import ActionPrompt from "./ActionPrompt";
 import Timer from "./Timer";
 
-import { useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 async function nextSongbookSong(
   sessionKey: string | undefined,
-  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>
+  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>,
 ) {
   if (!sessionKey) return;
   const result = await axios.patch<Songbook>(
-    `/api/songbooks/${sessionKey}/next-song/`
+    `/api/songbooks/${sessionKey}/next-song/`,
   );
   if (result.status !== 200) {
     console.error("Couldn't get next song");
@@ -60,11 +59,11 @@ async function nextSongbookSong(
 
 async function prevSongbookSong(
   sessionKey: string | undefined,
-  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>
+  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>,
 ) {
   if (!sessionKey) return;
   const result = await axios.patch<Songbook>(
-    `/api/songbooks/${sessionKey}/previous-song/`
+    `/api/songbooks/${sessionKey}/previous-song/`,
   );
   if (result.status !== 200) {
     console.error("Couldn't get previous song");
@@ -89,8 +88,9 @@ function CurrentSongView() {
   const timerRef = useRef<any>();
   const asyncSongbook = useAsync(
     async () => await axios.get<Songbook>(`/api/songbooks/${sessionKey}/`),
-    []
+    [],
   );
+
   const splitTab =
     !asyncSongbook.loading &&
     !asyncSongbook.error &&
@@ -98,6 +98,20 @@ function CurrentSongView() {
       .replaceAll("[tab]", "")
       .replaceAll("[/tab]", "")
       .split("\n");
+
+  const truncatedSplitTab = splitTab && splitTab?.slice(0, 86);
+  /*
+  truncatedSplitTab &&
+    truncatedSplitTab?.splice(
+      Math.floor(truncatedSplitTab.length / 2 - 1),
+      0,
+      "FIX CHORDS ON BOTTOM OF SCREEN -- TBD",
+    );
+  */
+  const tabToDisplay = asyncSongbook.result?.data?.is_noodle_mode
+    ? splitTab
+    : truncatedSplitTab;
+
   const currentSongbook =
     !asyncSongbook.loading &&
     !asyncSongbook.error &&
@@ -302,10 +316,9 @@ function CurrentSongView() {
               isLoaded={!asyncSongbook.loading}
               spacing="4"
             />
-            {splitTab && (
-              <pre style={{ fontSize: "1.25rem", fontFamily: "Ubuntu Mono" }}>
-                Tab:{" "}
-                {splitTab?.map((tabLine) => {
+            {tabToDisplay && (
+              <pre style={{ fontSize: "1.1rem", fontFamily: "Ubuntu Mono" }}>
+                {tabToDisplay?.map((tabLine) => {
                   if (tabLine.includes("[ch]")) {
                     return (
                       <Text color="cyan.500">
