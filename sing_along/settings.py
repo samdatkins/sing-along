@@ -10,19 +10,32 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DJANGO_ENV=(str, "development")
+)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Take environment variables from .env file
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
+DJANGO_ENV = env("DJANGO_ENV")
+TAB_SEARCH_URL = env("TAB_SEARCH_URL")
 
 # insert these lines after the definition of BASE_DIR
 BACKEND_DIR = BASE_DIR  # rename variable for clarity
 FRONTEND_DIR = BASE_DIR / "frontend"
 
 # modify the definition of DEBUG and ALLOWED_HOSTS
-import os
-
-DEBUG = os.environ.get("DJANGO_ENV") == "development"
+DEBUG = DJANGO_ENV == "development"
 ALLOWED_HOSTS = ["localhost"]
 
 
@@ -44,6 +57,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
     "api.apps.ApiConfig",
     "safedelete",
     "rest_framework",
@@ -155,3 +169,5 @@ REST_FRAMEWORK = {
     ],
     "PAGE_SIZE": 100,
 }
+
+TEST_RUNNER = "sing_along.test_runner.CustomTestRunner"
