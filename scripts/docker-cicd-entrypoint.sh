@@ -4,6 +4,7 @@ set -e
 
 export ENV=Test
 export DEBUG=false
+export TAB_SEARCH_URL=http://fakewebsite.com
 
 until psql "postgresql://postgres:postgres@db:5432/postgres" -c '\l'; do
   echo >&2 "postgres is unavailable - sleeping"
