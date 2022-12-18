@@ -1,5 +1,7 @@
 from operator import attrgetter
 
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector
 from django.db import models
 from safedelete.config import SOFT_DELETE_CASCADE
 from safedelete.models import SafeDeleteModel
@@ -28,7 +30,7 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
             return None
         next_songs = [
             entry
-            for entry in self.song_entries.all()  # type: ignore
+            for entry in self.song_entries.all()
             if entry.created_at > current_song_entry.created_at
         ]
         return min(next_songs, key=attrgetter("created_at"), default=None)
@@ -36,14 +38,16 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
     def get_current_song_entry(self):
         current_and_next_songs = [
             entry
-            for entry in self.song_entries.all()  # type: ignore
+            for entry in self.song_entries.all()
             if entry.created_at >= self.current_song_timestamp
         ]
         current_song_entry = min(
             current_and_next_songs, key=attrgetter("created_at"), default=None
         )
         if current_song_entry is None:
-            return max(self.song_entries.all(), key=attrgetter("created_at"), default=None)  # type: ignore
+            return max(
+                self.song_entries.all(), key=attrgetter("created_at"), default=None
+            )
         return current_song_entry
 
     def get_previous_song_entry(self):
@@ -53,13 +57,13 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
 
         previous_songs = [
             entry
-            for entry in self.song_entries.all()  # type: ignore
+            for entry in self.song_entries.all()
             if entry.created_at < current_song_entry.created_at
         ]
         return max(previous_songs, key=attrgetter("created_at"), default=None)
 
     def get_total_song_count(self):
-        return len(self.song_entries.all())  # type: ignore
+        return len(self.song_entries.all())
 
     def get_current_song_position(self):
         current_song_entry = self.get_current_song_entry()
@@ -68,7 +72,7 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
         return len(
             [
                 entry
-                for entry in self.song_entries.all()  # type: ignore
+                for entry in self.song_entries.all()
                 if entry.created_at <= current_song_entry.created_at
             ]
         )
@@ -77,12 +81,8 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
 class Song(SafeDeleteModel, CreatedUpdated):
     class Meta:
         indexes = [
-            models.Index(
-                fields=[
-                    "artist",
-                ]
-            ),
-            models.Index(fields=["title"]),
+            GinIndex(fields=["artist"]),
+            GinIndex(fields=["title"]),
         ]
 
     artist = models.CharField(max_length=40, null=False, blank=False)
@@ -92,6 +92,13 @@ class Song(SafeDeleteModel, CreatedUpdated):
 
 
 class SongEntry(SafeDeleteModel, CreatedUpdated):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["songbook", "song"], name="unique songbook entry"
+            )
+        ]
+
     songbook = models.ForeignKey(
         Songbook,
         on_delete=models.CASCADE,
