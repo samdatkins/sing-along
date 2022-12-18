@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.contrib.postgres.search import SearchVector
+from django.contrib.postgres.search import TrigramSimilarity
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -25,8 +25,8 @@ class SongViewSet(viewsets.ModelViewSet):
     def search(self, request):
         q = self.request.query_params.get("q")
         song_matches = Song.objects.annotate(
-            search=SearchVector("artist", "title")
-        ).filter(search=q)
+            similarity=TrigramSimilarity("artist", q) + TrigramSimilarity("title", q)
+        ).filter(similarity__gt=0.6)
 
         song = None
         if len(song_matches) > 0:

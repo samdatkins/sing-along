@@ -81,10 +81,8 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
 class Song(SafeDeleteModel, CreatedUpdated):
     class Meta:
         indexes = [
-            GinIndex(
-                SearchVector("artist", "title", config="english"),
-                name="search_vector_idx",
-            )
+            GinIndex(fields=["artist"]),
+            GinIndex(fields=["title"]),
         ]
 
     artist = models.CharField(max_length=40, null=False, blank=False)
