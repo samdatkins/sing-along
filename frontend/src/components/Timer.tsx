@@ -3,14 +3,20 @@ import { Text, keyframes } from "@chakra-ui/react";
 import { forwardRef, useState } from "react";
 
 interface TimerProps {
-  startActionPrompt: () => void;
+  updateActionStatus: (status: any) => void;
+  moveForward: () => void;
   reference: any;
   key: number;
 }
 
-function Timer({ startActionPrompt, reference, key }: TimerProps) {
+function Timer({
+  updateActionStatus,
+  moveForward,
+  reference,
+  key,
+}: TimerProps) {
   // length of time for timer
-  const [expTime, setExpTime] = useState(Date.now() + 60000);
+  const [expTime, setExpTime] = useState(Date.now() + 10000);
   // state to manage styles and animation, allows for "warning" styling on timer when nearly expired (<= 5 secs)
   const [styles, setStyles] = useState({
     color: "#FAEBD7",
@@ -29,9 +35,7 @@ function Timer({ startActionPrompt, reference, key }: TimerProps) {
       key={key}
       animation={styles.animation}
       bgClip="text"
-      fontSize="2.5em"
-      mx="1rem"
-      my=".5rem"
+      fontSize="3em"
       fontWeight={styles.fontWeight}
       color={styles.color}
     >
@@ -58,7 +62,11 @@ function Timer({ startActionPrompt, reference, key }: TimerProps) {
           }
         }}
         // when expired, we run the startDoAction function, passed in as a prop
-        onComplete={startActionPrompt}
+        onComplete={() => {
+          updateActionStatus(true);
+          setInterval(() => updateActionStatus(false), 2000);
+          moveForward();
+        }}
       />
     </Text>
   );

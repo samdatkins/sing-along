@@ -1,10 +1,9 @@
 import { Text, keyframes } from "@chakra-ui/react";
 
-interface ActionPromptProps {
-  actionPromptText: string;
-}
+// global action variable
+const globalActionSetting = "DANCE";
 
-export default function Action({ actionPromptText }: ActionPromptProps) {
+export default function Action() {
   const animationKeyframes = keyframes`
   from { transform: scale(1) }
   to { transform: scale(3) rotate(360deg) }
@@ -18,7 +17,7 @@ export default function Action({ actionPromptText }: ActionPromptProps) {
       fontWeight="extrabold"
       color="periwinkle"
     >
-      {actionPromptText}!
+      {globalActionSetting}!
     </Text>
   );
 }
