@@ -10,6 +10,7 @@ import {
   MenuList,
   Skeleton,
   Text,
+  useColorMode,
 } from "@chakra-ui/react";
 import {
   AddIcon,
@@ -26,59 +27,28 @@ import {
   FaPlay,
   FaUndoAlt,
 } from "react-icons/fa";
-import axios, { AxiosResponse } from "axios";
-import { UseAsyncReturn } from "react-async-hook";
-import { Songbook } from "../models/song";
+import { ApplicationState, AppStateToTimerMap } from "../models";
 import { useParams } from "react-router-dom";
 import { useRef, useState, useCallback, useEffect } from "react";
 
 import Timer from "./Timer";
 import QRCode from "react-qr-code";
+import { nextSongbookSong, prevSongbookSong } from "../services/navigation";
 
 interface NavBarProps {
   asyncSongbook: any;
-  colorControls: any;
-  updateActionStatus: any;
-  doActionPrompt: boolean;
+  advanceToNextAppState: () => void;
+  resetAppState: () => void;
+  applicationState: ApplicationState;
 }
 
 const addSongUrl = window.location.origin + "/addSong";
 
-async function nextSongbookSong(
-  sessionKey: string | undefined,
-  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>
-) {
-  if (!sessionKey) return;
-  const result = await axios.patch<Songbook>(
-    `/api/songbooks/${sessionKey}/next-song/`
-  );
-  if (result.status !== 200) {
-    console.error("Couldn't get next song");
-  } else {
-    asyncSongbook.execute();
-  }
-}
-
-async function prevSongbookSong(
-  sessionKey: string | undefined,
-  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>
-) {
-  if (!sessionKey) return;
-  const result = await axios.patch<Songbook>(
-    `/api/songbooks/${sessionKey}/previous-song/`
-  );
-  if (result.status !== 200) {
-    console.error("Couldn't get previous song");
-  } else {
-    asyncSongbook.execute();
-  }
-}
-
 export default function NavBar({
   asyncSongbook,
-  colorControls,
-  updateActionStatus,
-  doActionPrompt,
+  advanceToNextAppState,
+  resetAppState,
+  applicationState,
 }: NavBarProps) {
   // gets session key from url
   const { sessionKey } = useParams();
@@ -88,6 +58,11 @@ export default function NavBar({
   const [timerKey, setTimerKey] = useState(Date.now());
   // state for whether time is running or not
   const [isLive, setIsLive] = useState(true);
+  // state for length of countdown timer in seconds
+  const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
+    AppStateToTimerMap[applicationState]
+  );
+  const { colorMode, toggleColorMode } = useColorMode();
 
   const currentSongbook =
     !asyncSongbook.loading &&
@@ -110,28 +85,43 @@ export default function NavBar({
     },
   };
 
+  const navToSong = (direction: "next" | "prev") => {
+    setIsLive(false);
+    if (direction === "next") {
+      nextSongbookSong(sessionKey, asyncSongbook);
+    } else {
+      prevSongbookSong(sessionKey, asyncSongbook);
+    }
+    resetAppState();
+    timerControls.refresh();
+  };
+
   const isSongbookOwner = true;
 
   // handle what happens on key press
-  const handleKeyPress = useCallback((event: any) => {
-    if (event.code === "Delete") {
-      alert(`This deletes the current song and advances to the next song.`);
-    } else if (event.code === "Space") {
-      timerControls.playPauseToggle();
-      // prevents scrolling from spacebar
-      event.preventDefault();
-    } else if (event.code === "ArrowLeft") {
-      timerControls.refresh();
-      prevSongbookSong(sessionKey, asyncSongbook);
-    } else if (event.code === "ArrowRight") {
-      timerControls.refresh();
-      nextSongbookSong(sessionKey, asyncSongbook);
-    } else if (event.code === "KeyR") {
-      timerControls.refresh();
-    } else if (event.code === "KeyF") {
-      alert(`This cancels the tab view truncation AND pauses the timer.`);
-    }
-  }, []);
+  const handleKeyPress = useCallback(
+    (event: any) => {
+      if (event.code === "Delete") {
+        alert(`This deletes the current song and advances to the next song.`);
+      } else if (event.code === "Space") {
+        timerControls.playPauseToggle();
+        // prevents scrolling from spacebar
+        event.preventDefault();
+      } else if (event.code === "ArrowLeft") {
+        navToSong("prev");
+      } else if (event.code === "ArrowRight") {
+        navToSong("next");
+      } else if (event.code === "KeyR") {
+        resetAppState();
+        timerControls.refresh();
+      } else if (event.code === "KeyF") {
+        alert(`This cancels the tab view truncation AND pauses the timer.`);
+      } else if (event.code === "Backquote") {
+        toggleColorMode();
+      }
+    },
+    [timerControls, toggleColorMode]
+  );
 
   useEffect(() => {
     // attach the event listener
@@ -142,6 +132,20 @@ export default function NavBar({
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [handleKeyPress]);
+
+  useEffect(() => {
+    setIsLive(false);
+
+    const newCountdownTime = AppStateToTimerMap[applicationState];
+    setCountdownTimerInSeconds(newCountdownTime);
+    if (applicationState === ApplicationState.PrepForNextSong) {
+      nextSongbookSong(sessionKey, asyncSongbook);
+    }
+  }, [applicationState]);
+
+  useEffect(() => {
+    timerControls.refresh();
+  }, [countdownTimerInSeconds]);
 
   return (
     <Flex flexDir="row" w="100%" justifyContent="space-between">
@@ -162,8 +166,7 @@ export default function NavBar({
                     <Button
                       colorScheme="blue"
                       onClick={() => {
-                        prevSongbookSong(sessionKey, asyncSongbook);
-                        timerControls.refresh();
+                        navToSong("prev");
                       }}
                     >
                       <Icon as={FaFastBackward} />
@@ -177,8 +180,7 @@ export default function NavBar({
                     <Button
                       colorScheme="blue"
                       onClick={() => {
-                        nextSongbookSong(sessionKey, asyncSongbook);
-                        timerControls.refresh();
+                        navToSong("next");
                       }}
                     >
                       <Icon as={FaFastForward} />
@@ -188,7 +190,10 @@ export default function NavBar({
                     <Button
                       flex="1"
                       colorScheme="blue"
-                      onClick={timerControls.refresh}
+                      onClick={() => {
+                        resetAppState();
+                        timerControls.refresh();
+                      }}
                     >
                       <Icon as={FaUndoAlt} />
                     </Button>
@@ -196,18 +201,10 @@ export default function NavBar({
                 </Flex>
               )}
               <MenuItem
-                icon={
-                  colorControls.colorMode === "light" ? (
-                    <MoonIcon />
-                  ) : (
-                    <SunIcon />
-                  )
-                }
-                onClick={colorControls.toggleColorMode}
+                icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                onClick={toggleColorMode}
               >
-                {colorControls.colorMode === "light"
-                  ? "Night Mode"
-                  : "Day Mode"}
+                {colorMode === "light" ? "Night Mode" : "Day Mode"}
               </MenuItem>
               {isSongbookOwner && (
                 <MenuItem
@@ -275,19 +272,15 @@ export default function NavBar({
       <Flex w="33%" justifyContent="space-between">
         <Flex></Flex>
         <Flex>
-          {/* Only show timer if running, hide when expired */}
-          {!doActionPrompt && (
-            <Flex>
-              <Timer
-                reference={timerRef}
-                key={timerKey}
-                // this function will be where we set off the song transition when that is ready, a redirect instead of reload
-
-                updateActionStatus={updateActionStatus}
-                moveForward={() => nextSongbookSong(sessionKey, asyncSongbook)}
-              />
-            </Flex>
-          )}
+          <Flex>
+            <Timer
+              isLive={isLive}
+              reference={timerRef}
+              timerKey={timerKey}
+              triggerOnTimerComplete={advanceToNextAppState}
+              countdownTimeInSeconds={countdownTimerInSeconds}
+            />
+          </Flex>
         </Flex>
         <Button colorScheme="blue" onClick={() => alert("Add Song")}>
           <AddIcon />

@@ -22,3 +22,15 @@ export type Songbook = {
   current_song_position: number;
   current_song_entry: SongEntry;
 };
+
+export enum ApplicationState {
+  ShowSong,
+  ActionPrompt,
+  PrepForNextSong,
+}
+
+export const AppStateToTimerMap = {
+  [ApplicationState.ShowSong]: 10,
+  [ApplicationState.ActionPrompt]: 7,
+  [ApplicationState.PrepForNextSong]: 8,
+};

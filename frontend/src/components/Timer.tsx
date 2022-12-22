@@ -1,75 +1,79 @@
 import Countdown from "react-countdown";
-import { Text, keyframes } from "@chakra-ui/react";
-import { forwardRef, useState } from "react";
+import { Text, keyframes, useColorModeValue } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 interface TimerProps {
-  updateActionStatus: (status: any) => void;
-  moveForward: () => void;
+  triggerOnTimerComplete: () => void;
   reference: any;
-  key: number;
+  timerKey: number;
+  isLive: boolean;
+  countdownTimeInSeconds: number;
 }
 
-function Timer({
-  updateActionStatus,
-  moveForward,
-  reference,
-  key,
-}: TimerProps) {
-  // length of time for timer
-  const [expTime, setExpTime] = useState(Date.now() + 10000);
-  // state to manage styles and animation, allows for "warning" styling on timer when nearly expired (<= 5 secs)
-  const [styles, setStyles] = useState({
-    color: "#FAEBD7",
-    animation: "",
-    fontWeight: "",
-  });
+function getTimerResetTime(countdownTimeInSeconds: number) {
+  return Date.now() + countdownTimeInSeconds * 1000;
+}
 
-  const animationKeyframes = keyframes`
-  0% { transform: scale(1); }
-  25% { transform: scale(1.5) }
-  50% { transform: scale(1); }
+const animationKeyframes = keyframes`
+0% { transform: scale(1); }
+25% { transform: scale(1.5) }
+50% { transform: scale(1); }
 `;
 
+export default function Timer({
+  triggerOnTimerComplete,
+  reference,
+  timerKey,
+  isLive,
+  countdownTimeInSeconds,
+}: TimerProps) {
+  // length of time for timer
+  const [expTime, setExpTime] = useState(
+    getTimerResetTime(countdownTimeInSeconds)
+  );
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
+
+  const defaultStyle = {};
+
+  const pausedStyle = {
+    color: useColorModeValue("blackAlpha.500", "whiteAlpha.500"),
+  };
+
+  const alertStyle = {
+    color: "tomato",
+    // time is calibrated to emulate the hearbeat effect
+    animation: `${animationKeyframes} 1s ease-in-out infinite`,
+    fontWeight: "extrabold",
+  };
+  const fontStyles = !isLive
+    ? pausedStyle
+    : remainingSeconds <= 5
+    ? alertStyle
+    : defaultStyle;
+
+  useEffect(() => {
+    setExpTime(getTimerResetTime(countdownTimeInSeconds));
+  }, [timerKey, countdownTimeInSeconds]);
+
   return (
-    <Text
-      key={key}
-      animation={styles.animation}
-      bgClip="text"
-      fontSize="3em"
-      fontWeight={styles.fontWeight}
-      color={styles.color}
-    >
+    <Text fontSize="3em" {...fontStyles}>
       <Countdown
         ref={reference}
-        key={key}
+        key={timerKey}
         text-align="top"
         date={expTime}
-        intervalDelay={0}
+        intervalDelay={250}
         // displays the whole second time until expiration
         renderer={(props) => (
-          <div key={key}>{props.total > 0 ? props.total / 1000 : ""}</div>
+          <span>{props.total > 0 ? props.total / 1000 : ""}</span>
         )}
-        // triggers the change in styling
         onTick={(props) => {
-          const remainingSeconds = props.total / 1000;
-          if (remainingSeconds === 5) {
-            setStyles({
-              color: "tomato",
-              // time is calibrated to emulate the hearbeat effect
-              animation: `${animationKeyframes} 1s ease-in-out infinite`,
-              fontWeight: "extrabold",
-            });
-          }
+          setRemainingSeconds(props.total / 1000);
         }}
-        // when expired, we run the startDoAction function, passed in as a prop
         onComplete={() => {
-          updateActionStatus(true);
-          setInterval(() => updateActionStatus(false), 2000);
-          moveForward();
+          triggerOnTimerComplete();
         }}
       />
     </Text>
   );
 }
-
-export default forwardRef(Timer);
