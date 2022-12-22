@@ -1,14 +1,14 @@
-import { Box, Center, Flex, SkeletonText, Text } from "@chakra-ui/react";
-import { useState } from "react";
+import { Box, SkeletonText, Text } from "@chakra-ui/react";
+import { ApplicationState } from "../models";
 
 import ActionPrompt from "./ActionPrompt";
 
 interface TabsProps {
   asyncSongbook: any;
-  doActionPrompt: boolean;
+  applicationState: ApplicationState;
 }
 
-function Tabs({ asyncSongbook, doActionPrompt }: TabsProps) {
+function Tabs({ asyncSongbook, applicationState }: TabsProps) {
   // state for showing ActionPrompt component instead of lyrics
   // const [doActionPrompt, setDoActionPrompt] = useState(false);
 
@@ -22,43 +22,40 @@ function Tabs({ asyncSongbook, doActionPrompt }: TabsProps) {
 
   return (
     <>
-      {/* hide lyrics when time to do action */}
-      {doActionPrompt ? (
-        <Flex width="100%" height="100%" justify="center" marginTop="25%">
-          <Center>
-            <ActionPrompt />
-          </Center>
-        </Flex>
-      ) : (
-        <Box
-          p="1rem"
-          style={{ columnCount: 2, columnGap: "1rem" }}
-          width="100%"
-          height="100%"
-        >
-          <SkeletonText
-            noOfLines={80}
-            isLoaded={!asyncSongbook.loading}
-            spacing="4"
-          />
-          {splitTab && (
-            <pre style={{ fontSize: "1.25rem", fontFamily: "Ubuntu Mono" }}>
-              Tab:{" "}
-              {splitTab?.map((tabLine: string) => {
-                if (tabLine.includes("[ch]")) {
-                  return (
-                    <Text color="cyan.500">
-                      {tabLine.replaceAll("[ch]", "").replaceAll("[/ch]", "")}
-                    </Text>
-                  );
-                } else {
-                  return <Text>{tabLine}</Text>;
-                }
-              })}
-            </pre>
-          )}
-        </Box>
+      {applicationState === ApplicationState.ActionPrompt && (
+        <ActionPrompt text="DANCE" animate={true} />
       )}
+      {applicationState === ApplicationState.PrepForNextSong && (
+        <ActionPrompt text="¡GET READY!" animate={false} />
+      )}
+      <Box
+        p="1rem"
+        style={{ columnCount: 2, columnGap: "1rem" }}
+        width="100%"
+        height="100%"
+      >
+        <SkeletonText
+          noOfLines={80}
+          isLoaded={!asyncSongbook.loading}
+          spacing="4"
+        />
+        {splitTab && (
+          <pre style={{ fontSize: "1.25rem", fontFamily: "Ubuntu Mono" }}>
+            Tab:{" "}
+            {splitTab?.map((tabLine: string) => {
+              if (tabLine.includes("[ch]")) {
+                return (
+                  <Text color="cyan.500" key={window.crypto.randomUUID()}>
+                    {tabLine.replaceAll("[ch]", "").replaceAll("[/ch]", "")}
+                  </Text>
+                );
+              } else {
+                return <Text key={window.crypto.randomUUID()}>{tabLine}</Text>;
+              }
+            })}
+          </pre>
+        )}
+      </Box>
     </>
   );
 }

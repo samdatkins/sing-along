@@ -1,23 +1,36 @@
-import { Text, keyframes } from "@chakra-ui/react";
+import { Text, keyframes, useColorModeValue } from "@chakra-ui/react";
 
-// global action variable
-const globalActionSetting = "DANCE";
+interface FullScreenPromptProps {
+  animate: boolean;
+  text: string;
+}
 
-export default function Action() {
+export default function FullScreenPrompt({
+  animate,
+  text,
+}: FullScreenPromptProps) {
   const animationKeyframes = keyframes`
-  from { transform: scale(1) }
-  to { transform: scale(3) rotate(360deg) }
+  from { transform: scale(3) }
+  to { transform: scale(1) rotate(360deg) }
 `;
 
   return (
     <Text
-      animation={`${animationKeyframes} 1.6s ease-in`}
-      bgClip="text"
-      fontSize="5em"
+      position="absolute"
+      ml="auto"
+      mr="auto"
+      left="0"
+      right="0"
+      mt="6rem"
+      textAlign="center"
+      animation={animate ? `${animationKeyframes} 1.6s ease-in` : ""}
+      fontSize="24rem"
       fontWeight="extrabold"
-      color="periwinkle"
+      color={useColorModeValue("blackAlpha.500", "whiteAlpha.500")}
+      lineHeight="100%"
+      pointerEvents="none" // This allows things behind the text to be clicked
     >
-      {globalActionSetting}!
+      {text}
     </Text>
   );
 }

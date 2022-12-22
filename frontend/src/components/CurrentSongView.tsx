@@ -1,21 +1,35 @@
-import { Flex, useColorMode } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
 import { useAsync } from "react-async-hook";
-import { Songbook } from "../models/song";
+import { ApplicationState, Songbook } from "../models";
 import NavBar from "./NavBar";
 import Tabs from "./Tabs";
 
 import { useParams } from "react-router-dom";
 
 function CurrentSongView() {
-  // state for toggling night/day modes
-  const { colorMode, toggleColorMode } = useColorMode();
   // state for showing ActionPrompt component instead of lyrics
-  const [doActionPrompt, setDoActionPrompt] = useState(false);
+  const [applicationState, setApplicationState] = useState(
+    ApplicationState.ShowSong
+  );
 
-  const updateActionStatus = (status: boolean) => {
-    setDoActionPrompt(status);
+  const advanceToNextAppState = () => {
+    switch (applicationState) {
+      case ApplicationState.ShowSong:
+        setApplicationState(ApplicationState.ActionPrompt);
+        break;
+      case ApplicationState.ActionPrompt:
+        setApplicationState(ApplicationState.PrepForNextSong);
+        break;
+      case ApplicationState.PrepForNextSong:
+        setApplicationState(ApplicationState.ShowSong);
+        break;
+    }
+  };
+
+  const resetAppState = () => {
+    setApplicationState(ApplicationState.ShowSong);
   };
 
   const { sessionKey } = useParams();
@@ -30,14 +44,14 @@ function CurrentSongView() {
       <Flex padding="1rem" paddingTop=".5rem" flexDir="column">
         <NavBar
           asyncSongbook={asyncSongbook}
-          colorControls={{
-            colorMode,
-            toggleColorMode,
-          }}
-          updateActionStatus={updateActionStatus}
-          doActionPrompt={doActionPrompt}
+          advanceToNextAppState={advanceToNextAppState}
+          resetAppState={resetAppState}
+          applicationState={applicationState}
         />
-        <Tabs asyncSongbook={asyncSongbook} doActionPrompt={doActionPrompt} />
+        <Tabs
+          asyncSongbook={asyncSongbook}
+          applicationState={applicationState}
+        />
       </Flex>
     </>
   );
