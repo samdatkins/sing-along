@@ -1,7 +1,8 @@
-import { Box, SkeletonText, Text } from "@chakra-ui/react";
+import { Box, SkeletonText } from "@chakra-ui/react";
 import { ApplicationState } from "../models";
 
 import ActionPrompt from "./ActionPrompt";
+import TabDisplay from "./TabDisplay";
 
 interface TabsProps {
   asyncSongbook: any;
@@ -12,13 +13,10 @@ function Tabs({ asyncSongbook, applicationState }: TabsProps) {
   // state for showing ActionPrompt component instead of lyrics
   // const [doActionPrompt, setDoActionPrompt] = useState(false);
 
-  const splitTab =
+  const tab =
     !asyncSongbook.loading &&
     !asyncSongbook.error &&
-    asyncSongbook.result?.data?.current_song_entry?.song?.content
-      .replaceAll("[tab]", "")
-      .replaceAll("[/tab]", "")
-      .split("\n");
+    asyncSongbook.result?.data?.current_song_entry?.song?.content;
 
   return (
     <>
@@ -30,7 +28,7 @@ function Tabs({ asyncSongbook, applicationState }: TabsProps) {
       )}
       <Box
         p="1rem"
-        style={{ columnCount: 2, columnGap: "1rem" }}
+        style={{ columnCount: 3, columnGap: "1rem" }}
         width="100%"
         height="100%"
       >
@@ -39,22 +37,10 @@ function Tabs({ asyncSongbook, applicationState }: TabsProps) {
           isLoaded={!asyncSongbook.loading}
           spacing="4"
         />
-        {splitTab && (
-          <pre style={{ fontSize: "1.25rem", fontFamily: "Ubuntu Mono" }}>
-            Tab:{" "}
-            {splitTab?.map((tabLine: string) => {
-              if (tabLine.includes("[ch]")) {
-                return (
-                  <Text color="cyan.500" key={window.crypto.randomUUID()}>
-                    {tabLine.replaceAll("[ch]", "").replaceAll("[/ch]", "")}
-                  </Text>
-                );
-              } else {
-                return <Text key={window.crypto.randomUUID()}>{tabLine}</Text>;
-              }
-            })}
-          </pre>
-        )}
+        <TabDisplay
+          tab={tab}
+          isNoodleMode={asyncSongbook?.result?.is_noodle_mode}
+        />
       </Box>
     </>
   );

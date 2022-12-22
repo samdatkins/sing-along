@@ -1,4 +1,11 @@
 import {
+  AddIcon,
+  DeleteIcon,
+  HamburgerIcon,
+  MoonIcon,
+  SunIcon,
+} from "@chakra-ui/icons";
+import {
   Button,
   Flex,
   Icon,
@@ -13,13 +20,7 @@ import {
   useBoolean,
   useColorMode,
 } from "@chakra-ui/react";
-import {
-  AddIcon,
-  DeleteIcon,
-  HamburgerIcon,
-  MoonIcon,
-  SunIcon,
-} from "@chakra-ui/icons";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FaExpandAlt,
   FaFastBackward,
@@ -30,13 +31,13 @@ import {
 } from "react-icons/fa";
 import { ApplicationState, AppStateToTimerMap, Songbook } from "../models";
 import { useParams } from "react-router-dom";
-import { useRef, useState, useCallback, useEffect } from "react";
+import { ApplicationState, AppStateToTimerMap } from "../models";
 
-import Timer from "./Timer";
 import QRCode from "react-qr-code";
 import { nextSongbookSong, prevSongbookSong } from "../services/navigation";
 import axios, { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
+
 
 interface NavBarProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
@@ -63,7 +64,7 @@ export default function NavBar({
   const [isLive, setIsLive] = useState(true);
   // state for length of countdown timer in seconds
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
-    AppStateToTimerMap[applicationState]
+    AppStateToTimerMap[applicationState],
   );
   const { colorMode, toggleColorMode } = useColorMode();
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
@@ -128,7 +129,7 @@ export default function NavBar({
         alert(`This cancels the tab view truncation AND pauses the timer.`);
       }
     },
-    [timerControls, toggleColorMode]
+    [timerControls, toggleColorMode],
   );
 
   useEffect(() => {
