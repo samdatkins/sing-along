@@ -1,4 +1,11 @@
 import {
+  AddIcon,
+  DeleteIcon,
+  HamburgerIcon,
+  MoonIcon,
+  SunIcon,
+} from "@chakra-ui/icons";
+import {
   Button,
   Flex,
   Icon,
@@ -12,13 +19,7 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import {
-  AddIcon,
-  DeleteIcon,
-  HamburgerIcon,
-  MoonIcon,
-  SunIcon,
-} from "@chakra-ui/icons";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FaExpandAlt,
   FaFastBackward,
@@ -27,13 +28,12 @@ import {
   FaPlay,
   FaUndoAlt,
 } from "react-icons/fa";
-import { ApplicationState, AppStateToTimerMap } from "../models";
 import { useParams } from "react-router-dom";
-import { useRef, useState, useCallback, useEffect } from "react";
+import { ApplicationState, AppStateToTimerMap } from "../models";
 
-import Timer from "./Timer";
 import QRCode from "react-qr-code";
 import { nextSongbookSong, prevSongbookSong } from "../services/navigation";
+import Timer from "./Timer";
 
 interface NavBarProps {
   asyncSongbook: any;
@@ -60,7 +60,7 @@ export default function NavBar({
   const [isLive, setIsLive] = useState(true);
   // state for length of countdown timer in seconds
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
-    AppStateToTimerMap[applicationState]
+    AppStateToTimerMap[applicationState],
   );
   const { colorMode, toggleColorMode } = useColorMode();
 
@@ -120,7 +120,7 @@ export default function NavBar({
         toggleColorMode();
       }
     },
-    [timerControls, toggleColorMode]
+    [timerControls, toggleColorMode],
   );
 
   useEffect(() => {
