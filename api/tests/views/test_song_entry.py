@@ -99,6 +99,27 @@ class TestSongEntry(TestCase):
         # Assert
         self.assertEqual(response.status_code, 409)
 
+    def test_add_deleted_song_again(self):
+        # Arrange
+        api_factory = APIRequestFactory()
+        view = SongEntryViewSet.as_view({"post": "create"})
+        self.third_song_entry.delete()
+        request = api_factory.post(
+            reverse("songentry-list"),
+            data={
+                "songbook_id": self.third_song_entry.songbook.pk,
+                "song_id": self.third_song_entry.song.pk,
+            },
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+
+        # Act
+        response = view(request)
+
+        # Assert
+        self.assertEqual(response.status_code, 201)
+
     def test_add_nonexistant_song(self):
         # Arrange
         api_factory = APIRequestFactory()

@@ -10,6 +10,7 @@ import {
   MenuList,
   Skeleton,
   Text,
+  useBoolean,
   useColorMode,
 } from "@chakra-ui/react";
 import {
@@ -27,16 +28,18 @@ import {
   FaPlay,
   FaUndoAlt,
 } from "react-icons/fa";
-import { ApplicationState, AppStateToTimerMap } from "../models";
+import { ApplicationState, AppStateToTimerMap, Songbook } from "../models";
 import { useParams } from "react-router-dom";
 import { useRef, useState, useCallback, useEffect } from "react";
 
 import Timer from "./Timer";
 import QRCode from "react-qr-code";
 import { nextSongbookSong, prevSongbookSong } from "../services/navigation";
+import axios, { AxiosResponse } from "axios";
+import { UseAsyncReturn } from "react-async-hook";
 
 interface NavBarProps {
-  asyncSongbook: any;
+  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
   advanceToNextAppState: () => void;
   resetAppState: () => void;
   applicationState: ApplicationState;
@@ -63,6 +66,7 @@ export default function NavBar({
     AppStateToTimerMap[applicationState]
   );
   const { colorMode, toggleColorMode } = useColorMode();
+  const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
 
   const currentSongbook =
     !asyncSongbook.loading &&
@@ -71,17 +75,20 @@ export default function NavBar({
 
   const timerControls = {
     playPauseToggle: () => {
-      if (timerRef?.current?.api?.isPaused()) {
-        timerRef?.current?.api?.start();
-        setIsLive(true);
-      } else {
-        timerRef.current.api?.pause();
-        setIsLive(false);
+      if (isTimerVisible) {
+        if (timerRef?.current?.api?.isPaused()) {
+          timerRef?.current?.api?.start();
+          setIsLive(true);
+        } else {
+          timerRef?.current?.api?.pause();
+          setIsLive(false);
+        }
       }
     },
     refresh: () => {
       setTimerKey(Date.now());
       setIsLive(true);
+      timerRef?.current?.api?.start();
     },
   };
 
@@ -101,8 +108,11 @@ export default function NavBar({
   // handle what happens on key press
   const handleKeyPress = useCallback(
     (event: any) => {
-      if (event.code === "Delete") {
-        alert(`This deletes the current song and advances to the next song.`);
+      // This first one is the only one that non-admins are allowed to use
+      if (event.code === "Backquote") {
+        toggleColorMode();
+      } else if (event.code === "Delete") {
+        axios.delete(`/song_entry/${asyncSongbook}`);
       } else if (event.code === "Space") {
         timerControls.playPauseToggle();
         // prevents scrolling from spacebar
@@ -116,8 +126,6 @@ export default function NavBar({
         timerControls.refresh();
       } else if (event.code === "KeyF") {
         alert(`This cancels the tab view truncation AND pauses the timer.`);
-      } else if (event.code === "Backquote") {
-        toggleColorMode();
       }
     },
     [timerControls, toggleColorMode]
@@ -221,7 +229,7 @@ export default function NavBar({
                 </MenuItem>
               )}
               {isSongbookOwner && (
-                <MenuItem icon={<DeleteIcon />}>Delete Song</MenuItem>
+                <MenuItem icon={<DeleteIcon />}>Delete Current Song</MenuItem>
               )}
             </MenuList>
           </Menu>
@@ -236,7 +244,7 @@ export default function NavBar({
       {/* MIDDLE COLUMN */}
       <Flex w="34%" alignContent="center" justifyContent="center">
         <Flex minWidth="24rem" direction="column">
-          {!asyncSongbook.loading ? (
+          {!asyncSongbook.loading && currentSongbook ? (
             <>
               <Text
                 as="h2"
@@ -273,13 +281,17 @@ export default function NavBar({
         <Flex></Flex>
         <Flex>
           <Flex>
-            <Timer
-              isLive={isLive}
-              reference={timerRef}
-              timerKey={timerKey}
-              triggerOnTimerComplete={advanceToNextAppState}
-              countdownTimeInSeconds={countdownTimerInSeconds}
-            />
+            {isTimerVisible ? (
+              <Timer
+                isLive={isLive}
+                reference={timerRef}
+                timerKey={timerKey}
+                triggerOnTimerComplete={advanceToNextAppState}
+                countdownTimeInSeconds={countdownTimerInSeconds}
+              />
+            ) : (
+              <Button onClick={setIsTimerVisible.toggle}>Start</Button>
+            )}
           </Flex>
         </Flex>
         <Button colorScheme="blue" onClick={() => alert("Add Song")}>

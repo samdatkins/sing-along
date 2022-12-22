@@ -1,8 +1,8 @@
 from operator import attrgetter
 
 from django.contrib.postgres.indexes import GinIndex
-from django.contrib.postgres.search import SearchVector
 from django.db import models
+from django.db.models import Q
 from safedelete.config import SOFT_DELETE_CASCADE
 from safedelete.models import SafeDeleteModel
 
@@ -95,7 +95,9 @@ class SongEntry(SafeDeleteModel, CreatedUpdated):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["songbook", "song"], name="unique songbook entry"
+                fields=["songbook", "song"],
+                name="unique songbook entry",
+                condition=Q(deleted__isnull=True),
             )
         ]
 
