@@ -1,5 +1,7 @@
 import { Text } from "@chakra-ui/react";
 
+const isFullSongMode = false;
+
 function formatTab(tab) {
   let tabStartIndex = 0;
   const capoArray = tab.filter((e) => e.toLowerCase().includes("capo"));
@@ -36,7 +38,8 @@ export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
         "FIX CHORDS ON BOTTOM OF SCREEN -- TBD",
       );
     */
-  const tabToDisplay = isNoodleMode ? fixedTabArray : truncatedSplitTabArray;
+  const tabToDisplay =
+    isNoodleMode || isFullSongMode ? fixedTabArray : truncatedSplitTabArray;
   return (
     <>
       {tabToDisplay && (

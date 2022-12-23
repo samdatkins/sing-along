@@ -33,14 +33,14 @@ import {
 import { ApplicationState, AppStateToTimerMap, Songbook } from "../models";
 import AddSongMenu from "./AddSongMenu";
 
+import { AxiosResponse } from "axios";
+import { UseAsyncReturn } from "react-async-hook";
 import QRCode from "react-qr-code";
 import {
   deleteSongbookSong,
   nextSongbookSong,
   prevSongbookSong,
 } from "../services/navigation";
-import { AxiosResponse } from "axios";
-import { UseAsyncReturn } from "react-async-hook";
 import Timer from "./Timer";
 
 interface NavBarProps {
@@ -66,7 +66,7 @@ export default function NavBar({
   const [isLive, setIsLive] = useState(true);
   // state for length of countdown timer in seconds
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
-    AppStateToTimerMap[applicationState]
+    AppStateToTimerMap[applicationState],
   );
   const { colorMode, toggleColorMode } = useColorMode();
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
@@ -113,24 +113,24 @@ export default function NavBar({
       // This first one is the only one that non-admins are allowed to use
       if (event.code === "Backquote") {
         toggleColorMode();
-      } else if (event.code === "Delete") {
+      } else if (isSongbookOwner && event.code === "Delete") {
         performSongNavAction("delete");
-      } else if (event.code === "Space") {
+      } else if (isSongbookOwner && event.code === "Space") {
         timerControls.playPauseToggle();
         // prevents scrolling from spacebar
         event.preventDefault();
-      } else if (event.code === "ArrowLeft") {
+      } else if (isSongbookOwner && event.code === "ArrowLeft") {
         performSongNavAction("prev");
-      } else if (event.code === "ArrowRight") {
+      } else if (isSongbookOwner && event.code === "ArrowRight") {
         performSongNavAction("next");
-      } else if (event.code === "KeyR") {
+      } else if (isSongbookOwner && event.code === "KeyR") {
         resetAppState();
         timerControls.refresh();
-      } else if (event.code === "KeyF") {
+      } else if (isSongbookOwner && event.code === "KeyF") {
         alert(`This cancels the tab view truncation AND pauses the timer.`);
       }
     },
-    [timerControls, toggleColorMode]
+    [timerControls, toggleColorMode],
   );
 
   useEffect(() => {
@@ -290,16 +290,20 @@ export default function NavBar({
         <Flex></Flex>
         <Flex>
           <Flex>
-            {isTimerVisible ? (
-              <Timer
-                isLive={isLive}
-                reference={timerRef}
-                timerKey={timerKey}
-                triggerOnTimerComplete={advanceToNextAppState}
-                countdownTimeInSeconds={countdownTimerInSeconds}
-              />
-            ) : (
-              <Button onClick={setIsTimerVisible.toggle}>Start</Button>
+            {isSongbookOwner && (
+              <>
+                {isTimerVisible ? (
+                  <Timer
+                    isLive={isLive}
+                    reference={timerRef}
+                    timerKey={timerKey}
+                    triggerOnTimerComplete={advanceToNextAppState}
+                    countdownTimeInSeconds={countdownTimerInSeconds}
+                  />
+                ) : (
+                  <Button onClick={setIsTimerVisible.toggle}>Start</Button>
+                )}
+              </>
             )}
           </Flex>
         </Flex>
