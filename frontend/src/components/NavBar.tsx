@@ -30,11 +30,14 @@ import {
   FaUndoAlt,
 } from "react-icons/fa";
 import { ApplicationState, AppStateToTimerMap, Songbook } from "../models";
-import { useParams } from "react-router-dom";
 
 import QRCode from "react-qr-code";
-import { nextSongbookSong, prevSongbookSong } from "../services/navigation";
-import axios, { AxiosResponse } from "axios";
+import {
+  deleteSongbookSong,
+  nextSongbookSong,
+  prevSongbookSong,
+} from "../services/navigation";
+import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
 import Timer from "./Timer";
 
@@ -53,8 +56,6 @@ export default function NavBar({
   resetAppState,
   applicationState,
 }: NavBarProps) {
-  // gets session key from url
-  const { sessionKey } = useParams();
   // ref for controlling the timer from parent component
   const timerRef = useRef<any>();
   // state for triggering refresh in Timer component when restart is clicked
@@ -92,12 +93,14 @@ export default function NavBar({
     },
   };
 
-  const navToSong = (direction: "next" | "prev") => {
+  const performSongNavAction = (action: "next" | "prev" | "delete") => {
     setIsLive(false);
-    if (direction === "next") {
-      nextSongbookSong(sessionKey, asyncSongbook);
+    if (action === "next") {
+      nextSongbookSong(asyncSongbook);
+    } else if (action === "prev") {
+      prevSongbookSong(asyncSongbook);
     } else {
-      prevSongbookSong(sessionKey, asyncSongbook);
+      deleteSongbookSong(asyncSongbook);
     }
     resetAppState();
     timerControls.refresh();
@@ -112,15 +115,15 @@ export default function NavBar({
       if (event.code === "Backquote") {
         toggleColorMode();
       } else if (event.code === "Delete") {
-        axios.delete(`/song_entry/${asyncSongbook}`);
+        performSongNavAction("delete");
       } else if (event.code === "Space") {
         timerControls.playPauseToggle();
         // prevents scrolling from spacebar
         event.preventDefault();
       } else if (event.code === "ArrowLeft") {
-        navToSong("prev");
+        performSongNavAction("prev");
       } else if (event.code === "ArrowRight") {
-        navToSong("next");
+        performSongNavAction("next");
       } else if (event.code === "KeyR") {
         resetAppState();
         timerControls.refresh();
@@ -147,7 +150,7 @@ export default function NavBar({
     const newCountdownTime = AppStateToTimerMap[applicationState];
     setCountdownTimerInSeconds(newCountdownTime);
     if (applicationState === ApplicationState.PrepForNextSong) {
-      nextSongbookSong(sessionKey, asyncSongbook);
+      nextSongbookSong(asyncSongbook);
     }
   }, [applicationState]);
 
@@ -174,7 +177,7 @@ export default function NavBar({
                     <Button
                       colorScheme="blue"
                       onClick={() => {
-                        navToSong("prev");
+                        performSongNavAction("prev");
                       }}
                     >
                       <Icon as={FaFastBackward} />
@@ -188,7 +191,7 @@ export default function NavBar({
                     <Button
                       colorScheme="blue"
                       onClick={() => {
-                        navToSong("next");
+                        performSongNavAction("next");
                       }}
                     >
                       <Icon as={FaFastForward} />
@@ -229,7 +232,12 @@ export default function NavBar({
                 </MenuItem>
               )}
               {isSongbookOwner && (
-                <MenuItem icon={<DeleteIcon />}>Delete Current Song</MenuItem>
+                <MenuItem
+                  onClick={() => performSongNavAction("delete")}
+                  icon={<DeleteIcon />}
+                >
+                  Delete Current Song
+                </MenuItem>
               )}
             </MenuList>
           </Menu>

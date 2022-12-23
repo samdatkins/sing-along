@@ -10,7 +10,7 @@ function formatTab(tab) {
     }
   }
   const newArray = tab.slice(tabStartIndex, tab.length);
-  const fixedTabArray = [(capoArray[0] || []), ...newArray];
+  const fixedTabArray = [capoArray[0] || [], ...newArray];
   return fixedTabArray;
 }
 
@@ -32,8 +32,6 @@ export default function TabDisplay({ tab, isNoodleMode }) {
       );
     */
   const tabToDisplay = isNoodleMode ? fixedTabArray : truncatedSplitTabArray;
-  console.log(tabToDisplay.length);
-  console.dir(tabToDisplay);
   return (
     <>
       {tabToDisplay && (
