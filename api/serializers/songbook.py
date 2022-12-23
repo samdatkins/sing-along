@@ -19,6 +19,7 @@ class SongbookDetailSerializer(serializers.ModelSerializer):
             "total_songs",
             "current_song_position",
             "current_song_entry",
+            "id",
         ]
 
     def get_total_songs(self, obj):
