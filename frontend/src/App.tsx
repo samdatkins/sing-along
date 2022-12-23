@@ -1,7 +1,6 @@
 import axios from "axios";
 import cookie from "react-cookies";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import AddSongView from "./components/AddSongView";
 import CurrentSongView from "./components/CurrentSongView";
 import WelcomePage from "./components/WelcomePage";
 import { createCSRF } from "./helpers/session";
@@ -16,7 +15,6 @@ function App() {
       <Routes>
         <Route path="/live/:sessionKey/" element={<CurrentSongView />} />
         <Route path="/" element={<WelcomePage />} />
-        <Route path="/live/:sessionKey/addSong" element={<AddSongView />} />
       </Routes>
     </BrowserRouter>
   );
