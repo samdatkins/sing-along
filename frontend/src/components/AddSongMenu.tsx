@@ -26,7 +26,7 @@ export default function AddSongMenu({ isOpen, onClose }: AddSongMenuProps) {
           <DrawerHeader>Request a song:</DrawerHeader>
 
           <DrawerBody>
-            <Input id="request" placeholder="Lynyrd Skynyrd - Free Bird" />
+            <Input placeholder="Lynyrd Skynyrd - Free Bird" />
             <Flex direction="row" justifyContent="end">
               <Button type="submit" mt="1rem">
                 Submit
