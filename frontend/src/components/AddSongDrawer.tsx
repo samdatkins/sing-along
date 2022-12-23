@@ -33,8 +33,8 @@ export default function AddSongDrawer() {
   });
   const [searchText, setSearchText] = useState("");
   const [alertText, setAlertText] = useState("");
-  const [undoSongEntryID, setUndoSongEntryID] = useState<number | undefined>();
   const [alertStatus, setAlertStatus] = useState<ChakraAlertStatus>();
+  const [undoSongEntryID, setUndoSongEntryID] = useState<number | undefined>();
   const [isSubmitting, setIsSubmitting] = useBoolean();
   const songbook = useContext(SongbookContext);
 
@@ -93,7 +93,6 @@ export default function AddSongDrawer() {
                           `Successfully added "${searchSongResult?.data?.title}" by ${searchSongResult?.data?.artist}.`
                         );
                         setSearchText("");
-                        // setUndoSongDetails(searchSongResult?.data.id);
                       }
                     }
                     setIsSubmitting.off();
