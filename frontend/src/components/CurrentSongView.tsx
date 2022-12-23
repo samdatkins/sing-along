@@ -6,8 +6,9 @@ import NavBar from "./NavBar";
 import Tabs from "./Tabs";
 
 import { useParams } from "react-router-dom";
-import { getCurrentSong } from "../services/navigation";
+import { getCurrentSong } from "../services/songs";
 import { useInterval } from "usehooks-ts";
+import SongbookContext from "../contexts/SongbookContext";
 
 const SONGBOOK_POLL_INTERVAL = 1 * 1000;
 
@@ -49,18 +50,20 @@ function CurrentSongView() {
 
   return (
     <>
-      <Flex padding="1rem" paddingTop=".5rem" flexDir="column">
-        <NavBar
-          asyncSongbook={asyncSongbook}
-          advanceToNextAppState={advanceToNextAppState}
-          resetAppState={resetAppState}
-          applicationState={applicationState}
-        />
-        <Tabs
-          asyncSongbook={asyncSongbook}
-          applicationState={applicationState}
-        />
-      </Flex>
+      <SongbookContext.Provider value={asyncSongbook?.result?.data}>
+        <Flex padding="1rem" paddingTop=".5rem" flexDir="column">
+          <NavBar
+            asyncSongbook={asyncSongbook}
+            advanceToNextAppState={advanceToNextAppState}
+            resetAppState={resetAppState}
+            applicationState={applicationState}
+          />
+          <Tabs
+            asyncSongbook={asyncSongbook}
+            applicationState={applicationState}
+          />
+        </Flex>
+      </SongbookContext.Provider>
     </>
   );
 }

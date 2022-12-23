@@ -38,7 +38,7 @@ class TabSearcher:
 
     @staticmethod
     def _calculate_weighted_rating(result, max_votes):
-        return (result["votes"] / max_votes) * result["rating"]
+        return (result["votes"] / max(max_votes, 1)) * result["rating"]
 
     @staticmethod
     def _build_search_results_dict(results):
@@ -72,7 +72,7 @@ class TabSearcher:
 
     def get_best_tab_entry(self, query: str):
         parsed_search_results = self._get_parsed_search_results(query)
-        if parsed_search_results is None:
+        if parsed_search_results is None or len(parsed_search_results) == 0:
             return None
 
         max_votes = max(tab["votes"] for tab in parsed_search_results)
@@ -85,7 +85,7 @@ class TabSearcher:
 class TabScraper:
     @staticmethod
     def _build_single_tab_dict(results):
-        return {
+        tab_dict = {
             "artist": results["tab"]["artist_name"],
             "title": results["tab"]["song_name"],
             "url": results["tab"]["tab_url"],
@@ -93,11 +93,20 @@ class TabScraper:
             "votes": results["tab"]["votes"],
             "type": results["tab"]["type"],
             "difficulty": results["tab"].get("difficulty", None),
-            "capo": results["tab_view"]["meta"].get("capo", None),
-            "key": results["tab_view"]["meta"].get("tonality", None),
-            "tuning": results["tab_view"]["meta"].get("tuning", {}).get("value", None),
             "content": results["tab_view"]["wiki_tab"]["content"],
         }
+        if "meta" in results["tab_view"] and type(results["tab_view"]["meta"]) is dict:
+            tab_dict.update(
+                {
+                    "capo": results["tab_view"]["meta"].get("capo", None),
+                    "key": results["tab_view"]["meta"].get("tonality", None),
+                    "tuning": results["tab_view"]["meta"]
+                    .get("tuning", {})
+                    .get("value", None),
+                }
+            )
+
+        return tab_dict
 
     def load_tab_from_url(self, tab_url):
         response = requests.get(

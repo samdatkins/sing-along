@@ -3,6 +3,7 @@ export type Song = {
   content: string;
   url: string;
   title: string;
+  id: number;
 };
 
 export type SongEntry = {
@@ -14,6 +15,7 @@ export type SongEntry = {
 };
 
 export type Songbook = {
+  id: number; // we should remove this from the API and only use session_key eventually
   session_key: string;
   max_active_songs: number;
   title: string;
@@ -34,3 +36,18 @@ export const AppStateToTimerMap = {
   [ApplicationState.ActionPrompt]: 7,
   [ApplicationState.PrepForNextSong]: 8,
 };
+
+export type DjangoPaginatedResponse<T> = {
+  count: number;
+  next: string;
+  previous: string;
+  results: T[];
+};
+
+export type ChakraAlertStatus =
+  | "info"
+  | "warning"
+  | "error"
+  | "success"
+  | "loading"
+  | undefined;

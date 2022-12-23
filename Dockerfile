@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM python:3.10-buster
+FROM python:3.10-bullseye
 ARG YOUR_ENV
 
 ENV YOUR_ENV=${YOUR_ENV}

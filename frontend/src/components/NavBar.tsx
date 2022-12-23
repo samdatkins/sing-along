@@ -19,7 +19,6 @@ import {
   Text,
   useBoolean,
   useColorMode,
-  useDisclosure,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -31,17 +30,17 @@ import {
   FaUndoAlt,
 } from "react-icons/fa";
 import { ApplicationState, AppStateToTimerMap, Songbook } from "../models";
-import AddSongMenu from "./AddSongMenu";
 
 import QRCode from "react-qr-code";
 import {
   deleteSongbookSong,
   nextSongbookSong,
   prevSongbookSong,
-} from "../services/navigation";
+} from "../services/songs";
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
 import Timer from "./Timer";
+import { Link as RouterLink, useOutlet } from "react-router-dom";
 
 interface NavBarProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
@@ -58,6 +57,8 @@ export default function NavBar({
   resetAppState,
   applicationState,
 }: NavBarProps) {
+  // Outlet that conditionally renders the add song drawer based on URL
+  const addSongDrawerOutlet = useOutlet();
   // ref for controlling the timer from parent component
   const timerRef = useRef<any>();
   // state for triggering refresh in Timer component when restart is clicked
@@ -92,15 +93,22 @@ export default function NavBar({
     },
   };
 
-  const performSongNavAction = (action: "next" | "prev" | "delete") => {
+  const performSongNavAction = async (action: "next" | "prev" | "delete") => {
+    const sessionKey = asyncSongbook?.result?.data?.session_key;
     setIsLive(false);
+
+    asyncSongbook.reset();
     if (action === "next") {
-      nextSongbookSong(asyncSongbook);
+      await nextSongbookSong(sessionKey);
     } else if (action === "prev") {
-      prevSongbookSong(asyncSongbook);
+      await prevSongbookSong(sessionKey);
     } else {
-      deleteSongbookSong(asyncSongbook);
+      await deleteSongbookSong(
+        asyncSongbook?.result?.data?.current_song_entry?.id
+      );
     }
+    asyncSongbook.execute();
+
     resetAppState();
     timerControls.refresh();
   };
@@ -110,6 +118,9 @@ export default function NavBar({
   // handle what happens on key press
   const handleKeyPress = useCallback(
     (event: any) => {
+      // if the add song drawer is open, ignore all typing
+      if (addSongDrawerOutlet) return;
+
       // This first one is the only one that non-admins are allowed to use
       if (event.code === "Backquote") {
         toggleColorMode();
@@ -144,20 +155,25 @@ export default function NavBar({
   }, [handleKeyPress]);
 
   useEffect(() => {
-    setIsLive(false);
+    async function appStateChanged() {
+      setIsLive(false);
 
-    const newCountdownTime = AppStateToTimerMap[applicationState];
-    setCountdownTimerInSeconds(newCountdownTime);
-    if (applicationState === ApplicationState.PrepForNextSong) {
-      nextSongbookSong(asyncSongbook);
+      const newCountdownTime = AppStateToTimerMap[applicationState];
+      setCountdownTimerInSeconds(newCountdownTime);
+      if (applicationState === ApplicationState.PrepForNextSong) {
+        const sessionKey = asyncSongbook?.result?.data?.session_key;
+        asyncSongbook.reset();
+        await nextSongbookSong(sessionKey);
+        asyncSongbook.execute();
+      }
     }
+
+    appStateChanged();
   }, [applicationState]);
 
   useEffect(() => {
     timerControls.refresh();
   }, [countdownTimerInSeconds]);
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Flex flexDir="row" w="100%" justifyContent="space-between">
@@ -303,10 +319,10 @@ export default function NavBar({
             )}
           </Flex>
         </Flex>
-        <Button colorScheme="blue" onClick={onOpen}>
+        <Button colorScheme="blue" as={RouterLink} to={"addSong"}>
           <AddIcon />
         </Button>
-        <AddSongMenu isOpen={isOpen} onClose={onClose} />
+        {addSongDrawerOutlet}
       </Flex>
     </Flex>
   );

@@ -25,11 +25,16 @@ class SongViewSet(viewsets.ModelViewSet):
     def search(self, request):
         q = self.request.query_params.get("q")
         if q is None or len(q) == 0:
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        song_matches = Song.objects.annotate(
-            similarity=TrigramSimilarity("artist", q) + TrigramSimilarity("title", q)
-        ).filter(similarity__gt=0.6)
+        song_matches = (
+            Song.objects.annotate(
+                similarity=TrigramSimilarity("artist", q)
+                + TrigramSimilarity("title", q)
+            )
+            .filter(similarity__gt=0.55)
+            .order_by("-similarity")
+        )
 
         song = None
         if len(song_matches) > 0:
@@ -44,10 +49,16 @@ class SongViewSet(viewsets.ModelViewSet):
                 logger.exception("Failed to fetch tab from external server")
 
             if tab is not None:
-                song = Song()
-                for key, value in tab.items():
-                    setattr(song, key, value)
-                song.save()
+                existing_song = None
+                try:
+                    existing_song = Song.objects.get(url=tab["url"])
+                except (Song.DoesNotExist) as e:
+                    song = Song()
+                    for key, value in tab.items():
+                        setattr(song, key, value)
+                    song.save()
+                else:
+                    song = existing_song
 
         if song is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
