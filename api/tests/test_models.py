@@ -32,6 +32,16 @@ class TestSongbook(TestCase):
         self.third_song_entry.created_at = get_datetime_x_seconds_ago(1)
         self.third_song_entry.save()
 
+        self.deleted_song_entry = SongEntryFactory.create()
+        self.deleted_song_entry.created_at = get_datetime_x_seconds_ago(5)
+        self.deleted_song_entry.save()
+        self.empty_from_deletion_songbook = self.deleted_song_entry.songbook
+        self.empty_from_deletion_songbook.current_song_timestamp = (
+            get_datetime_x_seconds_ago(60)
+        )
+        self.empty_from_deletion_songbook.save()
+        self.deleted_song_entry.delete()
+
     # Test on empty songbooks (should be empty)
     def test_get_next_song_entry_on_empty_songbook(self):
         next_song = self.empty_songbook.get_next_song_entry()
@@ -51,6 +61,29 @@ class TestSongbook(TestCase):
 
     def test_get_total_song_count_on_empty_songbook(self):
         soung_count = self.empty_songbook.get_total_song_count()
+        self.assertEqual(soung_count, 0)
+
+    # Test on songbooks with a deleted song (should be empty)
+    def test_get_next_song_entry_on_deleted_empty_songbook(self):
+        next_song = self.empty_from_deletion_songbook.get_next_song_entry()
+        self.assertEqual(next_song, None)
+
+    def test_get_previous_song_entry_on_deleted_empty_songbook(self):
+        previous_song = self.empty_from_deletion_songbook.get_previous_song_entry()
+        self.assertEqual(previous_song, None)
+
+    def test_get_current_song_entry_on_deleted_empty_songbook(self):
+        current_song = self.empty_from_deletion_songbook.get_current_song_entry()
+        self.assertEqual(current_song, None)
+
+    def test_get_current_song_position_on_deleted_empty_songbook(self):
+        current_song_position = (
+            self.empty_from_deletion_songbook.get_current_song_position()
+        )
+        self.assertEqual(current_song_position, 0)
+
+    def test_get_total_song_count_on_deleted_empty_songbook(self):
+        soung_count = self.empty_from_deletion_songbook.get_total_song_count()
         self.assertEqual(soung_count, 0)
 
     # Test happy path on non-empty songbooks

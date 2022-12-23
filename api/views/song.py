@@ -24,6 +24,9 @@ class SongViewSet(viewsets.ModelViewSet):
     @action(methods=["get"], detail=False, url_path="search", url_name="search")
     def search(self, request):
         q = self.request.query_params.get("q")
+        if q is None or len(q) == 0:
+            return Response(status=status.HTTP_200_OK)
+
         song_matches = Song.objects.annotate(
             similarity=TrigramSimilarity("artist", q) + TrigramSimilarity("title", q)
         ).filter(similarity__gt=0.6)

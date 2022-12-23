@@ -31,7 +31,9 @@ export default function Timer({
   const [expTime, setExpTime] = useState(
     getTimerResetTime(countdownTimeInSeconds)
   );
-  const [remainingSeconds, setRemainingSeconds] = useState(0);
+
+  // Default to something greater than 5 so we don't get alert styling at the start
+  const [remainingSeconds, setRemainingSeconds] = useState(100);
 
   const defaultStyle = {};
 

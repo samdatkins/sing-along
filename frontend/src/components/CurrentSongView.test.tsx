@@ -1,7 +1,7 @@
-import { ChakraProvider } from "@chakra-ui/react";
 import { render } from "@testing-library/react";
-import { mockMatchMedia } from "../testUtils";
 import CurrentSongView from "./CurrentSongView";
+import { ChakraProvider } from "@chakra-ui/react";
+import { mockMatchMedia } from "../testUtils";
 
 beforeAll(mockMatchMedia);
 
@@ -9,7 +9,7 @@ test("renders dark mode button", () => {
   render(
     <ChakraProvider>
       <CurrentSongView />
-    </ChakraProvider>,
+    </ChakraProvider>
   );
 
   // const buttonElement = screen.getByTestId("darkMode");

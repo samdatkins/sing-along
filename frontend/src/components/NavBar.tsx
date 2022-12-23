@@ -17,6 +17,7 @@ import {
   MenuList,
   Skeleton,
   Text,
+  useBoolean,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -29,16 +30,21 @@ import {
   FaPlay,
   FaUndoAlt,
 } from "react-icons/fa";
-import { useParams } from "react-router-dom";
-import { ApplicationState, AppStateToTimerMap } from "../models";
+import { ApplicationState, AppStateToTimerMap, Songbook } from "../models";
 import AddSongMenu from "./AddSongMenu";
 
 import QRCode from "react-qr-code";
-import { nextSongbookSong, prevSongbookSong } from "../services/navigation";
+import {
+  deleteSongbookSong,
+  nextSongbookSong,
+  prevSongbookSong,
+} from "../services/navigation";
+import { AxiosResponse } from "axios";
+import { UseAsyncReturn } from "react-async-hook";
 import Timer from "./Timer";
 
 interface NavBarProps {
-  asyncSongbook: any;
+  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
   advanceToNextAppState: () => void;
   resetAppState: () => void;
   applicationState: ApplicationState;
@@ -52,8 +58,6 @@ export default function NavBar({
   resetAppState,
   applicationState,
 }: NavBarProps) {
-  // gets session key from url
-  const { sessionKey } = useParams();
   // ref for controlling the timer from parent component
   const timerRef = useRef<any>();
   // state for triggering refresh in Timer component when restart is clicked
@@ -62,37 +66,40 @@ export default function NavBar({
   const [isLive, setIsLive] = useState(true);
   // state for length of countdown timer in seconds
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
-    AppStateToTimerMap[applicationState],
+    AppStateToTimerMap[applicationState]
   );
   const { colorMode, toggleColorMode } = useColorMode();
+  const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
 
-  const currentSongbook =
-    !asyncSongbook.loading &&
-    !asyncSongbook.error &&
-    asyncSongbook.result?.data;
+  const currentSongbook = asyncSongbook.result?.data;
 
   const timerControls = {
     playPauseToggle: () => {
-      if (timerRef?.current?.api?.isPaused()) {
-        timerRef?.current?.api?.start();
-        setIsLive(true);
-      } else {
-        timerRef.current.api?.pause();
-        setIsLive(false);
+      if (isTimerVisible) {
+        if (timerRef?.current?.api?.isPaused()) {
+          timerRef?.current?.api?.start();
+          setIsLive(true);
+        } else {
+          timerRef?.current?.api?.pause();
+          setIsLive(false);
+        }
       }
     },
     refresh: () => {
       setTimerKey(Date.now());
       setIsLive(true);
+      timerRef?.current?.api?.start();
     },
   };
 
-  const navToSong = (direction: "next" | "prev") => {
+  const performSongNavAction = (action: "next" | "prev" | "delete") => {
     setIsLive(false);
-    if (direction === "next") {
-      nextSongbookSong(sessionKey, asyncSongbook);
+    if (action === "next") {
+      nextSongbookSong(asyncSongbook);
+    } else if (action === "prev") {
+      prevSongbookSong(asyncSongbook);
     } else {
-      prevSongbookSong(sessionKey, asyncSongbook);
+      deleteSongbookSong(asyncSongbook);
     }
     resetAppState();
     timerControls.refresh();
@@ -103,26 +110,27 @@ export default function NavBar({
   // handle what happens on key press
   const handleKeyPress = useCallback(
     (event: any) => {
-      if (event.code === "Delete") {
-        alert(`This deletes the current song and advances to the next song.`);
+      // This first one is the only one that non-admins are allowed to use
+      if (event.code === "Backquote") {
+        toggleColorMode();
+      } else if (event.code === "Delete") {
+        performSongNavAction("delete");
       } else if (event.code === "Space") {
         timerControls.playPauseToggle();
         // prevents scrolling from spacebar
         event.preventDefault();
       } else if (event.code === "ArrowLeft") {
-        navToSong("prev");
+        performSongNavAction("prev");
       } else if (event.code === "ArrowRight") {
-        navToSong("next");
+        performSongNavAction("next");
       } else if (event.code === "KeyR") {
         resetAppState();
         timerControls.refresh();
       } else if (event.code === "KeyF") {
         alert(`This cancels the tab view truncation AND pauses the timer.`);
-      } else if (event.code === "Backquote") {
-        toggleColorMode();
       }
     },
-    [timerControls, toggleColorMode],
+    [timerControls, toggleColorMode]
   );
 
   useEffect(() => {
@@ -141,7 +149,7 @@ export default function NavBar({
     const newCountdownTime = AppStateToTimerMap[applicationState];
     setCountdownTimerInSeconds(newCountdownTime);
     if (applicationState === ApplicationState.PrepForNextSong) {
-      nextSongbookSong(sessionKey, asyncSongbook);
+      nextSongbookSong(asyncSongbook);
     }
   }, [applicationState]);
 
@@ -170,7 +178,7 @@ export default function NavBar({
                     <Button
                       colorScheme="blue"
                       onClick={() => {
-                        navToSong("prev");
+                        performSongNavAction("prev");
                       }}
                     >
                       <Icon as={FaFastBackward} />
@@ -184,7 +192,7 @@ export default function NavBar({
                     <Button
                       colorScheme="blue"
                       onClick={() => {
-                        navToSong("next");
+                        performSongNavAction("next");
                       }}
                     >
                       <Icon as={FaFastForward} />
@@ -225,7 +233,12 @@ export default function NavBar({
                 </MenuItem>
               )}
               {isSongbookOwner && (
-                <MenuItem icon={<DeleteIcon />}>Delete Song</MenuItem>
+                <MenuItem
+                  onClick={() => performSongNavAction("delete")}
+                  icon={<DeleteIcon />}
+                >
+                  Delete Current Song
+                </MenuItem>
               )}
             </MenuList>
           </Menu>
@@ -240,7 +253,7 @@ export default function NavBar({
       {/* MIDDLE COLUMN */}
       <Flex w="34%" alignContent="center" justifyContent="center">
         <Flex minWidth="24rem" direction="column">
-          {!asyncSongbook.loading ? (
+          {!!asyncSongbook?.result && currentSongbook ? (
             <>
               <Text
                 as="h2"
@@ -265,7 +278,7 @@ export default function NavBar({
             </>
           ) : (
             <Skeleton
-              isLoaded={!asyncSongbook.loading}
+              isLoaded={!!asyncSongbook?.result}
               flex="1"
               height="2rem"
             />
@@ -277,13 +290,17 @@ export default function NavBar({
         <Flex></Flex>
         <Flex>
           <Flex>
-            <Timer
-              isLive={isLive}
-              reference={timerRef}
-              timerKey={timerKey}
-              triggerOnTimerComplete={advanceToNextAppState}
-              countdownTimeInSeconds={countdownTimerInSeconds}
-            />
+            {isTimerVisible ? (
+              <Timer
+                isLive={isLive}
+                reference={timerRef}
+                timerKey={timerKey}
+                triggerOnTimerComplete={advanceToNextAppState}
+                countdownTimeInSeconds={countdownTimerInSeconds}
+              />
+            ) : (
+              <Button onClick={setIsTimerVisible.toggle}>Start</Button>
+            )}
           </Flex>
         </Flex>
         <Button colorScheme="blue" onClick={onOpen}>

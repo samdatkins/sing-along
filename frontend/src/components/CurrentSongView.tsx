@@ -1,12 +1,15 @@
 import { Flex } from "@chakra-ui/react";
-import axios from "axios";
 import { useState } from "react";
 import { useAsync } from "react-async-hook";
-import { ApplicationState, Songbook } from "../models";
+import { ApplicationState } from "../models";
 import NavBar from "./NavBar";
 import Tabs from "./Tabs";
 
 import { useParams } from "react-router-dom";
+import { getCurrentSong } from "../services/navigation";
+import { useInterval } from "usehooks-ts";
+
+const SONGBOOK_POLL_INTERVAL = 1 * 1000;
 
 function CurrentSongView() {
   // state for showing ActionPrompt component instead of lyrics
@@ -34,10 +37,15 @@ function CurrentSongView() {
 
   const { sessionKey } = useParams();
 
-  const asyncSongbook = useAsync(
-    async () => await axios.get<Songbook>(`/api/songbooks/${sessionKey}/`),
-    []
-  );
+  const asyncSongbook = useAsync(async () => getCurrentSong(sessionKey), [], {
+    setLoading: (state) => ({ ...state, loading: true }),
+  });
+
+  useInterval(() => {
+    if (!asyncSongbook.loading) {
+      asyncSongbook.execute();
+    }
+  }, SONGBOOK_POLL_INTERVAL);
 
   return (
     <>
