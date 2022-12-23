@@ -2,6 +2,10 @@ import axios, { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
 import { Songbook } from "../models";
 
+export async function getCurrentSong(sessionKey: string | undefined) {
+  return await axios.get<Songbook>(`/api/songbooks/${sessionKey}/`);
+}
+
 export async function nextSongbookSong(
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>
 ) {

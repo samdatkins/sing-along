@@ -69,10 +69,7 @@ export default function NavBar({
   const { colorMode, toggleColorMode } = useColorMode();
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
 
-  const currentSongbook =
-    !asyncSongbook.loading &&
-    !asyncSongbook.error &&
-    asyncSongbook.result?.data;
+  const currentSongbook = asyncSongbook.result?.data;
 
   const timerControls = {
     playPauseToggle: () => {
@@ -252,7 +249,7 @@ export default function NavBar({
       {/* MIDDLE COLUMN */}
       <Flex w="34%" alignContent="center" justifyContent="center">
         <Flex minWidth="24rem" direction="column">
-          {!asyncSongbook.loading && currentSongbook ? (
+          {!!asyncSongbook?.result && currentSongbook ? (
             <>
               <Text
                 as="h2"
@@ -277,7 +274,7 @@ export default function NavBar({
             </>
           ) : (
             <Skeleton
-              isLoaded={!asyncSongbook.loading}
+              isLoaded={!!asyncSongbook?.result}
               flex="1"
               height="2rem"
             />

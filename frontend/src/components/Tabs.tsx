@@ -1,11 +1,13 @@
 import { Box, SkeletonText } from "@chakra-ui/react";
-import { ApplicationState } from "../models";
+import { AxiosResponse } from "axios";
+import { UseAsyncReturn } from "react-async-hook";
+import { ApplicationState, Songbook } from "../models";
 
 import ActionPrompt from "./ActionPrompt";
 import TabDisplay from "./TabDisplay";
 
 interface TabsProps {
-  asyncSongbook: any;
+  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
   applicationState: ApplicationState;
 }
 
@@ -13,10 +15,7 @@ function Tabs({ asyncSongbook, applicationState }: TabsProps) {
   // state for showing ActionPrompt component instead of lyrics
   // const [doActionPrompt, setDoActionPrompt] = useState(false);
 
-  const tab =
-    !asyncSongbook.loading &&
-    !asyncSongbook.error &&
-    asyncSongbook.result?.data?.current_song_entry?.song?.content;
+  const tab = asyncSongbook.result?.data?.current_song_entry?.song?.content;
 
   return (
     <>
@@ -34,12 +33,12 @@ function Tabs({ asyncSongbook, applicationState }: TabsProps) {
       >
         <SkeletonText
           noOfLines={80}
-          isLoaded={!asyncSongbook.loading}
+          isLoaded={!!asyncSongbook?.result}
           spacing="4"
         />
         <TabDisplay
           tab={tab}
-          isNoodleMode={asyncSongbook?.result?.is_noodle_mode}
+          isNoodleMode={asyncSongbook?.result?.data?.is_noodle_mode}
         />
       </Box>
     </>

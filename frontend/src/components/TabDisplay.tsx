@@ -14,7 +14,12 @@ function formatTab(tab) {
   return fixedTabArray;
 }
 
-export default function TabDisplay({ tab, isNoodleMode }) {
+interface TabDisplayProps {
+  tab: string | false | undefined;
+  isNoodleMode: boolean | undefined;
+}
+
+export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
   const splitTab = (tab || "")
     .replaceAll("[tab]", "")
     .replaceAll("[/tab]", "")
