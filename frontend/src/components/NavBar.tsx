@@ -18,6 +18,7 @@ import {
   Skeleton,
   Text,
   useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -30,6 +31,7 @@ import {
 } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { ApplicationState, AppStateToTimerMap } from "../models";
+import AddSongMenu from "./AddSongMenu";
 
 import QRCode from "react-qr-code";
 import { nextSongbookSong, prevSongbookSong } from "../services/navigation";
@@ -146,6 +148,8 @@ export default function NavBar({
   useEffect(() => {
     timerControls.refresh();
   }, [countdownTimerInSeconds]);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Flex flexDir="row" w="100%" justifyContent="space-between">
@@ -282,9 +286,10 @@ export default function NavBar({
             />
           </Flex>
         </Flex>
-        <Button colorScheme="blue" onClick={() => alert("Add Song")}>
+        <Button colorScheme="blue" onClick={onOpen}>
           <AddIcon />
         </Button>
+        <AddSongMenu isOpen={isOpen} onClose={onClose} />
       </Flex>
     </Flex>
   );
