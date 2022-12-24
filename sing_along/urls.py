@@ -29,7 +29,7 @@ urlpatterns = [
     path("login", views.login, name="login"),
     path("logout", views.logout, name="logout"),
     path("callback", views.callback, name="callback"),
-    path("api/", login_required(include("api.urls"))),
+    path("api/", include("api.urls")),
     path("admin/", admin.site.urls),
     re_path(
         r"^live/*",
