@@ -36,7 +36,7 @@ FRONTEND_DIR = BASE_DIR / "frontend"
 
 # modify the definition of DEBUG and ALLOWED_HOSTS
 DEBUG = DJANGO_ENV == "development"
-ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOST", "localhost")]
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOST", "localhost").split(",")
 
 
 # Quick-start development settings - unsuitable for production

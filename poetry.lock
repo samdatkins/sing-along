@@ -423,6 +423,28 @@ url = "https://pypi.python.org/simple"
 reference = "py"
 
 [[package]]
+name = "gunicorn"
+version = "20.1.0"
+description = "WSGI HTTP Server for UNIX"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+setuptools = ">=3.0"
+
+[package.extras]
+eventlet = ["eventlet (>=0.24.1)"]
+gevent = ["gevent (>=1.4.0)"]
+setproctitle = ["setproctitle"]
+tornado = ["tornado (>=0.2)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.python.org/simple"
+reference = "py"
+
+[[package]]
 name = "httpretty"
 version = "1.1.4"
 description = "HTTP client mock for Python"
@@ -909,7 +931,7 @@ reference = "py"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "833f672b8bc3bb00b47302ed4c9956b5483355c5d5bf6defe9f0312a58922561"
+content-hash = "bb0e686df6c1d18f537fb623c6f9159d6aebd0214c514ce6e84f9b51de2abb8e"
 
 [metadata.files]
 asgiref = [
@@ -1152,6 +1174,10 @@ factory-boy = [
 faker = [
     {file = "Faker-15.3.4-py3-none-any.whl", hash = "sha256:c2a2ff9dd8dfd991109b517ab98d5cb465e857acb45f6b643a0e284a9eb2cc76"},
     {file = "Faker-15.3.4.tar.gz", hash = "sha256:2d5443724f640ce07658ca8ca8bbd40d26b58914e63eec6549727869aa67e2cc"},
+]
+gunicorn = [
+    {file = "gunicorn-20.1.0-py3-none-any.whl", hash = "sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e"},
+    {file = "gunicorn-20.1.0.tar.gz", hash = "sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8"},
 ]
 httpretty = [
     {file = "httpretty-1.1.4.tar.gz", hash = "sha256:20de0e5dd5a18292d36d928cc3d6e52f8b2ac73daec40d41eb62dee154933b68"},
