@@ -84,10 +84,17 @@ class Song(SafeDeleteModel, CreatedUpdated):
             GinIndex(fields=["artist"]),
             GinIndex(fields=["title"]),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["url"],
+                name="unique song entry",
+                condition=Q(deleted__isnull=True),
+            )
+        ]
 
     artist = models.CharField(max_length=40, null=False, blank=False)
     title = models.CharField(max_length=40, null=False, blank=False)
-    url = models.TextField(null=False, blank=False, unique=True)
+    url = models.TextField(null=False, blank=False)
     content = models.TextField(null=False, blank=False)
 
 
