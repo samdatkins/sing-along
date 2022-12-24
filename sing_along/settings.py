@@ -45,8 +45,6 @@ ALLOWED_HOSTS = ["localhost", "dolphin-app-nrp6q.ondigitalocean.app"]
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-p@)42jg)9u6-yr)id+kv5j5kdmmxu+&u8((y_4=&hg4g_ebe9j"
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
