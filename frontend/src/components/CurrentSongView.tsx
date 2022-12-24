@@ -33,7 +33,7 @@ function CurrentSongView() {
   };
 
   const resetAppState = () => {
-    setApplicationState(ApplicationState.ShowSong);
+    setApplicationState(ApplicationState.PrepForNextSong);
   };
 
   const { sessionKey } = useParams();

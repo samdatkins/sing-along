@@ -34,6 +34,22 @@ url = "https://pypi.python.org/simple"
 reference = "py"
 
 [[package]]
+name = "authlib"
+version = "1.2.0"
+description = "The ultimate Python library in building OAuth and OpenID Connect servers and clients."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+cryptography = ">=3.2"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.python.org/simple"
+reference = "py"
+
+[[package]]
 name = "autobahn"
 version = "21.11.1"
 description = "WebSocket client & server library, WAMP real-time framework"
@@ -931,7 +947,7 @@ reference = "py"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "bb0e686df6c1d18f537fb623c6f9159d6aebd0214c514ce6e84f9b51de2abb8e"
+content-hash = "50a7227e5770d9b03d9c4df1ca279144e504d47c1b51c739e80544da72f3c7c1"
 
 [metadata.files]
 asgiref = [
@@ -941,6 +957,10 @@ asgiref = [
 attrs = [
     {file = "attrs-21.2.0-py2.py3-none-any.whl", hash = "sha256:149e90d6d8ac20db7a955ad60cf0e6881a3f20d37096140088356da6c716b0b1"},
     {file = "attrs-21.2.0.tar.gz", hash = "sha256:ef6aaac3ca6cd92904cdd0d83f629a15f18053ec84e6432106f7a4d04ae4f5fb"},
+]
+authlib = [
+    {file = "Authlib-1.2.0-py2.py3-none-any.whl", hash = "sha256:4ddf4fd6cfa75c9a460b361d4bd9dac71ffda0be879dbe4292a02e92349ad55a"},
+    {file = "Authlib-1.2.0.tar.gz", hash = "sha256:4fa3e80883a5915ef9f5bc28630564bc4ed5b5af39812a3ff130ec76bd631e9d"},
 ]
 autobahn = [
     {file = "autobahn-21.11.1.tar.gz", hash = "sha256:bd6f46315419ca0a5be4109f737410208ad5f19718f67ca6a4a674cc66ca9b18"},

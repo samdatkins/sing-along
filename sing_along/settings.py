@@ -48,6 +48,9 @@ SECRET_KEY = os.environ.get(
     "django-insecure-p@)42jg)9u6-yr)id+kv5j5kdmmxu+&u8((y_4=&hg4g_ebe9j",
 )
 
+AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
+AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
+AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
 
 # Application definition
 
@@ -77,10 +80,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "sing_along.urls"
 
+TEMPLATE_DIR = os.path.join(BASE_DIR, "sing_along", "templates")
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [FRONTEND_DIR / "build"],
+        "DIRS": [FRONTEND_DIR / "build", TEMPLATE_DIR],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -129,6 +133,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_URL = "login"
+LOGOUT_URL = "logout"
+LOGIN_REDIRECT_URL = "live/"
+LOGOUT_REDIRECT_URL = ""
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

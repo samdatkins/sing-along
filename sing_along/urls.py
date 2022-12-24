@@ -14,11 +14,26 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from django.urls import include, path, re_path
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView, TemplateView
+
+from sing_along import views
 
 urlpatterns = [
-    path("api/", include("api.urls")),
+    path(
+        "",
+        login_required(RedirectView.as_view(pattern_name="react", permanent=True)),
+        name="index",
+    ),
+    path("login", views.login, name="login"),
+    path("logout", views.logout, name="logout"),
+    path("callback", views.callback, name="callback"),
+    path("api/", login_required(include("api.urls"))),
     path("admin/", admin.site.urls),
-    re_path(r"", TemplateView.as_view(template_name="index.html")),
+    re_path(
+        r"^live/*",
+        login_required(TemplateView.as_view(template_name="index.html")),
+        name="react",
+    ),
 ]
