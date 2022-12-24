@@ -43,7 +43,7 @@ ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOST", "localhost")]
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-p@)42jg)9u6-yr)id+kv5j5kdmmxu+&u8((y_4=&hg4g_ebe9j"
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-p@)42jg)9u6-yr)id+kv5j5kdmmxu+&u8((y_4=&hg4g_ebe9j")
 
 
 # Application definition
@@ -106,7 +106,6 @@ DATABASES = {
         "PORT": os.environ.get("POSTGRES_PORT", 5432),
     }
 }
-print(os.environ)
 
 
 # Password validation
