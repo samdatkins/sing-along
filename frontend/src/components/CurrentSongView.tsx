@@ -51,7 +51,7 @@ function CurrentSongView() {
   return (
     <>
       <SongbookContext.Provider value={asyncSongbook?.result?.data}>
-        <Flex padding="1rem" paddingTop=".5rem" flexDir="column">
+        <Flex padding="1rem" paddingTop=".5rem" flexDir="column" height="100%">
           <NavBar
             asyncSongbook={asyncSongbook}
             advanceToNextAppState={advanceToNextAppState}

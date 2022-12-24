@@ -6,6 +6,7 @@ import {
   SunIcon,
 } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
   Flex,
   Icon,
@@ -264,11 +265,11 @@ export default function NavBar({
           </Menu>
         </Flex>
         {!isMobileDevice && (
-          <Flex style={{ background: "white", padding: "8px" }}>
+          <Box bgColor="white" p="8px" position="fixed" right="0" bottom="0">
             <a href={addSongUrl} target="_blank" rel="noreferrer">
-              <QRCode size={56} value={addSongUrl} />
+              <QRCode size={200} value={addSongUrl} />
             </a>
-          </Flex>
+          </Box>
         )}
 
         <Flex></Flex>
@@ -330,7 +331,7 @@ export default function NavBar({
             )}
           </Flex>
         </Flex>
-        <Button colorScheme="blue" as={RouterLink} to={"addSong"}>
+        <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
           <AddIcon />
         </Button>
         {addSongDrawerOutlet}
