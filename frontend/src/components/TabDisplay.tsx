@@ -51,7 +51,7 @@ export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
 }
 
 function TabWithChords({ tabToDisplay }) {
-  const chordColor = useColorModeValue("teal.500", "cyan.500");
+  const chordColor = useColorModeValue("teal.500", "cyan.300");
 
   return (
     <pre style={{ fontSize: "1rem", fontFamily: "Ubuntu Mono" }}>
