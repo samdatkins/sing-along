@@ -31,7 +31,10 @@ class SongEntryViewSet(viewsets.ModelViewSet):
         except (Song.DoesNotExist, Songbook.DoesNotExist) as e:
             raise NotFound("No such song and/or songbook")
 
-        if songbook.get_total_song_count() >= songbook.max_active_songs:
+        if (
+            songbook.max_active_songs is not None
+            and songbook.get_total_song_count() >= songbook.max_active_songs
+        ):
             raise DuplicateValue("Max songs reached")
 
         try:
