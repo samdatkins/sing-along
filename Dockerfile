@@ -20,7 +20,7 @@ RUN pip install "poetry==1.2.2"
 # Copy only requirements to cache them in docker layer
 WORKDIR /code
 COPY poetry.lock pyproject.toml /scripts/ /code/
-COPY --from=frontend /code/frontend-build/ /code/frontend/build
+COPY --from=frontend /code/frontend-build/build/ /code/frontend/build
 
 # Project initialization:
 RUN poetry config virtualenvs.create false \
