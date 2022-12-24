@@ -36,7 +36,7 @@ FRONTEND_DIR = BASE_DIR / "frontend"
 
 # modify the definition of DEBUG and ALLOWED_HOSTS
 DEBUG = DJANGO_ENV == "development"
-ALLOWED_HOSTS = ["localhost"]
+ALLOWED_HOSTS = ["localhost", "dolphin-app-nrp6q.ondigitalocean.app"]
 
 
 # Quick-start development settings - unsuitable for production
