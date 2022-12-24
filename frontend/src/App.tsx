@@ -15,7 +15,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/live/:sessionKey/" element={<CurrentSongView />}>
-          <Route path="addSong" element={<AddSongDrawer />} />
+          <Route path="add-song" element={<AddSongDrawer />} />
         </Route>
         <Route path="/live" element={<WelcomePage />} />
       </Routes>

@@ -41,7 +41,7 @@ import {
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
 import Timer from "./Timer";
-import { Link as RouterLink, useOutlet } from "react-router-dom";
+import { Link as RouterLink, useOutlet, useParams } from "react-router-dom";
 
 interface NavBarProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
@@ -49,8 +49,6 @@ interface NavBarProps {
   resetAppState: () => void;
   applicationState: ApplicationState;
 }
-
-const addSongUrl = window.location.origin + "/addSong";
 
 export default function NavBar({
   asyncSongbook,
@@ -74,6 +72,9 @@ export default function NavBar({
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   const isMobileDevice = isSmallerThan900;
+
+  const { sessionKey } = useParams();
+  const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
   const currentSongbook = asyncSongbook.result?.data;
 
