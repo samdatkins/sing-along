@@ -330,6 +330,22 @@ url = "https://pypi.python.org/simple"
 reference = "py"
 
 [[package]]
+name = "dj-database-url"
+version = "1.2.0"
+description = "Use Database URLs in your Django Application."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Django = ">=3.2"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.python.org/simple"
+reference = "py"
+
+[[package]]
 name = "django"
 version = "3.2.16"
 description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design."
@@ -947,7 +963,7 @@ reference = "py"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "50a7227e5770d9b03d9c4df1ca279144e504d47c1b51c739e80544da72f3c7c1"
+content-hash = "7ea4c26e0d8c004ee41be324fe66ae43305f7eea15b3231255dd32fad9ef9c46"
 
 [metadata.files]
 asgiref = [
@@ -1170,6 +1186,10 @@ debugpy = [
     {file = "debugpy-1.6.0-cp39-cp39-win_amd64.whl", hash = "sha256:30abefefd2ff5a5481162d613cb70e60e2fa80a5eb4c994717c0f008ed25d2e1"},
     {file = "debugpy-1.6.0-py2.py3-none-any.whl", hash = "sha256:4de7777842da7e08652f2776c552070bbdd758557fdec73a15d7be0e4aab95ce"},
     {file = "debugpy-1.6.0.zip", hash = "sha256:7b79c40852991f7b6c3ea65845ed0f5f6b731c37f4f9ad9c61e2ab4bd48a9275"},
+]
+dj-database-url = [
+    {file = "dj-database-url-1.2.0.tar.gz", hash = "sha256:b23b15046cb38180e0c95207bcc90fe5e9dbde8eef16065907dd85cf4ca7036c"},
+    {file = "dj_database_url-1.2.0-py3-none-any.whl", hash = "sha256:5c2993b91801c0f78a8b19e642b497b90831124cbade0c265900d4c1037b4730"},
 ]
 django = [
     {file = "Django-3.2.16-py3-none-any.whl", hash = "sha256:18ba8efa36b69cfcd4b670d0fa187c6fe7506596f0ababe580e16909bcdec121"},
