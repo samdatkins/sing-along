@@ -1,4 +1,4 @@
-import { Text } from "@chakra-ui/react";
+import { Text, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
 
 function formatTab(tab) {
   let tabStartIndex = 0;
@@ -28,6 +28,7 @@ export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
 
   const fixedTabArray = formatTab(splitTab);
   const truncatedSplitTabArray = fixedTabArray && fixedTabArray?.slice(0, 120);
+  const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   /*
     truncatedSplitTab &&
       truncatedSplitTab?.splice(
@@ -39,25 +40,53 @@ export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
   const tabToDisplay = isNoodleMode ? fixedTabArray : truncatedSplitTabArray;
   return (
     <>
-      {tabToDisplay && (
-        <pre style={{ fontSize: "1rem", fontFamily: "Ubuntu Mono" }}>
-          {tabToDisplay?.map((tabLine: string) => {
-            if (tabLine.includes("[ch]")) {
-              return (
-                <Text color="cyan.500" key={window.crypto.randomUUID()}>
-                  {tabLine.replaceAll("[ch]", "").replaceAll("[/ch]", "")}
-                </Text>
-              );
-            } else {
-              return (
-                <Text key={window.crypto.randomUUID()}>
-                  {tabLine.length > 0 ? tabLine : " "}
-                </Text>
-              );
-            }
-          })}
-        </pre>
-      )}
+      {tabToDisplay &&
+        (isSmallerThan900 ? (
+          <TabWithoutChords tabToDisplay={tabToDisplay} />
+        ) : (
+          <TabWithChords tabToDisplay={tabToDisplay} />
+        ))}
     </>
+  );
+}
+
+function TabWithChords({ tabToDisplay }) {
+  const chordColor = useColorModeValue("teal.500", "cyan.500");
+
+  return (
+    <pre style={{ fontSize: "1rem", fontFamily: "Ubuntu Mono" }}>
+      {tabToDisplay?.map((tabLine: string) => {
+        if (tabLine.includes("[ch]")) {
+          return (
+            <Text color={chordColor} key={window.crypto.randomUUID()}>
+              {tabLine.replaceAll("[ch]", "").replaceAll("[/ch]", "")}
+            </Text>
+          );
+        } else {
+          return (
+            <Text key={window.crypto.randomUUID()}>
+              {tabLine.length > 0 ? tabLine : " "}
+            </Text>
+          );
+        }
+      })}
+    </pre>
+  );
+}
+
+function TabWithoutChords({ tabToDisplay }) {
+  return (
+    <pre style={{ fontSize: "1rem", fontFamily: "Helvetica" }}>
+      {tabToDisplay?.map((tabLine: string) => {
+        if (!tabLine.includes("[ch]")) {
+          return (
+            <Text key={window.crypto.randomUUID()}>
+              {tabLine.length > 0 ? tabLine : " "}
+            </Text>
+          );
+        }
+        return;
+      })}
+    </pre>
   );
 }

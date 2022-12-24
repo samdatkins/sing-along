@@ -19,6 +19,7 @@ import {
   Text,
   useBoolean,
   useColorMode,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -71,6 +72,8 @@ export default function NavBar({
   );
   const { colorMode, toggleColorMode } = useColorMode();
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
+  const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
+  const isMobileDevice = isSmallerThan900;
 
   const currentSongbook = asyncSongbook.result?.data;
 
@@ -188,7 +191,7 @@ export default function NavBar({
               variant="outline"
             />
             <MenuList>
-              {isSongbookOwner && (
+              {isSongbookOwner && !isMobileDevice && (
                 <Flex direction="column">
                   <Flex justifyContent="space-between" mx="1rem" my=".5rem">
                     <Button
@@ -234,7 +237,7 @@ export default function NavBar({
               >
                 {colorMode === "light" ? "Night Mode" : "Day Mode"}
               </MenuItem>
-              {isSongbookOwner && (
+              {isSongbookOwner && !isMobileDevice && (
                 <MenuItem
                   icon={<Icon as={FaExpandAlt} />}
                   onClick={() => {
@@ -248,7 +251,7 @@ export default function NavBar({
                   Toggle Fullscreen
                 </MenuItem>
               )}
-              {isSongbookOwner && (
+              {isSongbookOwner && !isMobileDevice && (
                 <MenuItem
                   onClick={() => performSongNavAction("delete")}
                   icon={<DeleteIcon />}
@@ -259,16 +262,19 @@ export default function NavBar({
             </MenuList>
           </Menu>
         </Flex>
-        <Flex style={{ background: "white", padding: "8px" }}>
-          <a href={addSongUrl} target="_blank" rel="noreferrer">
-            <QRCode size={56} value={addSongUrl} />
-          </a>
-        </Flex>
+        {!isMobileDevice && (
+          <Flex style={{ background: "white", padding: "8px" }}>
+            <a href={addSongUrl} target="_blank" rel="noreferrer">
+              <QRCode size={56} value={addSongUrl} />
+            </a>
+          </Flex>
+        )}
+
         <Flex></Flex>
       </Flex>
       {/* MIDDLE COLUMN */}
       <Flex w="34%" alignContent="center" justifyContent="center">
-        <Flex minWidth="24rem" direction="column">
+        <Flex direction="column">
           {!!asyncSongbook?.result && currentSongbook ? (
             <>
               <Text
@@ -306,16 +312,20 @@ export default function NavBar({
         <Flex></Flex>
         <Flex>
           <Flex>
-            {isTimerVisible ? (
-              <Timer
-                isLive={isLive}
-                reference={timerRef}
-                timerKey={timerKey}
-                triggerOnTimerComplete={advanceToNextAppState}
-                countdownTimeInSeconds={countdownTimerInSeconds}
-              />
-            ) : (
-              <Button onClick={setIsTimerVisible.toggle}>Start</Button>
+            {!isMobileDevice && (
+              <>
+                {isTimerVisible ? (
+                  <Timer
+                    isLive={isLive}
+                    reference={timerRef}
+                    timerKey={timerKey}
+                    triggerOnTimerComplete={advanceToNextAppState}
+                    countdownTimeInSeconds={countdownTimerInSeconds}
+                  />
+                ) : (
+                  <Button onClick={setIsTimerVisible.toggle}>Start</Button>
+                )}
+              </>
             )}
           </Flex>
         </Flex>

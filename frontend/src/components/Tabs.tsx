@@ -1,4 +1,4 @@
-import { Box, SkeletonText } from "@chakra-ui/react";
+import { Box, SkeletonText, useMediaQuery } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
 import { ApplicationState, Songbook } from "../models";
@@ -12,10 +12,8 @@ interface TabsProps {
 }
 
 function Tabs({ asyncSongbook, applicationState }: TabsProps) {
-  // state for showing ActionPrompt component instead of lyrics
-  // const [doActionPrompt, setDoActionPrompt] = useState(false);
-
   const tab = asyncSongbook.result?.data?.current_song_entry?.song?.content;
+  const [isLargerThan1900] = useMediaQuery("(min-width: 1900px)");
 
   return (
     <>
@@ -27,7 +25,10 @@ function Tabs({ asyncSongbook, applicationState }: TabsProps) {
       )}
       <Box
         p="1rem"
-        style={{ columnCount: 3, columnGap: "1rem" }}
+        style={{
+          columnCount: isLargerThan1900 ? 3 : 1,
+          columnGap: "1rem",
+        }}
         width="100%"
         height="100%"
         overflow="hidden"

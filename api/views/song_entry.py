@@ -35,7 +35,7 @@ class SongEntryViewSet(viewsets.ModelViewSet):
             songbook.max_active_songs is not None
             and songbook.get_total_song_count() >= songbook.max_active_songs
         ):
-            raise DuplicateValue("Max songs reached")
+            raise ConflictingStates("Max songs reached")
 
         try:
             queryset.get(
@@ -47,7 +47,7 @@ class SongEntryViewSet(viewsets.ModelViewSet):
             # we'll throw an error
             pass
         else:
-            raise ConflictingStates("That song entry already exists")
+            raise DuplicateValue("That song entry already exists")
 
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
