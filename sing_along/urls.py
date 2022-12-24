@@ -23,7 +23,7 @@ from sing_along import views
 urlpatterns = [
     path(
         "",
-        login_required(RedirectView.as_view(pattern_name="react", permanent=True)),
+        RedirectView.as_view(pattern_name="react", permanent=True),
         name="index",
     ),
     path("login", views.login, name="login"),

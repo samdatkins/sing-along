@@ -138,9 +138,6 @@ LOGOUT_URL = "logout"
 LOGIN_REDIRECT_URL = "live/"
 LOGOUT_REDIRECT_URL = ""
 
-# if not DEBUG:
-#     SECURE_SSL_REDIRECT = True
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
