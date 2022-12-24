@@ -1,4 +1,12 @@
 # syntax=docker/dockerfile:1
+FROM node:18 AS frontend
+RUN mkdir /code
+WORKDIR /code
+
+COPY frontend/ frontend-build/
+WORKDIR /code/frontend-build/
+RUN yarn install && GENERATE_SOURCEMAP=false yarn build
+
 FROM python:3.10-slim-bullseye
 ARG YOUR_ENV
 
@@ -12,6 +20,7 @@ RUN pip install "poetry==1.2.2"
 # Copy only requirements to cache them in docker layer
 WORKDIR /code
 COPY poetry.lock pyproject.toml /scripts/ /code/
+COPY --from=frontend /code/frontend-build/ /code/frontend/build
 
 # Project initialization:
 RUN poetry config virtualenvs.create false \
