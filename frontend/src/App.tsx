@@ -17,7 +17,7 @@ function App() {
         <Route path="/live/:sessionKey/" element={<CurrentSongView />}>
           <Route path="addSong" element={<AddSongDrawer />} />
         </Route>
-        <Route path="/" element={<WelcomePage />} />
+        <Route path="/live" element={<WelcomePage />} />
       </Routes>
     </BrowserRouter>
   );
