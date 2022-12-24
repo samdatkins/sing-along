@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM python:3.10-bullseye
+FROM python:3.10-slim-bullseye
 ARG YOUR_ENV
 
 ENV YOUR_ENV=${YOUR_ENV}
@@ -19,3 +19,5 @@ RUN poetry config virtualenvs.create false \
 
 # Creating folders, and files for a project:
 COPY . /code
+
+CMD ./scripts/docker-entrypoint.sh

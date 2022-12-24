@@ -1,6 +1,6 @@
 #!/bin/bash
 
-until psql "postgresql://postgres:postgres@db:5432/postgres" -c '\l'; do
+until psql "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_NAME}" -c '\l'; do
   echo >&2 "postgres is unavailable - sleeping"
   sleep 1
 done
