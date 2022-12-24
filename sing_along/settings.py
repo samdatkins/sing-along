@@ -166,7 +166,6 @@ WHITENOISE_ROOT = FRONTEND_DIR / "build"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-ASGI_APPLICATION = "sing_along.asgi.application"
 
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",

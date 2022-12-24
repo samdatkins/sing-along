@@ -7,4 +7,4 @@ echo "Apply database migrations"
 python manage.py migrate
 
 echo "Starting prod server"
-gunicorn sing_along.wsgi:application --bind 0.0.0.0:8080 --log-level=info --capture-output
+gunicorn sing_along.wsgi:application --bind 0.0.0.0:8080 --workers 3 --log-level=info --capture-output

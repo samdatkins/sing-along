@@ -10,7 +10,7 @@ import { getCurrentSong } from "../services/songs";
 import { useInterval } from "usehooks-ts";
 import SongbookContext from "../contexts/SongbookContext";
 
-const SONGBOOK_POLL_INTERVAL = 1 * 1000;
+const SONGBOOK_POLL_INTERVAL = 1 * 2000;
 
 function CurrentSongView() {
   // state for showing ActionPrompt component instead of lyrics
