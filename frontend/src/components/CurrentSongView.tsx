@@ -32,15 +32,19 @@ function CurrentSongView() {
     }
   };
 
-  const resetAppState = () => {
-    setApplicationState(ApplicationState.PrepForNextSong);
-  };
-
   const { sessionKey } = useParams();
 
   const asyncSongbook = useAsync(async () => getCurrentSong(sessionKey), [], {
     setLoading: (state) => ({ ...state, loading: true }),
   });
+
+  const resetAppState = () => {
+    if (asyncSongbook?.result?.data?.is_noodle_mode) {
+      setApplicationState(ApplicationState.ShowSong);
+    } else {
+      setApplicationState(ApplicationState.PrepForNextSong);
+    }
+  };
 
   useInterval(() => {
     if (!asyncSongbook.loading) {

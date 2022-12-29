@@ -314,21 +314,22 @@ export default function NavBar({
         <Flex></Flex>
         <Flex>
           <Flex>
-            {!isMobileDevice && (
-              <>
-                {isTimerVisible ? (
-                  <Timer
-                    isLive={isLive}
-                    reference={timerRef}
-                    timerKey={timerKey}
-                    triggerOnTimerComplete={advanceToNextAppState}
-                    countdownTimeInSeconds={countdownTimerInSeconds}
-                  />
-                ) : (
-                  <Button onClick={setIsTimerVisible.toggle}>Start</Button>
-                )}
-              </>
-            )}
+            {!isMobileDevice &&
+              !asyncSongbook?.result?.data?.is_noodle_mode && (
+                <>
+                  {isTimerVisible ? (
+                    <Timer
+                      isLive={isLive}
+                      reference={timerRef}
+                      timerKey={timerKey}
+                      triggerOnTimerComplete={advanceToNextAppState}
+                      countdownTimeInSeconds={countdownTimerInSeconds}
+                    />
+                  ) : (
+                    <Button onClick={setIsTimerVisible.toggle}>Start</Button>
+                  )}
+                </>
+              )}
           </Flex>
         </Flex>
         <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
