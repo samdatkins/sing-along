@@ -23,7 +23,8 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
     title = models.CharField(max_length=40, null=False, blank=False)
     last_nav_action_taken_at = models.DateTimeField(null=True, blank=True)
     is_noodle_mode = models.BooleanField(null=False, blank=True, default=False)
-
+    songs = models.ManyToManyField("Song", related_name="songboooks", through="SongEntry")
+    
     def get_next_song_entry(self):
         current_song_entry = self.get_current_song_entry()
         if current_song_entry is None:

@@ -50,6 +50,7 @@ class TestSongbookView(TestCase):
         # Assert
         self.assertEqual(response.status_code, 200)
 
+    # Until we re-enabled auth, this should pass
     def test_unauthed_requests_fail(self):
         # Arrange
         api_factory = APIRequestFactory()
@@ -60,7 +61,7 @@ class TestSongbookView(TestCase):
         response = view(request)
 
         # Assert
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
 
     def test_detail_has_correct_number_of_songs(self):
         # Arrange
@@ -214,3 +215,24 @@ class TestSongbookView(TestCase):
             self.nonempty_songbook.get_current_song_entry(), self.first_song_entry
         )
         self.assertEqual(response.status_code, 409)
+
+    def test_songbook_details(self):
+        # Arrange
+        session_key = self.nonempty_songbook.session_key
+        api_factory = APIRequestFactory()
+        view = SongbookViewSet.as_view({"get": "songbook_details"})
+        request = api_factory.get(
+            reverse(
+                "songbook-details",
+                kwargs={"session_key": session_key},
+            ),
+        )
+        force_authenticate(request, user=self.user)
+
+        # Act
+        with self.assertNumQueries(3):
+            response = view(request, session_key=session_key)
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["song_entries"]), 3)

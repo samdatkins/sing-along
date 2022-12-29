@@ -6,7 +6,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.models import Songbook
-from api.serializers.songbook import SongbookDetailSerializer, SongbookSerializer
+from api.serializers.songbook import (
+    SongbookDetailSerializer,
+    SongbookListSerializer,
+    SongbookSerializer,
+)
 
 
 class SongbookViewSet(viewsets.ModelViewSet):
@@ -14,18 +18,20 @@ class SongbookViewSet(viewsets.ModelViewSet):
     API endpoint that allows all standard interactions with Songbooks.
     """
 
-    queryset = Songbook.objects.prefetch_related("song_entries").all()
+    queryset = Songbook.objects.all()
     lookup_field = "session_key"
 
     def get_queryset(self):
         if self.action == "retrieve":
             return Songbook.objects.prefetch_related("song_entries").all()
-        return Songbook.objects.all()
+        elif self.action == "songbook_details":
+            return Songbook.objects.all().prefetch_related("song_entries__song")
+        return self.queryset
 
     def get_serializer_class(self):
         if self.action == "retrieve":
-            return SongbookDetailSerializer
-        return SongbookSerializer
+            return SongbookSerializer
+        return SongbookListSerializer
 
     @action(methods=["patch"], detail=True, url_path="next-song", url_name="next-song")
     def next_song(self, request, session_key=None):
@@ -59,3 +65,16 @@ class SongbookViewSet(viewsets.ModelViewSet):
         )
         instance.save()
         return Response(status=status.HTTP_200_OK)
+
+    @action(
+        methods=["get"],
+        detail=True,
+        url_path="details",
+        url_name="details",
+    )
+    def songbook_details(self, request, session_key=None):
+        instance = self.get_object()
+
+        return Response(
+            status=status.HTTP_200_OK, data=SongbookDetailSerializer(instance).data
+        )

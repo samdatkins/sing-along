@@ -1,10 +1,11 @@
 from rest_framework import serializers
 
-from api.models import Songbook
+from api.models import Songbook, SongEntry
+from api.serializers.song import SongSerializer
 from api.serializers.song_entry import SongEntrySerializer
 
 
-class SongbookDetailSerializer(serializers.ModelSerializer):
+class SongbookSerializer(serializers.ModelSerializer):
     total_songs = serializers.SerializerMethodField()
     current_song_position = serializers.SerializerMethodField()
     current_song_entry = serializers.SerializerMethodField()
@@ -35,7 +36,7 @@ class SongbookDetailSerializer(serializers.ModelSerializer):
         return SongEntrySerializer(song_entry).data
 
 
-class SongbookSerializer(serializers.ModelSerializer):
+class SongbookListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Songbook
         fields = [
@@ -43,4 +44,18 @@ class SongbookSerializer(serializers.ModelSerializer):
             "max_active_songs",
             "title",
             "is_noodle_mode",
+        ]
+
+
+class SongbookDetailSerializer(serializers.ModelSerializer):
+    song_entries = SongEntrySerializer(many=True)
+
+    class Meta:
+        model = Songbook
+        fields = [
+            "session_key",
+            "max_active_songs",
+            "title",
+            "is_noodle_mode",
+            "song_entries",
         ]
