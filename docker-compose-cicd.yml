@@ -22,11 +22,6 @@ services:
     volumes:
       - .:/code
     environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
-      - POSTGRES_PASSWORD=postgres
       - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
     ports:
       - "8080:8080"
