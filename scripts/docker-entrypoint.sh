@@ -1,7 +1,7 @@
 #!/bin/bash
 
 until psql "${POSTGRES_URL}" -c '\l'; do
-  echo >&2 "postgres is unavailable - sleeping"
+  echo >&2 "postgres is unavailable at ${POSTGRES_URL} - sleeping"
   sleep 1
 done
 
