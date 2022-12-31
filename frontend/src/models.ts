@@ -25,6 +25,14 @@ export type Songbook = {
   current_song_entry: SongEntry;
 };
 
+export type SongbookDetails = {
+  id: number; // we should remove this from the API and only use session_key eventually
+  session_key: string;
+  max_active_songs: number;
+  title: string;
+  is_noodle_mode: boolean;
+  song_entries: SongEntry[];
+};
 export enum ApplicationState {
   ShowSong,
   ActionPrompt,

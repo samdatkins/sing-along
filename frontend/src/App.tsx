@@ -2,7 +2,9 @@ import axios from "axios";
 import cookie from "react-cookies";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AddSongDrawer from "./components/AddSongDrawer";
+import CreateNewSongbook from "./components/CreateNewSongbook";
 import CurrentSongView from "./components/CurrentSongView";
+import SongbookList from "./components/SongbookList";
 import WelcomePage from "./components/WelcomePage";
 import { createCSRF } from "./helpers/session";
 
@@ -17,6 +19,8 @@ function App() {
         <Route path="/live/:sessionKey/" element={<CurrentSongView />}>
           <Route path="add-song" element={<AddSongDrawer />} />
         </Route>
+        <Route path="/live/createsongbook" element={<CreateNewSongbook />} />
+        <Route path="/live/:sessionKey/list" element={<SongbookList />} />
         <Route path="/live" element={<WelcomePage />} />
       </Routes>
     </BrowserRouter>
