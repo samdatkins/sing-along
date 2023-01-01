@@ -17,14 +17,26 @@ class CreatedUpdated(models.Model):
 
 class Songbook(SafeDeleteModel, CreatedUpdated):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    session_key = models.CharField(max_length=20, unique=True, null=False, blank=False)
-    current_song_timestamp = models.DateTimeField(null=False, blank=False)
+    session_key = models.CharField(max_length=20, null=False, blank=False)
+    current_song_timestamp = models.DateTimeField(
+        null=False, blank=True, auto_now_add=True
+    )
     max_active_songs = models.IntegerField(null=True, blank=True)
     title = models.CharField(max_length=40, null=False, blank=False)
     last_nav_action_taken_at = models.DateTimeField(null=True, blank=True)
     is_noodle_mode = models.BooleanField(null=False, blank=True, default=False)
-    songs = models.ManyToManyField("Song", related_name="songboooks", through="SongEntry")
-    
+    songs = models.ManyToManyField(
+        "Song", related_name="songboooks", through="SongEntry"
+    )
+
+    constraints = [
+        models.UniqueConstraint(
+            fields=["session_key"],
+            name="unique songbook session key",
+            condition=Q(deleted__isnull=True),
+        )
+    ]
+
     def get_next_song_entry(self):
         current_song_entry = self.get_current_song_entry()
         if current_song_entry is None:

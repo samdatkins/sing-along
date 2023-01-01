@@ -31,18 +31,24 @@ import {
   FaPlay,
   FaUndoAlt,
 } from "react-icons/fa";
+import { GrUnorderedList } from "react-icons/gr";
 import { ApplicationState, AppStateToTimerMap, Songbook } from "../models";
 
+import { AxiosResponse } from "axios";
+import { UseAsyncReturn } from "react-async-hook";
 import QRCode from "react-qr-code";
+import {
+  Link as RouterLink,
+  useNavigate,
+  useOutlet,
+  useParams,
+} from "react-router-dom";
 import {
   deleteSongbookSong,
   nextSongbookSong,
   prevSongbookSong,
 } from "../services/songs";
-import { AxiosResponse } from "axios";
-import { UseAsyncReturn } from "react-async-hook";
 import Timer from "./Timer";
-import { Link as RouterLink, useOutlet, useParams } from "react-router-dom";
 
 interface NavBarProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
@@ -66,8 +72,9 @@ export default function NavBar({
   // state for whether time is running or not
   const [isLive, setIsLive] = useState(true);
   // state for length of countdown timer in seconds
+  const navigate = useNavigate();
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
-    AppStateToTimerMap[applicationState]
+    AppStateToTimerMap[applicationState],
   );
   const { colorMode, toggleColorMode } = useColorMode();
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
@@ -109,7 +116,7 @@ export default function NavBar({
       await prevSongbookSong(sessionKey);
     } else {
       await deleteSongbookSong(
-        asyncSongbook?.result?.data?.current_song_entry?.id
+        asyncSongbook?.result?.data?.current_song_entry?.id,
       );
     }
     asyncSongbook.execute();
@@ -146,7 +153,7 @@ export default function NavBar({
         alert(`This cancels the tab view truncation AND pauses the timer.`);
       }
     },
-    [timerControls, toggleColorMode]
+    [timerControls, toggleColorMode],
   );
 
   useEffect(() => {
@@ -233,6 +240,13 @@ export default function NavBar({
                   </Flex>
                 </Flex>
               )}
+              {asyncSongbook?.result?.data?.is_noodle_mode && (
+                <RouterLink to="list">
+                  <MenuItem icon={<Icon as={GrUnorderedList} />}>
+                    Songbook Index
+                  </MenuItem>
+                </RouterLink>
+              )}
               <MenuItem
                 icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
                 onClick={toggleColorMode}
@@ -266,9 +280,9 @@ export default function NavBar({
         </Flex>
         {!isMobileDevice && (
           <Box bgColor="white" p="8px" position="fixed" right="0" bottom="0">
-            <a href={addSongUrl} target="_blank" rel="noreferrer">
+            <Link onClick={() => navigate(`add-song`)}>
               <QRCode size={200} value={addSongUrl} />
-            </a>
+            </Link>
           </Box>
         )}
 

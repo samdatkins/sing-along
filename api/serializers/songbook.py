@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from api.models import Songbook, SongEntry
-from api.serializers.song import SongSerializer
+from api.models import Songbook
 from api.serializers.song_entry import SongEntrySerializer
 
 
@@ -44,6 +43,7 @@ class SongbookListSerializer(serializers.ModelSerializer):
             "max_active_songs",
             "title",
             "is_noodle_mode",
+            "current_song_timestamp",
         ]
 
 
