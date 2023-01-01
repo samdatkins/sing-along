@@ -1,10 +1,6 @@
-from datetime import datetime
-
-from django.db import models
 from rest_framework import serializers
 
-from api.models import Songbook, SongEntry
-from api.serializers.song import SongSerializer
+from api.models import Songbook
 from api.serializers.song_entry import SongEntrySerializer
 
 

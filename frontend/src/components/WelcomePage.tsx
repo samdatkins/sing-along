@@ -3,10 +3,6 @@ import { useAsync } from "react-async-hook";
 import { Link } from "react-router-dom";
 import { getAllSongbooks } from "../services/songs";
 
-//
-//
-//
-
 export default function WelcomePage() {
   const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
   const songbooks = asyncSongbooks.result?.data.results;

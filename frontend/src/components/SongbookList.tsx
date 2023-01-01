@@ -31,8 +31,7 @@ export default function SongbookList() {
                   }}
                 >
                   "{entry.song.title}" by {entry.song.artist}
-                </Link>{" "}
-                (edit)
+                </Link>
               </ListItem>
             ))}
           </UnorderedList>

@@ -33,19 +33,17 @@ export async function nextSongbookSong(sessionKey: string | undefined) {
   }
 }
 
-//start of createSongbook
 export async function createNewSongbook(
   sessionKey: string | undefined,
   maxActiveSongs: string | undefined,
   songbookTitle: string | undefined,
   isNoodleMode: boolean | undefined,
-) 
-
-{
+) {
   try {
     await axios.post<Songbook>(`/api/songbooks/`, {
       session_key: sessionKey,
-      max_active_songs: maxActiveSongs && maxActiveSongs.length > 0 ? maxActiveSongs : null,
+      max_active_songs:
+        maxActiveSongs && maxActiveSongs.length > 0 ? maxActiveSongs : null,
       title: songbookTitle,
       is_noodle_mode: isNoodleMode,
     });
@@ -55,7 +53,6 @@ export async function createNewSongbook(
     return false;
   }
 }
-// end of createSongbook
 
 export async function setSongbookSong(
   sessionKey: string | undefined,

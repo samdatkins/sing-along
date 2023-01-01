@@ -17,7 +17,7 @@ export default function CreateNewSongbook() {
       </Heading>
       <form>
         <Text mb="1rem">
-          TITLE (<i>displays on songbook</i>):
+          Title (<i>displays on songbook</i>):
           <Input
             value={title}
             onChange={(e) =>
@@ -26,7 +26,7 @@ export default function CreateNewSongbook() {
           />
         </Text>
         <Text mb="1rem">
-          SESSION KEY (<i>alphanumeric plus dashes</i>):
+          Session Key (<i>alphanumeric plus dashes</i>):
           <Input
             value={key}
             onChange={(e) =>
@@ -35,14 +35,14 @@ export default function CreateNewSongbook() {
           />
         </Text>
         <Text mb="1rem">
-          MAX SONGS (<i>leave blank for no max</i>):
+          Max Songs (<i>leave blank for no max</i>):
           <Input
             value={maxSongs}
             onChange={(e) => setMaxSongs(e.target.value)}
           />
         </Text>
         <Text mb="1rem">
-          ACTION VERB (<i>coming soon</i>):
+          Action Verb (<i>coming soon</i>):
           <Input disabled defaultValue={"DANCE"} />
         </Text>
         <Text mb="1rem">
@@ -67,7 +67,7 @@ export default function CreateNewSongbook() {
               noodleMode,
             );
             if (result === true) {
-              navigate(`../live/${key}`);
+              navigate(`/live/${key}`);
             } else {
               console.log("Couldn't create new songbook.");
             }
@@ -80,8 +80,3 @@ export default function CreateNewSongbook() {
     </Box>
   );
 }
-// sessionKey: string | undefined,
-// maxActiveSongs: number | undefined,
-// songbookTitle: string | undefined,
-// isNoodleMode: boolean | undefined,
-// currentSongTimestamp: string | undefined,
