@@ -18,7 +18,7 @@ class SongbookViewSet(viewsets.ModelViewSet):
     API endpoint that allows all standard interactions with Songbooks.
     """
 
-    queryset = Songbook.objects.all()
+    queryset = Songbook.objects.all().order_by("-created_at")
     lookup_field = "session_key"
 
     def get_queryset(self):
