@@ -25,7 +25,11 @@ class SongbookViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return Songbook.objects.prefetch_related("song_entries").all()
         elif self.action == "songbook_details":
-            return Songbook.objects.all().prefetch_related("song_entries__song")
+            return (
+                Songbook.objects.all()
+                .prefetch_related("song_entries__song")
+                .order_by("-song_entry__song__created_at")
+            )
         return self.queryset
 
     def get_serializer_class(self):
