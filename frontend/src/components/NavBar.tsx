@@ -1,10 +1,4 @@
-import {
-  AddIcon,
-  DeleteIcon,
-  HamburgerIcon,
-  MoonIcon,
-  SunIcon,
-} from "@chakra-ui/icons";
+import { AddIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -27,8 +21,10 @@ import {
   FaExpandAlt,
   FaFastBackward,
   FaFastForward,
+  FaHome,
   FaPause,
   FaPlay,
+  FaTrash,
   FaUndoAlt,
 } from "react-icons/fa";
 import { GrUnorderedList } from "react-icons/gr";
@@ -226,10 +222,9 @@ export default function NavBar({
                       <Icon as={FaFastForward} />
                     </Button>
                   </Flex>
-                  <Flex flex="space-between" mx="1rem" my=".5rem">
+                  <Flex justifyContent="space-between" mx="1rem" my=".5rem">
                     <Button
-                      flex="1"
-                      colorScheme="blue"
+                      colorScheme="gray"
                       onClick={() => {
                         resetAppState();
                         timerControls.refresh();
@@ -237,13 +232,34 @@ export default function NavBar({
                     >
                       <Icon as={FaUndoAlt} />
                     </Button>
+                    <Button
+                      colorScheme="gray"
+                      onClick={() => performSongNavAction("delete")}
+                    >
+                      <Icon as={FaTrash} />
+                    </Button>
+                    <Button
+                      colorScheme="gray"
+                      onClick={() => {
+                        if (!document.fullscreenElement) {
+                          document.body.requestFullscreen();
+                        } else {
+                          document.exitFullscreen();
+                        }
+                      }}
+                    >
+                      <Icon as={FaExpandAlt} />
+                    </Button>
                   </Flex>
                 </Flex>
               )}
+              <RouterLink to="../live/">
+                <MenuItem icon={<Icon as={FaHome} />}>Home</MenuItem>
+              </RouterLink>
               {asyncSongbook?.result?.data?.is_noodle_mode && (
                 <RouterLink to="list">
                   <MenuItem icon={<Icon as={GrUnorderedList} />}>
-                    Songbook Index
+                    Song List
                   </MenuItem>
                 </RouterLink>
               )}
@@ -253,31 +269,10 @@ export default function NavBar({
               >
                 {colorMode === "light" ? "Night Mode" : "Day Mode"}
               </MenuItem>
-              {isSongbookOwner && !isMobileDevice && (
-                <MenuItem
-                  icon={<Icon as={FaExpandAlt} />}
-                  onClick={() => {
-                    if (!document.fullscreenElement) {
-                      document.body.requestFullscreen();
-                    } else {
-                      document.exitFullscreen();
-                    }
-                  }}
-                >
-                  Toggle Fullscreen
-                </MenuItem>
-              )}
-              {isSongbookOwner && !isMobileDevice && (
-                <MenuItem
-                  onClick={() => performSongNavAction("delete")}
-                  icon={<DeleteIcon />}
-                >
-                  Delete Current Song
-                </MenuItem>
-              )}
             </MenuList>
           </Menu>
         </Flex>
+
         {!isMobileDevice && (
           <Box bgColor="white" p="8px" position="fixed" right="0" bottom="0">
             <Link onClick={() => navigate(`add-song`)}>

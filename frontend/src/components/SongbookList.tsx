@@ -1,6 +1,14 @@
-import { Box, Heading, Link, ListItem, UnorderedList } from "@chakra-ui/react";
+import {
+  Box,
+  Heading,
+  Icon,
+  Link,
+  ListItem,
+  UnorderedList,
+} from "@chakra-ui/react";
 import { useAsync } from "react-async-hook";
-import { useNavigate, useParams } from "react-router-dom";
+import { FaEdit } from "react-icons/fa";
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { getSongbookDetails, setSongbookSong } from "../services/songs";
 
 export default function SongbookList() {
@@ -15,7 +23,7 @@ export default function SongbookList() {
     <Box margin="3rem">
       {songbook && (
         <>
-          <Heading mb="2rem">{songbook.title}</Heading>
+          <Heading mb="2rem">Song List for {songbook.title}</Heading>
           <UnorderedList>
             {songbook.song_entries.map((entry) => (
               <ListItem key={entry.id}>
@@ -31,7 +39,10 @@ export default function SongbookList() {
                   }}
                 >
                   "{entry.song.title}" by {entry.song.artist}
-                </Link>
+                </Link>{" "}
+                <RouterLink to={`../admin/api/song/${entry.song.id}/change/`}>
+                  <Icon as={FaEdit} />
+                </RouterLink>
               </ListItem>
             ))}
           </UnorderedList>
