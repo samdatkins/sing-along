@@ -21,7 +21,12 @@ export default function WelcomePage() {
       </Text>
       <Flex justifyContent="center">
         <Flex justifyContent="center" direction="column">
-        <Text mb="1rem" fontSize="2rem" color="gray.400" fontFamily="Ubuntu Mono">
+          <Text
+            mb="1rem"
+            fontSize="2rem"
+            color="gray.400"
+            fontFamily="Ubuntu Mono"
+          >
             Upcoming Features
           </Text>
           <UnorderedList mb="2rem">
@@ -30,13 +35,20 @@ export default function WelcomePage() {
             <ListItem>Participation History & Stats</ListItem>
             <ListItem>Spotify & Shazam Integration</ListItem>
           </UnorderedList>
-          <Text mb="1rem" fontSize="2rem" fontFamily="Ubuntu Mono" color="gray.400">
+          <Text
+            mb="1rem"
+            fontSize="2rem"
+            fontFamily="Ubuntu Mono"
+            color="gray.400"
+          >
             Your Songbooks
           </Text>
           <Text mb="1rem">
             <Link to={`/live/createsongbook/`}>+ Create a New Songbook</Link>
           </Text>
-          <Text mb="1rem"><SongbookIndexTable songbooks={songbooks} /></Text>
+          <Text mb="1rem">
+            <SongbookIndexTable songbooks={songbooks} />
+          </Text>
         </Flex>
       </Flex>
     </Box>
