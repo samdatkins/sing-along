@@ -1,11 +1,12 @@
 import datetime
 
+from django.db.models import Prefetch
 from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.models import Songbook
+from api.models import Song, Songbook, SongEntry
 from api.serializers.songbook import (
     SongbookDetailSerializer,
     SongbookListSerializer,
@@ -25,11 +26,14 @@ class SongbookViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return Songbook.objects.prefetch_related("song_entries").all()
         elif self.action == "songbook_details":
-            return (
-                Songbook.objects.all()
-                .prefetch_related("song_entries__song")
-                .order_by("-song_entry__song__created_at")
-            )
+            return Songbook.objects.prefetch_related(
+                Prefetch(
+                    "song_entries",
+                    queryset=SongEntry.objects.order_by("created_at").prefetch_related(
+                        "song"
+                    ),
+                )
+            ).all()
         return self.queryset
 
     def get_serializer_class(self):

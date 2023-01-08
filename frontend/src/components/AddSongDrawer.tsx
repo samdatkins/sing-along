@@ -52,7 +52,7 @@ export default function AddSongDrawer() {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Request a song:</DrawerHeader>
+          <DrawerHeader>Request a song for "{songbook?.title}"</DrawerHeader>
 
           <DrawerBody>
             <form>
