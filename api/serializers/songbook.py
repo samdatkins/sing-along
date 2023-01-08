@@ -20,6 +20,7 @@ class SongbookSerializer(serializers.ModelSerializer):
             "current_song_position",
             "current_song_entry",
             "id",
+            "current_song_timestamp",
         ]
 
     def get_total_songs(self, obj):
@@ -36,6 +37,8 @@ class SongbookSerializer(serializers.ModelSerializer):
 
 
 class SongbookListSerializer(serializers.ModelSerializer):
+    current_song_timestamp = serializers.DateTimeField(read_only=False)
+
     class Meta:
         model = Songbook
         fields = [
@@ -58,4 +61,5 @@ class SongbookDetailSerializer(serializers.ModelSerializer):
             "title",
             "is_noodle_mode",
             "song_entries",
+            "current_song_timestamp",
         ]
