@@ -38,13 +38,15 @@ class Command(BaseCommand):
         for song in songs_for_artist:
             try:
                 Song.objects.get(
-                    artist__iexact=song["artist"],
-                    title__iexact=song["title"],
+                    artist__iexact=song["artist"][0:40],
+                    title__iexact=song["title"][0:40],
                 )
             except Song.DoesNotExist:
                 # Only add if the song isn't already in the DB
                 Song.objects.create(
-                    artist=song["artist"], title=song["title"], url=song["url"]
+                    artist=song["artist"][0:40],
+                    title=song["title"][0:40],
+                    url=song["url"],
                 )
 
     def handle(self, *args, **options):
