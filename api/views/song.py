@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from api.models import Song
 from api.serializers.song import SongSerializer
-from sing_along.utils.tabs import ServerNotAvailable, TabFetcher, TabType
+from sing_along.utils.tabs import ServerNotAvailable, TabFetcher, TabScraper, TabType
 
 logger = logging.getLogger(__name__)
 
@@ -62,5 +62,13 @@ class SongViewSet(viewsets.ModelViewSet):
 
         if song is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        if song.content is None or song.content == "":
+            tab_scraper = TabScraper()
+            tab = tab_scraper.load_tab_from_url(song.url)
+            if tab is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            song.content = tab["content"]
+            song.save()
 
         return Response(status=status.HTTP_200_OK, data=SongSerializer(song).data)
