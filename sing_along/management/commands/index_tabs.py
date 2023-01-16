@@ -36,7 +36,6 @@ class Command(BaseCommand):
 
     def _select_and_create_songs_for_artist(self, songs_for_artist):
         for song in songs_for_artist:
-            breakpoint()
             try:
                 Song.objects.get(
                     artist__iexact=song["artist"],
@@ -112,4 +111,4 @@ class Command(BaseCommand):
                         )
                         if not can_continue:
                             break
-                    self._select_and_submit_songs_for_artist(songs_for_artist)
+                    self._select_and_create_songs_for_artist(songs_for_artist)
