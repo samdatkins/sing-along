@@ -34,20 +34,47 @@ class Command(BaseCommand):
             # which matches to the 0-9 page
             return "0-9" == band_page
 
+    def _calculate_weighted_rating(self, result, max_votes):
+        return (result["votes"] / max(max_votes, 1)) * result["rating"]
+
+    def _choose_song(self, same_song_entries):
+        max_votes = max(tab["votes"] for tab in same_song_entries)
+        return max(
+            same_song_entries,
+            key=lambda tab: self._calculate_weighted_rating(tab, max_votes),
+        )
+
+    def _create_chosen_song(self, song):
+        try:
+            Song.objects.get(
+                artist__iexact=song["artist"][0:40],
+                title__iexact=song["title"][0:40],
+            )
+        except Song.DoesNotExist:
+            # Only add if the song isn't already in the DB
+            Song.objects.create(
+                artist=song["artist"][0:40],
+                title=song["title"][0:40],
+                url=song["url"],
+            )
+
     def _select_and_create_songs_for_artist(self, songs_for_artist):
+        same_song_entries = []
         for song in songs_for_artist:
-            try:
-                Song.objects.get(
-                    artist__iexact=song["artist"][0:40],
-                    title__iexact=song["title"][0:40],
-                )
-            except Song.DoesNotExist:
-                # Only add if the song isn't already in the DB
-                Song.objects.create(
-                    artist=song["artist"][0:40],
-                    title=song["title"][0:40],
-                    url=song["url"],
-                )
+            if len(same_song_entries) == 0 or (
+                same_song_entries[0]["artist"] == song["artist"]
+                and same_song_entries[0]["title"] == song["title"]
+            ):
+                same_song_entries.append(song)
+            else:
+                if len(same_song_entries) > 1:
+                    breakpoint()
+                chosen_song = self._choose_song(same_song_entries)
+                self._create_chosen_song(chosen_song)
+                same_song_entries = [song]
+        if len(same_song_entries) > 0:
+            chosen_song = self._choose_song(same_song_entries)
+            self._create_chosen_song(chosen_song)
 
     def handle(self, *args, **options):
         stop_skipping = False
