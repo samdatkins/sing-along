@@ -40,7 +40,7 @@ class SongViewSet(viewsets.ModelViewSet):
         if len(song_matches) > 0:
             song = song_matches.first()
         else:
-            tab_fetcher = TabFetcher(settings.TAB_SEARCH_URL, TabType.CHORDS)
+            tab_fetcher = TabFetcher(settings.TAB_SEARCH_URL, [TabType.CHORDS])
 
             tab = None
             try:

@@ -21,6 +21,7 @@ django-environ = "^0.9.0"
 gunicorn = "^20.1.0"
 authlib = "^1.2.0"
 dj-database-url = "^1.2.0"
+backoff = "^2.2.1"
 
 [tool.poetry.group.dev.dependencies]
 factory-boy = "^3.2.1"
