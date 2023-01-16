@@ -11,7 +11,7 @@ class TestTabSearcher(TestCase):
         # Arrange
         status_code_mock = PropertyMock(return_value=404)
         type(mock_requests.get.return_value).status_code = status_code_mock
-        tab_searcher = TabSearcher("my_url", TabType.CHORDS)
+        tab_searcher = TabSearcher("http://fake.com", [TabType.CHORDS])
 
         # Act
         tab = tab_searcher.get_best_tab_entry("my song")
@@ -19,16 +19,19 @@ class TestTabSearcher(TestCase):
         # Assert
         self.assertEqual(tab, None)
 
-    @patch("sing_along.utils.tabs.TabSearcher._get_parsed_search_results")
-    def test_best_tab_is_chosen(self, mock_searcher):
+    def test_best_tab_is_chosen(self):
         # Arrange
-        mock_searcher.return_value = [
-            {"votes": 10, "rating": 5},
-            {"votes": 100, "rating": 4.5},
-        ]
+        ts = TabSearcher("http://fake.com", [TabType.CHORDS])
+        ts._get_parsed_search_results = Mock(
+            return_value=[
+                {"votes": 10, "rating": 5},
+                {"votes": 100, "rating": 4.5},
+            ]
+        )
+        ts._get_search_results = Mock()
 
         # Act
-        fake_tab = TabSearcher("my_url", TabType.CHORDS).get_best_tab_entry("my song")
+        fake_tab = ts.get_best_tab_entry("my song")
 
         # Assert
         self.assertEqual(fake_tab["rating"], 4.5)  # type: ignore
