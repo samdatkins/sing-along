@@ -2,8 +2,9 @@ import json
 import random
 import time
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
+from api.models import Song
 from sing_along.utils.tabs import TabIndexer, TabType
 
 
@@ -32,6 +33,20 @@ class Command(BaseCommand):
             # If the first character is not in A-Z, it must be a special char
             # which matches to the 0-9 page
             return "0-9" == band_page
+
+    def _select_and_create_songs_for_artist(self, songs_for_artist):
+        for song in songs_for_artist:
+            breakpoint()
+            try:
+                Song.objects.get(
+                    artist__iexact=song["artist"],
+                    title__iexact=song["title"],
+                )
+            except Song.DoesNotExist:
+                # Only add if the song isn't already in the DB
+                Song.objects.create(
+                    artist=song["artist"], title=song["title"], url=song["url"]
+                )
 
     def handle(self, *args, **options):
         stop_skipping = False
@@ -68,8 +83,10 @@ class Command(BaseCommand):
                         continue
                     else:
                         stop_skipping = True
+
+                    songs_for_artist = []
                     for song_index in range(1, 5000):
-                        time.sleep(random.uniform(1, 3))
+                        time.sleep(random.uniform(0, 2))
                         (
                             can_continue,
                             tab_results,
@@ -78,6 +95,7 @@ class Command(BaseCommand):
                         )
 
                         if tab_results is not None:
+                            songs_for_artist.extend(tab_results)
                             self.stdout.write(
                                 json.dumps(tab_results, indent=4)
                                 .replace("[", "")
@@ -94,3 +112,4 @@ class Command(BaseCommand):
                         )
                         if not can_continue:
                             break
+                    self._select_and_submit_songs_for_artist(songs_for_artist)

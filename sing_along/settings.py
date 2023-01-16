@@ -20,6 +20,8 @@ import environ
 env = environ.Env(
     # set casting, default value
     DJANGO_ENV=(str, "development"),
+    # These are all used by management commands, so they aren't necessary
+    # in production or if you aren't using those management commands
     TAB_ARTIST_SONGS_INDEX=(str, "fake_url"),
     TAB_BAND_INDEX=(str, "fake_url"),
 )
