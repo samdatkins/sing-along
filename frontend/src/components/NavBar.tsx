@@ -1,33 +1,15 @@
-import { AddIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
+import { AddIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
   Flex,
-  Icon,
-  IconButton,
   Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Skeleton,
   Text,
   useBoolean,
-  useColorMode,
   useMediaQuery,
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  FaExpandAlt,
-  FaFastBackward,
-  FaFastForward,
-  FaHome,
-  FaPause,
-  FaPlay,
-  FaTrash,
-  FaUndoAlt,
-} from "react-icons/fa";
-import { GrUnorderedList } from "react-icons/gr";
+import { useEffect, useRef, useState } from "react";
 import { ApplicationState, AppStateToTimerMap, Songbook } from "../models";
 
 import { AxiosResponse } from "axios";
@@ -39,11 +21,8 @@ import {
   useOutlet,
   useParams,
 } from "react-router-dom";
-import {
-  deleteSongbookSong,
-  nextSongbookSong,
-  prevSongbookSong,
-} from "../services/songs";
+import { nextSongbookSong } from "../services/songs";
+import HamburgerMenu from "./HamburgerMenu";
 import Timer from "./Timer";
 
 interface NavBarProps {
@@ -72,7 +51,6 @@ export default function NavBar({
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
     AppStateToTimerMap[applicationState],
   );
-  const { colorMode, toggleColorMode } = useColorMode();
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   const isMobileDevice = isSmallerThan900;
@@ -101,66 +79,7 @@ export default function NavBar({
     },
   };
 
-  const performSongNavAction = async (action: "next" | "prev" | "delete") => {
-    const sessionKey = asyncSongbook?.result?.data?.session_key;
-    setIsLive(false);
-
-    asyncSongbook.reset();
-    if (action === "next") {
-      await nextSongbookSong(sessionKey);
-    } else if (action === "prev") {
-      await prevSongbookSong(sessionKey);
-    } else {
-      await deleteSongbookSong(
-        asyncSongbook?.result?.data?.current_song_entry?.id,
-      );
-    }
-    asyncSongbook.execute();
-
-    resetAppState();
-    timerControls.refresh();
-  };
-
   const isSongbookOwner = true;
-
-  // handle what happens on key press
-  const handleKeyPress = useCallback(
-    (event: any) => {
-      // if the add song drawer is open, ignore all typing
-      if (addSongDrawerOutlet) return;
-
-      // This first one is the only one that non-admins are allowed to use
-      if (event.code === "Backquote") {
-        toggleColorMode();
-      } else if (event.code === "Delete") {
-        performSongNavAction("delete");
-      } else if (event.code === "Space") {
-        timerControls.playPauseToggle();
-        // prevents scrolling from spacebar
-        event.preventDefault();
-      } else if (event.code === "ArrowLeft") {
-        performSongNavAction("prev");
-      } else if (event.code === "ArrowRight") {
-        performSongNavAction("next");
-      } else if (event.code === "KeyR") {
-        resetAppState();
-        timerControls.refresh();
-      } else if (event.code === "KeyF") {
-        alert(`This cancels the tab view truncation AND pauses the timer.`);
-      }
-    },
-    [timerControls, toggleColorMode],
-  );
-
-  useEffect(() => {
-    // attach the event listener
-    document.addEventListener("keydown", handleKeyPress);
-
-    // remove the event listener
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [handleKeyPress]);
 
   useEffect(() => {
     async function appStateChanged() {
@@ -188,89 +107,16 @@ export default function NavBar({
       {/* LEFT COLUMN */}
       <Flex w="33%" justifyContent="space-between">
         <Flex paddingRight="1rem">
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              aria-label="Options"
-              icon={<HamburgerIcon />}
-              variant="outline"
-            />
-            <MenuList>
-              {isSongbookOwner && !isMobileDevice && (
-                <Flex direction="column">
-                  <Flex justifyContent="space-between" mx="1rem" my=".5rem">
-                    <Button
-                      colorScheme="blue"
-                      onClick={() => {
-                        performSongNavAction("prev");
-                      }}
-                    >
-                      <Icon as={FaFastBackward} />
-                    </Button>
-                    <Button
-                      colorScheme="blue"
-                      onClick={timerControls.playPauseToggle}
-                    >
-                      <Icon as={isLive ? FaPause : FaPlay} />
-                    </Button>
-                    <Button
-                      colorScheme="blue"
-                      onClick={() => {
-                        performSongNavAction("next");
-                      }}
-                    >
-                      <Icon as={FaFastForward} />
-                    </Button>
-                  </Flex>
-                  <Flex justifyContent="space-between" mx="1rem" my=".5rem">
-                    <Button
-                      colorScheme="gray"
-                      onClick={() => {
-                        resetAppState();
-                        timerControls.refresh();
-                      }}
-                    >
-                      <Icon as={FaUndoAlt} />
-                    </Button>
-                    <Button
-                      colorScheme="gray"
-                      onClick={() => performSongNavAction("delete")}
-                    >
-                      <Icon as={FaTrash} />
-                    </Button>
-                    <Button
-                      colorScheme="gray"
-                      onClick={() => {
-                        if (!document.fullscreenElement) {
-                          document.body.requestFullscreen();
-                        } else {
-                          document.exitFullscreen();
-                        }
-                      }}
-                    >
-                      <Icon as={FaExpandAlt} />
-                    </Button>
-                  </Flex>
-                </Flex>
-              )}
-              <RouterLink to="../live/">
-                <MenuItem icon={<Icon as={FaHome} />}>Home</MenuItem>
-              </RouterLink>
-              {asyncSongbook?.result?.data?.is_noodle_mode && (
-                <RouterLink to="list">
-                  <MenuItem icon={<Icon as={GrUnorderedList} />}>
-                    Song List
-                  </MenuItem>
-                </RouterLink>
-              )}
-              <MenuItem
-                icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-                onClick={toggleColorMode}
-              >
-                {colorMode === "light" ? "Night Mode" : "Day Mode"}
-              </MenuItem>
-            </MenuList>
-          </Menu>
+          <HamburgerMenu
+            isSongbookOwner={isSongbookOwner}
+            isMobileDevice={isMobileDevice}
+            timerControls={timerControls}
+            isLive={isLive}
+            setIsLive={setIsLive}
+            addSongDrawerOutlet={addSongDrawerOutlet}
+            asyncSongbook={asyncSongbook}
+            resetAppState={resetAppState}
+          />
         </Flex>
 
         {!isMobileDevice && (

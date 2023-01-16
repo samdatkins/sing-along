@@ -108,7 +108,7 @@ class Song(SafeDeleteModel, CreatedUpdated):
     artist = models.CharField(max_length=40, null=False, blank=False)
     title = models.CharField(max_length=40, null=False, blank=False)
     url = models.TextField(null=False, blank=False)
-    content = models.TextField(null=False, blank=False)
+    content = models.TextField(null=True, blank=True)
 
 
 class SongEntry(SafeDeleteModel, CreatedUpdated):
