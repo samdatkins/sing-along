@@ -100,13 +100,18 @@ class Song(SafeDeleteModel, CreatedUpdated):
         constraints = [
             models.UniqueConstraint(
                 fields=["url"],
-                name="unique song entry",
+                name="unique song url",
                 condition=Q(deleted__isnull=True),
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["artist", "title"],
+                name="unique song title and artist",
+                condition=Q(deleted__isnull=True),
+            ),
         ]
 
-    artist = models.CharField(max_length=40, null=False, blank=False)
-    title = models.CharField(max_length=40, null=False, blank=False)
+    artist = models.CharField(max_length=120, null=False, blank=False)
+    title = models.CharField(max_length=120, null=False, blank=False)
     url = models.TextField(null=False, blank=False)
     content = models.TextField(null=True, blank=True)
 
