@@ -19,7 +19,11 @@ import environ
 
 env = environ.Env(
     # set casting, default value
-    DJANGO_ENV=(str, "development")
+    DJANGO_ENV=(str, "development"),
+    # These are all used by management commands, so they aren't necessary
+    # in production or if you aren't using those management commands
+    TAB_ARTIST_SONGS_INDEX=(str, "fake_url"),
+    TAB_BAND_INDEX=(str, "fake_url"),
 )
 
 
@@ -31,6 +35,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 DJANGO_ENV = env("DJANGO_ENV")
 TAB_SEARCH_URL = env("TAB_SEARCH_URL")
+TAB_ARTIST_SONGS_INDEX = env("TAB_ARTIST_SONGS_INDEX")
+TAB_BAND_INDEX = env("TAB_BAND_INDEX")
 
 # insert these lines after the definition of BASE_DIR
 BACKEND_DIR = BASE_DIR  # rename variable for clarity
@@ -67,6 +73,7 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "safedelete",
     "rest_framework",
+    "sing_along",
 ]
 
 MIDDLEWARE = [

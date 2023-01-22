@@ -101,6 +101,19 @@ url = "https://pypi.python.org/simple"
 reference = "py"
 
 [[package]]
+name = "backoff"
+version = "2.2.1"
+description = "Function decoration for backoff and retry"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.python.org/simple"
+reference = "py"
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.11.1"
 description = "Screen-scraping library"
@@ -963,7 +976,7 @@ reference = "py"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "7ea4c26e0d8c004ee41be324fe66ae43305f7eea15b3231255dd32fad9ef9c46"
+content-hash = "e1707ac8ab03b32d2af66c8e3f5ceee73d5f9812ae9cba7c7d5edff8e47fdb32"
 
 [metadata.files]
 asgiref = [
@@ -984,6 +997,10 @@ autobahn = [
 automat = [
     {file = "Automat-20.2.0-py2.py3-none-any.whl", hash = "sha256:b6feb6455337df834f6c9962d6ccf771515b7d939bca142b29c20c2376bc6111"},
     {file = "Automat-20.2.0.tar.gz", hash = "sha256:7979803c74610e11ef0c0d68a2942b152df52da55336e0c9d58daf1831cbdf33"},
+]
+backoff = [
+    {file = "backoff-2.2.1-py3-none-any.whl", hash = "sha256:63579f9a0628e06278f7e47b7d7d5b6ce20dc65c5e96a6f3ca99a6adca0396e8"},
+    {file = "backoff-2.2.1.tar.gz", hash = "sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba"},
 ]
 beautifulsoup4 = [
     {file = "beautifulsoup4-4.11.1-py3-none-any.whl", hash = "sha256:58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30"},
