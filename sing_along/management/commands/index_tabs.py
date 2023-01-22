@@ -14,6 +14,24 @@ def char_range(c1, c2):
         yield chr(c)
 
 
+def is_english(s):
+    try:
+        s.encode(encoding="utf-8").decode("ascii")
+    except UnicodeDecodeError:
+        return False
+    else:
+        return True
+
+
+def is_english_str(s):
+    non_eng_char_count = 0
+    for c in s:
+        non_eng_char_count += 0 if is_english(c) else 1
+    if non_eng_char_count >= 4 or non_eng_char_count >= len(s) / 2:
+        return False
+    return True
+
+
 class Command(BaseCommand):
     help = "Index all tabs"
 
@@ -60,6 +78,7 @@ class Command(BaseCommand):
 
     def _select_and_create_songs_for_artist(self, songs_for_artist):
         same_song_entries = []
+        songs_for_artist = [s for s in songs_for_artist if s["votes"] > 0]
         for song in songs_for_artist:
             if len(same_song_entries) == 0 or (
                 same_song_entries[0]["artist"] == song["artist"]
@@ -67,8 +86,6 @@ class Command(BaseCommand):
             ):
                 same_song_entries.append(song)
             else:
-                if len(same_song_entries) > 1:
-                    breakpoint()
                 chosen_song = self._choose_song(same_song_entries)
                 self._create_chosen_song(chosen_song)
                 same_song_entries = [song]
@@ -111,6 +128,10 @@ class Command(BaseCommand):
                         continue
                     else:
                         stop_skipping = True
+
+                    if not is_english_str(band["name"]):
+                        self.stderr.write(f"Skipping band {band['name']}")
+                        continue
 
                     songs_for_artist = []
                     for song_index in range(1, 5000):
