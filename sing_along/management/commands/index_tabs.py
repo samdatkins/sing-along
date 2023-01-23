@@ -65,15 +65,17 @@ class Command(BaseCommand):
     def _create_chosen_song(self, song):
         try:
             Song.objects.get(
-                artist__iexact=song["artist"][0:40],
-                title__iexact=song["title"][0:40],
+                artist__iexact=song["artist"][0:120],
+                title__iexact=song["title"][0:120],
             )
         except Song.DoesNotExist:
             # Only add if the song isn't already in the DB
             Song.objects.create(
-                artist=song["artist"][0:40],
-                title=song["title"][0:40],
+                artist=song["artist"][0:120],
+                title=song["title"][0:120],
                 url=song["url"],
+                rating=song["rating"],
+                votes=song["votes"],
             )
 
     def _select_and_create_songs_for_artist(self, songs_for_artist):
