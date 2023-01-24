@@ -4,6 +4,7 @@ export type Song = {
   url: string;
   title: string;
   id: number;
+  capo: number;
 };
 
 export type SongEntry = {
@@ -12,6 +13,7 @@ export type SongEntry = {
   updated_at: string;
   play_time: string;
   song: Song;
+  is_flagged: boolean;
 };
 
 export type Songbook = {

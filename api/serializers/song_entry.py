@@ -20,4 +20,5 @@ class SongEntrySerializer(serializers.ModelSerializer):
             "song",
             "songbook_id",
             "song_id",
+            "is_flagged",
         ]

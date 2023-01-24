@@ -116,6 +116,7 @@ class Song(SafeDeleteModel, CreatedUpdated):
     content = models.TextField(null=True, blank=True)
     rating = models.DecimalField(max_digits=8, decimal_places=6, null=True, blank=True)
     votes = models.IntegerField(null=True, blank=True)
+    capo = models.IntegerField(null=True, blank=True)
 
 
 class SongEntry(SafeDeleteModel, CreatedUpdated):
@@ -143,3 +144,4 @@ class SongEntry(SafeDeleteModel, CreatedUpdated):
     play_time = models.DecimalField(
         max_digits=8, decimal_places=2, null=True, blank=True
     )
+    is_flagged = models.BooleanField(null=True, blank=True)
