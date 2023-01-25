@@ -29,11 +29,10 @@ const flatToneArr = [
 ];
 
 function getToneDetails(chordString) {
+  let hasAccidental = true;
   const chord =
     chordString.substring(0, 1).toUpperCase() + chordString.substring(1, 2);
-  let hasAccidental = true;
   let chordIndex = sharpToneArr.indexOf(chord);
-
   if (chordIndex === -1) {
     chordIndex = flatToneArr.indexOf(chord);
   }
@@ -54,7 +53,15 @@ function transposer(chords, steps, usesSharps) {
   const splitChordsArray = chords.split("[/ch]").reduce((acc, cur) => {
     return [...acc, ...cur.split("[ch]")];
   }, []);
-  return splitChordsArray
+  const chordsSplitAtSlashes = splitChordsArray.reduce((acc, cur) => {
+    const splitSlashedChord = cur.split("/");
+    const slashSplitReturn =
+      splitSlashedChord.length === 2
+        ? [...acc, splitSlashedChord[0], "/", splitSlashedChord[1]]
+        : [...acc, cur];
+    return slashSplitReturn;
+  }, []);
+  return chordsSplitAtSlashes
     .map((elem) => {
       if (elem.replaceAll(" ", "") === "") {
         return elem;
