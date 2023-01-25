@@ -37,7 +37,7 @@ class SongbookSerializer(serializers.ModelSerializer):
 
 
 class SongbookListSerializer(serializers.ModelSerializer):
-    current_song_timestamp = serializers.DateTimeField(read_only=False)
+    current_song_timestamp = serializers.DateTimeField(read_only=False, required=False)
 
     class Meta:
         model = Songbook
