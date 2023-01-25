@@ -1,6 +1,8 @@
 import { Text, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
+import { useCallback, useEffect, useState } from "react";
+import transposer from "./transposer";
 
-function formatTab(tab) {
+function formatTab(tab, toneSteps) {
   let tabStartIndex = 0;
   const capoArray = tab.filter((e) => e.toLowerCase().includes("capo"));
   for (let i = 0; i < tab.length; i++) {
@@ -10,7 +12,11 @@ function formatTab(tab) {
     }
   }
   const newArray = tab.slice(tabStartIndex, tab.length);
-  const fixedTabArray = [capoArray[0] || [], ...newArray];
+  const capoValueString = capoArray[0] || [];
+  const transposeValueString =
+    toneSteps != 0 ? "transposed " + toneSteps + " steps" : "";
+  const pitchBendString = capoValueString + " " + transposeValueString;
+  const fixedTabArray = [pitchBendString, ...newArray];
   return fixedTabArray;
 }
 
@@ -20,13 +26,48 @@ interface TabDisplayProps {
 }
 
 export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
+  const [toneSteps, setToneSteps] = useState(0);
+  const [usesSharps, setUsesSharps] = useState(true);
+
+  function handleTransposeChange(num) {
+    let newTone = toneSteps + num;
+    if (newTone === 12 || newTone === -12) {
+      newTone = 0;
+    }
+    setToneSteps(newTone);
+  }
+
+  const handleKeyPress = useCallback(
+    (event: any) => {
+      // This first one is the only one that non-admins are allowed to use
+      if (event.key === "+") {
+        handleTransposeChange(1);
+      } else if (event.key === "-") {
+        handleTransposeChange(-1);
+      } else if (event.key === "#") {
+        setUsesSharps(!usesSharps);
+      }
+    },
+    [handleTransposeChange, usesSharps, setUsesSharps],
+  );
+
+  useEffect(() => {
+    // attach the event listener
+    document.addEventListener("keydown", handleKeyPress);
+
+    // remove the event listener
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [handleKeyPress]);
+
   const splitTab = (tab || "")
     .replaceAll("[tab]", "")
     .replaceAll("[/tab]", "")
     .replaceAll("\r\n", "\n")
     .split("\n");
 
-  const fixedTabArray = formatTab(splitTab);
+  const fixedTabArray = formatTab(splitTab, toneSteps);
   const truncatedSplitTabArray = fixedTabArray && fixedTabArray?.slice(0, 120);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   /*
@@ -44,13 +85,27 @@ export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
         (isSmallerThan900 ? (
           <TabWithoutChords tabToDisplay={tabToDisplay} />
         ) : (
-          <TabWithChords tabToDisplay={tabToDisplay} />
+          <TabWithChords
+            tabToDisplay={tabToDisplay}
+            toneSteps={toneSteps}
+            usesSharps={usesSharps}
+          />
         ))}
     </>
   );
 }
 
-function TabWithChords({ tabToDisplay }) {
+type TabWithChordsProps = {
+  tabToDisplay: any[];
+  toneSteps: number;
+  usesSharps: boolean;
+};
+
+function TabWithChords({
+  tabToDisplay,
+  toneSteps,
+  usesSharps,
+}: TabWithChordsProps) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
 
   return (
@@ -59,7 +114,7 @@ function TabWithChords({ tabToDisplay }) {
         if (tabLine.includes("[ch]")) {
           return (
             <Text color={chordColor} key={window.crypto.randomUUID()}>
-              {tabLine.replaceAll("[ch]", "").replaceAll("[/ch]", "")}
+              {transposer(tabLine, toneSteps, usesSharps)}
             </Text>
           );
         } else {
