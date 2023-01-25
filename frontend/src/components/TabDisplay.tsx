@@ -48,7 +48,7 @@ export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
         setUsesSharps(!usesSharps);
       }
     },
-    [handleTransposeChange, usesSharps, setUsesSharps],
+    [handleTransposeChange, usesSharps, setUsesSharps]
   );
 
   useEffect(() => {
@@ -60,6 +60,11 @@ export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [handleKeyPress]);
+
+  useEffect(() => {
+    setToneSteps(0);
+    setUsesSharps(true);
+  }, [setToneSteps, setUsesSharps, tab]);
 
   const splitTab = (tab || "")
     .replaceAll("[tab]", "")
