@@ -28,6 +28,21 @@ const flatToneArr = [
   "B",
 ];
 
+const flatToneOutput = [
+  "C",
+  "D♭",
+  "D",
+  "E♭",
+  "E",
+  "F",
+  "G♭",
+  "G",
+  "A♭",
+  "A",
+  "B♭",
+  "B",
+];
+
 function getToneDetails(chordString) {
   let hasAccidental = true;
   const chord =
@@ -75,12 +90,12 @@ function transposer(chords, steps, usesSharps) {
           const sharpToneArrayReturn =
             sharpToneArr[(chordIndex + absoluteSteps) % 12] +
             elem.substring(startRestOfChord, elem.length);
-          const flatToneArrayReturn =
-            flatToneArr[(chordIndex + absoluteSteps) % 12] +
+          const flatToneOutputReturn =
+            flatToneOutput[(chordIndex + absoluteSteps) % 12] +
             elem.substring(startRestOfChord, elem.length);
           const toneArrayToReturn = usesSharps
             ? sharpToneArrayReturn
-            : flatToneArrayReturn;
+            : flatToneOutputReturn;
           return toneArrayToReturn;
         }
       }
