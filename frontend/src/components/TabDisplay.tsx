@@ -11,13 +11,13 @@ function formatTab(tab, toneSteps) {
       break;
     }
   }
-  const newArray = tab.slice(tabStartIndex, tab.length);
-  const capoValueString = capoArray[0] || [];
-  const transposeValueString =
+  const trimmedTab = tab.slice(tabStartIndex, tab.length);
+  const capoDisplay = capoArray[0] || [];
+  const transposeDisplay =
     toneSteps != 0 ? "transposed " + toneSteps + " steps" : "";
-  const pitchBendString = capoValueString + " " + transposeValueString;
-  const fixedTabArray = [pitchBendString, ...newArray];
-  return fixedTabArray;
+  const capoAndTranspositionDisplay = capoDisplay + " " + transposeDisplay;
+  const fixedTab = [capoAndTranspositionDisplay, ...trimmedTab];
+  return fixedTab;
 }
 
 interface TabDisplayProps {
