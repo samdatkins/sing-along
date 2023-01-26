@@ -27,6 +27,8 @@ class SongEntryAdmin(admin.ModelAdmin):
         "song__artist",
     )
 
+    raw_id_fields = ("song", "songbook")
+
     @admin.display(
         ordering="songbook__title",
         description="Songbook Title",
