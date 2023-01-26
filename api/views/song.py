@@ -2,13 +2,14 @@ import logging
 
 from django.conf import settings
 from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import F
+from django.db.models.functions import Log
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.models import Song
 from api.serializers.song import SongSerializer
-from sing_along.utils.tabs import ServerNotAvailable, TabFetcher, TabScraper, TabType
 
 logger = logging.getLogger(__name__)
 
@@ -29,46 +30,18 @@ class SongViewSet(viewsets.ModelViewSet):
 
         song_matches = (
             Song.objects.annotate(
-                similarity=TrigramSimilarity("artist", q)
-                + TrigramSimilarity("title", q)
+                similarity=(
+                    TrigramSimilarity("artist", q) + TrigramSimilarity("title", q)
+                )
             )
-            .filter(similarity__gt=0.55)
-            .order_by("-similarity")
+            .annotate(rank=F("similarity") * Log(F("votes"), 2.718))
+            .order_by("-rank")
         )
 
-        song = None
-        if len(song_matches) > 0:
-            song = song_matches.first()
-        else:
-            tab_fetcher = TabFetcher(settings.TAB_SEARCH_URL, [TabType.CHORDS])
-
-            tab = None
-            try:
-                tab = tab_fetcher.search_for_best_tab(q)
-            except ServerNotAvailable as e:
-                logger.exception("Failed to fetch tab from external server")
-
-            if tab is not None:
-                existing_song = None
-                try:
-                    existing_song = Song.objects.get(url=tab["url"])
-                except (Song.DoesNotExist) as e:
-                    song = Song()
-                    for key, value in tab.items():
-                        setattr(song, key, value)
-                    song.save()
-                else:
-                    song = existing_song
-
-        if song is None:
+        if len(song_matches) == 0:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if song.content is None or song.content == "":
-            tab_scraper = TabScraper()
-            tab = tab_scraper.load_tab_from_url(song.url)
-            if tab is None:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            song.content = tab["content"]
-            song.save()
-
-        return Response(status=status.HTTP_200_OK, data=SongSerializer(song).data)
+        return Response(
+            status=status.HTTP_200_OK,
+            data=SongSerializer(song_matches[0:5], many=True).data,
+        )

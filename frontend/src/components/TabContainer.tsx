@@ -11,7 +11,7 @@ interface TabsProps {
   applicationState: ApplicationState;
 }
 
-function Tabs({ asyncSongbook, applicationState }: TabsProps) {
+function TabContainer({ asyncSongbook, applicationState }: TabsProps) {
   const tab = asyncSongbook.result?.data?.current_song_entry?.song?.content;
   const [isLargerThan1900] = useMediaQuery("(min-width: 1900px)");
 
@@ -47,4 +47,4 @@ function Tabs({ asyncSongbook, applicationState }: TabsProps) {
   );
 }
 
-export default Tabs;
+export default TabContainer;

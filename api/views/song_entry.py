@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from api.models import Song, Songbook, SongEntry
 from api.serializers.song_entry import SongEntrySerializer
 from api.views.custom_exceptions import ConflictingStates, DuplicateValue
+from sing_along.utils.tabs import TabScraper
 
 
 class SongEntryViewSet(viewsets.ModelViewSet):
@@ -48,6 +49,14 @@ class SongEntryViewSet(viewsets.ModelViewSet):
             pass
         else:
             raise DuplicateValue("That song entry already exists")
+
+        if song.content is None or song.content == "":
+            tab_scraper = TabScraper()
+            tab = tab_scraper.load_tab_from_url(song.url)
+            if tab is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            song.content = tab["content"]
+            song.save()
 
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)

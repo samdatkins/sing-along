@@ -10,9 +10,9 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  SlideFade,
   Flex,
   Input,
-  Slide,
   useBoolean,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -76,7 +76,7 @@ export default function AddSongDrawer() {
                       setAlertText(searchSongResult);
                     } else {
                       const addSongResult = await addSongToSongbook(
-                        searchSongResult?.data,
+                        searchSongResult?.data?.[0],
                         songbook?.id
                       );
                       if (typeof addSongResult === "string") {
@@ -90,7 +90,7 @@ export default function AddSongDrawer() {
                         setUndoSongEntryID(addSongResult.data.id);
                         setAlertStatus("success");
                         setAlertText(
-                          `Successfully added "${searchSongResult?.data?.title}" by ${searchSongResult?.data?.artist}.`
+                          `Successfully added "${searchSongResult?.data?.[0]?.title}" by ${searchSongResult?.data?.[0]?.artist}.`
                         );
                         setSearchText("");
                       }
@@ -105,31 +105,31 @@ export default function AddSongDrawer() {
                   Submit
                 </Button>
               </Flex>
-            </form>
 
-            <Slide direction="bottom" in={!!alertText} style={{ zIndex: 10 }}>
-              <Alert status={alertStatus} py="2rem" roundedTop="md">
-                <Flex direction="column">
-                  <Flex direction="row" alignItems="center">
-                    <AlertIcon />
-                    <AlertDescription>{alertText}</AlertDescription>
+              <SlideFade in={!!alertText} style={{ zIndex: 10 }} offsetY="20px">
+                <Alert status={alertStatus} py="2rem" rounded="md" mt="3rem">
+                  <Flex direction="column">
+                    <Flex direction="row" alignItems="center">
+                      <AlertIcon />
+                      <AlertDescription>{alertText}</AlertDescription>
+                    </Flex>
+                    {undoSongEntryID !== undefined && (
+                      <Button
+                        mt="1rem"
+                        onClick={() => {
+                          deleteSongbookSong(undoSongEntryID);
+                          setUndoSongEntryID(undefined);
+                          setAlertText("");
+                          setAlertStatus(undefined);
+                        }}
+                      >
+                        Undo
+                      </Button>
+                    )}
                   </Flex>
-                  {undoSongEntryID !== undefined && (
-                    <Button
-                      mt="1rem"
-                      onClick={() => {
-                        deleteSongbookSong(undoSongEntryID);
-                        setUndoSongEntryID(undefined);
-                        setAlertText("");
-                        setAlertStatus(undefined);
-                      }}
-                    >
-                      Undo
-                    </Button>
-                  )}
-                </Flex>
-              </Alert>
-            </Slide>
+                </Alert>
+              </SlideFade>
+            </form>
           </DrawerBody>
 
           <DrawerFooter></DrawerFooter>

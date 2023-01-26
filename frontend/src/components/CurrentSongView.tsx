@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useAsync } from "react-async-hook";
 import { ApplicationState } from "../models";
 import NavBar from "./NavBar";
-import Tabs from "./Tabs";
+import TabContainer from "./TabContainer";
 
 import { useParams } from "react-router-dom";
 import { getCurrentSong } from "../services/songs";
@@ -62,7 +62,7 @@ function CurrentSongView() {
             resetAppState={resetAppState}
             applicationState={applicationState}
           />
-          <Tabs
+          <TabContainer
             asyncSongbook={asyncSongbook}
             applicationState={applicationState}
           />
