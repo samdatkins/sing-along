@@ -49,7 +49,7 @@ export default function SongSearchAutocomplete({
           {asyncSongSearch.loading && <Spinner />}
         </InputRightElement>
       </InputGroup>
-      {!isSubmitting && searchText.length >= 3 && (
+      {!isSubmitting && searchText.length >= 3 && !asyncSongSearch.loading && (
         <Flex
           direction="column"
           bg="gray.100"
