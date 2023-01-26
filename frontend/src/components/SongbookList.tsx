@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Heading,
   Icon,
   Link,
@@ -23,7 +24,17 @@ export default function SongbookList() {
     <Box margin="3rem">
       {songbook && (
         <>
-          <Heading mb="2rem">Song List for {songbook.title}</Heading>
+          <Heading mb="2rem" fontFamily="Ubuntu Mono">
+            Song List for{" "}
+            <RouterLink to={`../live/${sessionKey}/`}>
+              {songbook.title}
+            </RouterLink>
+          </Heading>
+          <RouterLink to={`../live/${sessionKey}/`}>
+            <Button colorScheme="blue" mb="2rem">
+              Back to Songbook
+            </Button>
+          </RouterLink>
           <UnorderedList>
             {songbook.song_entries.map((entry) => (
               <ListItem key={entry.id}>
