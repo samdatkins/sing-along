@@ -12,30 +12,24 @@ import {
   DrawerOverlay,
   SlideFade,
   Flex,
-  Input,
-  useBoolean,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SongbookContext from "../contexts/SongbookContext";
 import { ChakraAlertStatus } from "../models";
-import {
-  addSongToSongbook,
-  deleteSongbookSong,
-  searchForSong,
-} from "../services/songs";
+import { addSongToSongbook, deleteSongbookSong } from "../services/songs";
+import SongSearchAutocomplete from "./SongSearchAutocomplete";
 
 export default function AddSongDrawer() {
   const navigate = useNavigate();
   const { isOpen: isDrawerOpen, onClose: onDrawerClose } = useDisclosure({
     defaultIsOpen: true,
   });
-  const [searchText, setSearchText] = useState("");
+
   const [alertText, setAlertText] = useState("");
   const [alertStatus, setAlertStatus] = useState<ChakraAlertStatus>();
   const [undoSongEntryID, setUndoSongEntryID] = useState<number | undefined>();
-  const [isSubmitting, setIsSubmitting] = useBoolean();
   const songbook = useContext(SongbookContext);
 
   return (
@@ -47,7 +41,7 @@ export default function AddSongDrawer() {
           // Finish animation before navigating
           setTimeout(() => navigate("../"), 100);
         }}
-        size="sm"
+        size="md"
       >
         <DrawerOverlay />
         <DrawerContent>
@@ -56,55 +50,33 @@ export default function AddSongDrawer() {
 
           <DrawerBody>
             <form>
-              <Input
-                placeholder="Lynyrd Skynyrd - Free Bird"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-              />
-              <Flex direction="row" justifyContent="end">
-                <Button
-                  type="submit"
-                  mt="1rem"
-                  onClick={async (e) => {
-                    setAlertText("");
-                    setAlertStatus(undefined);
-                    setIsSubmitting.on();
+              <SongSearchAutocomplete
+                onSubmit={async (song) => {
+                  setAlertText("");
+                  setAlertStatus(undefined);
 
-                    const searchSongResult = await searchForSong(searchText);
-                    if (typeof searchSongResult === "string") {
-                      setAlertStatus("error");
-                      setAlertText(searchSongResult);
-                    } else {
-                      const addSongResult = await addSongToSongbook(
-                        searchSongResult?.data?.[0],
-                        songbook?.id
-                      );
-                      if (typeof addSongResult === "string") {
-                        setAlertStatus(
-                          addSongResult.includes("already")
-                            ? "warning"
-                            : "error"
-                        );
-                        setAlertText(addSongResult);
-                      } else {
-                        setUndoSongEntryID(addSongResult.data.id);
-                        setAlertStatus("success");
-                        setAlertText(
-                          `Successfully added "${searchSongResult?.data?.[0]?.title}" by ${searchSongResult?.data?.[0]?.artist}.`
-                        );
-                        setSearchText("");
-                      }
+                  const addSongResult = await addSongToSongbook(
+                    song,
+                    songbook?.id
+                  );
+                  if (typeof addSongResult === "string") {
+                    const isWarning = addSongResult.includes("already");
+                    setAlertStatus(isWarning ? "warning" : "error");
+                    setAlertText(addSongResult);
+                    if (isWarning) {
+                      return true;
                     }
-                    setIsSubmitting.off();
-
-                    e.preventDefault();
-                  }}
-                  isLoading={isSubmitting}
-                  width="100%"
-                >
-                  Submit
-                </Button>
-              </Flex>
+                    return false;
+                  } else {
+                    setUndoSongEntryID(addSongResult.data.id);
+                    setAlertStatus("success");
+                    setAlertText(
+                      `Successfully added "${song.title}" by ${song.artist}.`
+                    );
+                    return true;
+                  }
+                }}
+              />
 
               <SlideFade in={!!alertText} style={{ zIndex: 10 }} offsetY="20px">
                 <Alert status={alertStatus} py="2rem" rounded="md" mt="3rem">

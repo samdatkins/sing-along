@@ -69,12 +69,10 @@ class TestSong(TestCase):
 
         # Assert
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["id"], self.first_song_entry.song.pk)
+        self.assertEqual(response.data[0]["id"], self.first_song_entry.song.pk)
 
-    @patch("api.views.song.TabFetcher.search_for_best_tab")
-    def test_searching_for_new_unfindable_song_throws_404(self, mock_search):
+    def test_searching_for_non_existing_song_fails(self):
         # Arrange
-        mock_search.return_value = None
         api_factory = APIRequestFactory()
         view = SongViewSet.as_view({"get": "search"})
         query_params = {
@@ -87,30 +85,4 @@ class TestSong(TestCase):
         response = view(request)
 
         # Assert
-        mock_search.assert_called_once()
         self.assertEqual(response.status_code, 404)
-
-    @patch("api.views.song.TabFetcher.search_for_best_tab")
-    def test_searching_for_new_findable_song_adds_song_to_db(self, mock_search):
-        # Arrange
-        new_song = SongFactory.build()
-        mock_search.return_value = SongSerializer(new_song).data
-        api_factory = APIRequestFactory()
-        view = SongViewSet.as_view({"get": "search"})
-        query_params = {
-            "q": "some really really long string that definitely won't match a song in the database"
-        }
-        request = api_factory.get(reverse("song-search"), data=query_params)
-        force_authenticate(request, user=self.user)
-
-        # Act
-        # Double check we didn't accidentally add the song while testing
-        with self.assertRaises(Song.DoesNotExist):
-            Song.objects.get(content=new_song.content)
-        response = view(request)
-
-        # Assert
-        mock_search.assert_called_once()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["content"], new_song.content)
-        Song.objects.get(content=new_song.content)
