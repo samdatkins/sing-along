@@ -29,9 +29,11 @@ class SongViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         song_matches = (
-            Song.objects.annotate(artist_similarity=(TrigramSimilarity("artist", q)))
-            .annotate(title_similarity=(TrigramSimilarity("title", q)))
-            .filter(Q(artist_similarity__gte=0.3) | Q(title_similarity__gte=0.3))
+            Song.objects.filter(
+                Q(artist__trigram_similar=q) | Q(title__trigram_similar=q)
+            )
+            .annotate(artist_similarity=TrigramSimilarity("artist", q))
+            .annotate(title_similarity=TrigramSimilarity("title", q))
             .annotate(
                 rank=(F("artist_similarity") + F("title_similarity"))
                 * Log(F("votes"), 2.718)
