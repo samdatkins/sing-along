@@ -1,4 +1,13 @@
-import { Box, Flex, Input, Text, useBoolean } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Spinner,
+  Text,
+  useBoolean,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useDebounce } from "usehooks-ts";
@@ -29,12 +38,17 @@ export default function SongSearchAutocomplete({
 
   return (
     <>
-      <Input
-        placeholder="Lynyrd Skynyrd - Free Bird"
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        disabled={isSubmitting}
-      />
+      <InputGroup size="md">
+        <Input
+          placeholder="Lynyrd Skynyrd - Free Bird"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          disabled={isSubmitting}
+        />
+        <InputRightElement>
+          {asyncSongSearch.loading && <Spinner />}
+        </InputRightElement>
+      </InputGroup>
       {!isSubmitting &&
         typeof asyncSongSearch?.result !== "string" &&
         (asyncSongSearch?.result?.data?.length || 0) > 0 && (
