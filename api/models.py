@@ -94,8 +94,16 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
 class Song(SafeDeleteModel, CreatedUpdated):
     class Meta:
         indexes = [
-            GinIndex(fields=["artist"]),
-            GinIndex(fields=["title"]),
+            GinIndex(
+                name="song_artist_gin_index",
+                fields=["artist"],
+                opclasses=["gin_trgm_ops"],
+            ),
+            GinIndex(
+                name="song_title_gin_index",
+                fields=["title"],
+                opclasses=["gin_trgm_ops"],
+            ),
         ]
         constraints = [
             models.UniqueConstraint(

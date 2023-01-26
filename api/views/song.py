@@ -37,6 +37,7 @@ class SongViewSet(viewsets.ModelViewSet):
                 * Log(F("votes"), 2.718)
             )
             .order_by("-rank")
+            .all()[0:5]
         )
 
         if len(song_matches) == 0:
@@ -44,5 +45,5 @@ class SongViewSet(viewsets.ModelViewSet):
 
         return Response(
             status=status.HTTP_200_OK,
-            data=SongSerializer(song_matches[0:5], many=True).data,
+            data=SongSerializer(song_matches, many=True).data,
         )

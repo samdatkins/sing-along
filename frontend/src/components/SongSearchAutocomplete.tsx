@@ -49,39 +49,43 @@ export default function SongSearchAutocomplete({
           {asyncSongSearch.loading && <Spinner />}
         </InputRightElement>
       </InputGroup>
-      {!isSubmitting &&
-        typeof asyncSongSearch?.result !== "string" &&
-        (asyncSongSearch?.result?.data?.length || 0) > 0 && (
-          <Flex
-            direction="column"
-            bg="gray.100"
-            borderRadius="md"
-            overflow="hidden"
-          >
-            {typeof asyncSongSearch?.result !== "string" &&
-              asyncSongSearch?.result?.data?.map((song) => (
-                <Box
-                  key={song.id}
-                  padding="1rem"
-                  cursor="pointer"
-                  onClick={async () => {
-                    setIsSubmitting.on();
-                    const success = await onSubmit(song);
-                    if (success) {
-                      setSearchText("");
-                    }
-                    asyncSongSearch.reset();
-                    setIsSubmitting.off();
-                  }}
-                  _hover={{ bg: "gray.400" }}
-                >
-                  <Text color="gray.900">
-                    {song.artist} - {song.title}
-                  </Text>
-                </Box>
-              ))}
-          </Flex>
-        )}
+      {!isSubmitting && searchText.length >= 3 && (
+        <Flex
+          direction="column"
+          bg="gray.100"
+          borderRadius="md"
+          overflow="hidden"
+        >
+          {typeof asyncSongSearch?.result !== "string" &&
+          (asyncSongSearch?.result?.data?.length || 0) > 0 ? (
+            asyncSongSearch?.result?.data?.map((song) => (
+              <Box
+                key={song.id}
+                padding="1rem"
+                cursor="pointer"
+                onClick={async () => {
+                  setIsSubmitting.on();
+                  const success = await onSubmit(song);
+                  if (success) {
+                    setSearchText("");
+                  }
+                  asyncSongSearch.reset();
+                  setIsSubmitting.off();
+                }}
+                _hover={{ bg: "gray.400" }}
+              >
+                <Text color="gray.900">
+                  {song.artist} - {song.title}
+                </Text>
+              </Box>
+            ))
+          ) : (
+            <Box padding="1rem">
+              <Text color="gray.900">No Results Found</Text>
+            </Box>
+          )}
+        </Flex>
+      )}
     </>
   );
 }
