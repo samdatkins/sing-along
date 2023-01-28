@@ -33,7 +33,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     re_path(
         r"^live/*",
-        TemplateView.as_view(template_name="index.html"),
+        login_required(TemplateView.as_view(template_name="index.html")),
         name="react",
     ),
 ]
