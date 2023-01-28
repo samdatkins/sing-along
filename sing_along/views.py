@@ -3,6 +3,7 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.django_client import OAuth
 from django.conf import settings
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
@@ -44,3 +45,7 @@ def logout(request):
             quote_via=quote_plus,
         ),
     )
+
+
+def test(request):
+    return HttpResponse("testing")
