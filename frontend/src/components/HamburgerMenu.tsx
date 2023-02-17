@@ -14,6 +14,7 @@ import { AxiosResponse } from "axios";
 import { useCallback, useEffect } from "react";
 import { UseAsyncReturn } from "react-async-hook";
 import {
+  FaExclamationTriangle,
   FaExpandAlt,
   FaFastBackward,
   FaFastForward,
@@ -22,6 +23,7 @@ import {
   FaPlay,
   FaTrash,
   FaUndoAlt,
+  FaUserAlt,
 } from "react-icons/fa";
 import { GrUnorderedList } from "react-icons/gr";
 import { Link as RouterLink } from "react-router-dom";
@@ -30,6 +32,7 @@ import {
   deleteSongbookSong,
   nextSongbookSong,
   prevSongbookSong,
+  setSongEntryFlagged,
 } from "../services/songs";
 
 interface HamburgerMenuProps {
@@ -89,6 +92,10 @@ export default function HamburgerMenu({
         toggleColorMode();
       } else if (event.code === "Delete") {
         performSongNavAction("delete");
+      } else if (event.key === "!") {
+        setSongEntryFlagged(
+          asyncSongbook?.result?.data?.current_song_entry?.id,
+        );
       } else if (event.code === "Space") {
         timerControls.playPauseToggle();
         // prevents scrolling from spacebar
@@ -186,16 +193,30 @@ export default function HamburgerMenu({
         <RouterLink to="../live/">
           <MenuItem icon={<Icon as={FaHome} />}>Home</MenuItem>
         </RouterLink>
+        <RouterLink to="../live/profile">
+          <MenuItem icon={<Icon as={FaUserAlt} />}>Profile</MenuItem>
+        </RouterLink>
+        <MenuItem
+          icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+          onClick={toggleColorMode}
+        >
+          {colorMode === "light" ? "Night Mode" : "Day Mode"}
+        </MenuItem>
         {asyncSongbook?.result?.data?.is_noodle_mode && (
           <RouterLink to="list">
             <MenuItem icon={<Icon as={GrUnorderedList} />}>Song List</MenuItem>
           </RouterLink>
         )}
         <MenuItem
-          icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-          onClick={toggleColorMode}
+          color={"red.600"}
+          icon={<Icon as={FaExclamationTriangle} />}
+          onClick={() =>
+            setSongEntryFlagged(
+              asyncSongbook?.result?.data?.current_song_entry?.id,
+            )
+          }
         >
-          {colorMode === "light" ? "Night Mode" : "Day Mode"}
+          Flag Song
         </MenuItem>
       </MenuList>
     </Menu>

@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 
 export default function SongbookIndexTable({ songbooks }) {
   return (
-    <Tabs>
+    <Tabs isFitted variant="enclosed-colored" width="26rem">
       <TabList>
         <Tab>Power Hour</Tab>
         <Tab>Noodle Mode</Tab>

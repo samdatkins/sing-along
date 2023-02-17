@@ -132,3 +132,15 @@ export async function addSongToSongbook(
 
   return "Could not add song, please try again later.";
 }
+
+export async function setSongEntryFlagged(id: number | undefined) {
+  if (!id) return;
+
+  try {
+    await axios.patch<SongEntry>(`/api/song_entries/${id}/`, {
+      is_flagged: true,
+    });
+  } catch (error) {
+    console.error(`Couldn't flag song entry: ${error}`);
+  }
+}
