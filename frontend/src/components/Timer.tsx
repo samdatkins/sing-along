@@ -72,8 +72,8 @@ export default function Timer({
         onTick={(props) => {
           setRemainingSeconds(props.total / 1000);
         }}
-        onComplete={() => {
-          triggerOnTimerComplete();
+        onComplete={(_, completedOnStart) => {
+          !completedOnStart && triggerOnTimerComplete();
         }}
       />
     </Text>
