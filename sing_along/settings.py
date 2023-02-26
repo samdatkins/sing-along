@@ -56,9 +56,17 @@ SECRET_KEY = os.environ.get(
     "django-insecure-p@)42jg)9u6-yr)id+kv5j5kdmmxu+&u8((y_4=&hg4g_ebe9j",
 )
 
-AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN", "fake_domain")
-AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID", "fake_id")
-AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET", "fake_secret")
+# Auth0 settings
+SOCIAL_AUTH_TRAILING_SLASH = False  # Remove trailing slash from routes
+SOCIAL_AUTH_AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN", "fake_domain")
+SOCIAL_AUTH_AUTH0_KEY = os.environ.get("AUTH0_CLIENT_ID", "fake_id")
+SOCIAL_AUTH_AUTH0_SECRET = os.environ.get("AUTH0_CLIENT_SECRET", "fake_secret")
+SOCIAL_AUTH_AUTH0_SCOPE = ["openid", "profile", "email"]
+
+AUTHENTICATION_BACKENDS = {
+    "social_core.backends.auth0.Auth0OAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+}
 
 # Application definition
 
@@ -74,6 +82,7 @@ INSTALLED_APPS = [
     "safedelete",
     "rest_framework",
     "sing_along",
+    "social_django",
 ]
 
 MIDDLEWARE = [
@@ -139,10 +148,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LOGIN_URL = "login"
-LOGOUT_URL = "logout"
-LOGIN_REDIRECT_URL = "live/"
-LOGOUT_REDIRECT_URL = ""
+LOGIN_URL = "/login/auth0"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -179,8 +187,12 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [],
-    "DEFAULT_PERMISSION_CLASSES": [],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
     "PAGE_SIZE": 100,
 }
 

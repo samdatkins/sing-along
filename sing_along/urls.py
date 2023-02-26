@@ -22,20 +22,18 @@ from django.views.generic import RedirectView, TemplateView
 from sing_along import views
 
 urlpatterns = [
+    path("", include("social_django.urls")),
     path(
         "",
         RedirectView.as_view(pattern_name="react", permanent=True),
         name="index",
     ),
-    path("login", views.login, name="login"),
-    path("logout", views.logout, name="logout"),
-    path("callback", views.callback, name="callback"),
-    path("test", login_required(views.test), name="test"),
+    path("logout/", login_required(views.logout), name="logout"),
     path("api/", include("api.urls")),
     path("admin/", admin.site.urls),
     re_path(
         r"^live/*",
-        TemplateView.as_view(template_name="index.html"),
+        login_required(views.react),
         name="react",
     ),
 ]

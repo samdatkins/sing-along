@@ -1,17 +1,10 @@
-import axios from "axios";
-import cookie from "react-cookies";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import AddSongDrawer from "./components/AddSongDrawer";
 import CreateNewSongbook from "./components/CreateNewSongbook";
 import CurrentSongView from "./components/CurrentSongView";
 import SongbookList from "./components/SongbookList";
 import UserProfile from "./components/UserProfile";
 import WelcomePage from "./components/WelcomePage";
-import { createCSRF } from "./helpers/session";
-
-const randomCSRF = createCSRF();
-axios.defaults.headers.common["X-CSRFTOKEN"] = randomCSRF;
-cookie.save("csrftoken", randomCSRF, { path: "/" });
 
 function App() {
   return (
@@ -24,6 +17,7 @@ function App() {
         <Route path="/live/createsongbook" element={<CreateNewSongbook />} />
         <Route path="/live/:sessionKey/list" element={<SongbookList />} />
         <Route path="/live" element={<WelcomePage />} />
+        <Route path="/" element={<Navigate to="/live" />} />
       </Routes>
     </BrowserRouter>
   );

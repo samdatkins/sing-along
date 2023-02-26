@@ -1,51 +1,26 @@
-import json
-from urllib.parse import quote_plus, urlencode
-
-from authlib.integrations.django_client import OAuth
 from django.conf import settings
+from django.contrib.auth import logout as django_logout
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from django.urls import reverse
-
-oauth = OAuth()
-
-oauth.register(
-    "auth0",
-    client_id=settings.AUTH0_CLIENT_ID,
-    client_secret=settings.AUTH0_CLIENT_SECRET,
-    client_kwargs={
-        "scope": "openid profile email",
-    },
-    server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration",
-)
-
-
-def login(request):
-    return oauth.auth0.authorize_redirect(
-        request, request.build_absolute_uri(reverse("callback"))
-    )
-
-
-def callback(request):
-    token = oauth.auth0.authorize_access_token(request)
-    request.session["user"] = token
-    return redirect(request.build_absolute_uri(reverse("react")))
 
 
 def logout(request):
-    request.session.clear()
-
+    django_logout(request)
+    domain = settings.SOCIAL_AUTH_AUTH0_DOMAIN
+    client_id = settings.SOCIAL_AUTH_AUTH0_KEY
+    return_to = request.build_absolute_uri("/")
     return redirect(
-        f"https://{settings.AUTH0_DOMAIN}/v2/logout?"
-        + urlencode(
-            {
-                "returnTo": request.build_absolute_uri(reverse("react")),
-                "client_id": settings.AUTH0_CLIENT_ID,
-            },
-            quote_via=quote_plus,
-        ),
+        f"https://{domain}/v2/logout?client_id={client_id}&returnTo={return_to}"
     )
 
 
 def test(request):
-    return HttpResponse("testing")
+    user = request.user
+    return HttpResponse(user.first_name)
+
+
+def react(request):
+    if settings.DEBUG:
+        return redirect("http://localhost:3000/live")
+    else:
+        return render(request, "index.html")
