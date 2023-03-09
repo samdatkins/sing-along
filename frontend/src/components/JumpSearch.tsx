@@ -127,6 +127,7 @@ export default function JumpSearch({ isOpen, onClose }) {
                           );
                         }
                       })
+                      .slice(0, 5)
                       .map((songEntry, index) => (
                         <Box
                           key={songEntry.id}
