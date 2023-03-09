@@ -50,7 +50,6 @@ class TestSongbookView(TestCase):
         # Assert
         self.assertEqual(response.status_code, 200)
 
-    # Until we re-enabled auth, this should pass
     def test_unauthed_requests_fail(self):
         # Arrange
         api_factory = APIRequestFactory()
@@ -61,7 +60,7 @@ class TestSongbookView(TestCase):
         response = view(request)
 
         # Assert
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
 
     def test_detail_has_correct_number_of_songs(self):
         # Arrange

@@ -9,9 +9,10 @@ import {
   MenuItem,
   MenuList,
   useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { UseAsyncReturn } from "react-async-hook";
 import {
   FaExclamationTriangle,
@@ -25,6 +26,7 @@ import {
   FaUndoAlt,
   FaUserAlt,
 } from "react-icons/fa";
+import { MdOutlineMenuOpen } from "react-icons/md";
 import { GrUnorderedList } from "react-icons/gr";
 import { Link as RouterLink } from "react-router-dom";
 import { Songbook } from "../models";
@@ -34,6 +36,7 @@ import {
   prevSongbookSong,
   setSongEntryFlagged,
 } from "../services/songs";
+import JumpSearch from "./JumpSearch";
 
 interface HamburgerMenuProps {
   isSongbookOwner: boolean;
@@ -62,6 +65,7 @@ export default function HamburgerMenu({
   setIsLive,
 }: HamburgerMenuProps) {
   const { colorMode, toggleColorMode } = useColorMode();
+  const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
 
   const performSongNavAction = async (action: "next" | "prev" | "delete") => {
     const sessionKey = asyncSongbook?.result?.data?.session_key;
@@ -73,7 +77,7 @@ export default function HamburgerMenu({
       await prevSongbookSong(sessionKey);
     } else {
       await deleteSongbookSong(
-        asyncSongbook?.result?.data?.current_song_entry?.id,
+        asyncSongbook?.result?.data?.current_song_entry?.id
       );
     }
     asyncSongbook.execute();
@@ -82,37 +86,35 @@ export default function HamburgerMenu({
     timerControls.refresh();
   };
   // handle what happens on key press
-  const handleKeyPress = useCallback(
-    (event: any) => {
-      // if the add song drawer is open, ignore all typing
-      if (addSongDrawerOutlet) return;
+  const handleKeyPress = (event: any) => {
+    // if the add song drawer is open, ignore all typing
+    if (addSongDrawerOutlet || isJumpSearchOpen) return;
 
-      // This first one is the only one that non-admins are allowed to use
-      if (event.code === "Backquote") {
-        toggleColorMode();
-      } else if (event.code === "Delete") {
-        performSongNavAction("delete");
-      } else if (event.key === "!") {
-        setSongEntryFlagged(
-          asyncSongbook?.result?.data?.current_song_entry?.id,
-        );
-      } else if (event.code === "Space") {
-        timerControls.playPauseToggle();
-        // prevents scrolling from spacebar
-        event.preventDefault();
-      } else if (event.code === "ArrowLeft") {
-        performSongNavAction("prev");
-      } else if (event.code === "ArrowRight") {
-        performSongNavAction("next");
-      } else if (event.code === "KeyR") {
-        resetAppState();
-        timerControls.refresh();
-      } else if (event.code === "KeyF") {
-        alert(`This cancels the tab view truncation AND pauses the timer.`);
-      }
-    },
-    [timerControls, toggleColorMode],
-  );
+    // This first one is the only one that non-admins are allowed to use
+    if (event.code === "Backquote") {
+      toggleColorMode();
+    } else if (event.code === "Delete") {
+      performSongNavAction("delete");
+    } else if (event.key === "!") {
+      setSongEntryFlagged(asyncSongbook?.result?.data?.current_song_entry?.id);
+    } else if (event.code === "Space") {
+      timerControls.playPauseToggle();
+      // prevents scrolling from spacebar
+      event.preventDefault();
+    } else if (event.code === "ArrowLeft") {
+      performSongNavAction("prev");
+    } else if (event.code === "ArrowRight") {
+      performSongNavAction("next");
+    } else if (event.code === "KeyR") {
+      resetAppState();
+      timerControls.refresh();
+    } else if (event.code === "KeyF") {
+      alert(`This cancels the tab view truncation AND pauses the timer.`);
+    } else if (event.code === "Slash") {
+      onOpen();
+    }
+    event.preventDefault();
+  };
 
   useEffect(() => {
     // attach the event listener
@@ -125,100 +127,114 @@ export default function HamburgerMenu({
   }, [handleKeyPress]);
 
   return (
-    <Menu>
-      <MenuButton
-        as={IconButton}
-        aria-label="Options"
-        icon={<HamburgerIcon />}
-        variant="outline"
-      />
-      <MenuList>
-        {isSongbookOwner && !isMobileDevice && (
-          <Flex direction="column">
-            <Flex justifyContent="space-between" mx="1rem" my=".5rem">
-              <Button
-                colorScheme="blue"
-                onClick={() => {
-                  performSongNavAction("prev");
-                }}
-              >
-                <Icon as={FaFastBackward} />
-              </Button>
-              <Button
-                colorScheme="blue"
-                onClick={timerControls.playPauseToggle}
-              >
-                <Icon as={isLive ? FaPause : FaPlay} />
-              </Button>
-              <Button
-                colorScheme="blue"
-                onClick={() => {
-                  performSongNavAction("next");
-                }}
-              >
-                <Icon as={FaFastForward} />
-              </Button>
+    <>
+      {isJumpSearchOpen && (
+        <JumpSearch isOpen={isJumpSearchOpen} onClose={onClose} />
+      )}
+      <Menu>
+        <MenuButton
+          as={IconButton}
+          aria-label="Options"
+          icon={<HamburgerIcon />}
+          variant="outline"
+        />
+        <MenuList>
+          {isSongbookOwner && !isMobileDevice && (
+            <Flex direction="column">
+              <Flex justifyContent="space-between" mx="1rem" my=".5rem">
+                <Button
+                  colorScheme="blue"
+                  onClick={() => {
+                    performSongNavAction("prev");
+                  }}
+                >
+                  <Icon as={FaFastBackward} />
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  onClick={timerControls.playPauseToggle}
+                >
+                  <Icon as={isLive ? FaPause : FaPlay} />
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  onClick={() => {
+                    performSongNavAction("next");
+                  }}
+                >
+                  <Icon as={FaFastForward} />
+                </Button>
+              </Flex>
+              <Flex justifyContent="space-between" mx="1rem" my=".5rem">
+                <Button
+                  colorScheme="gray"
+                  onClick={() => {
+                    resetAppState();
+                    timerControls.refresh();
+                  }}
+                >
+                  <Icon as={FaUndoAlt} />
+                </Button>
+                <Button
+                  colorScheme="gray"
+                  onClick={() => performSongNavAction("delete")}
+                >
+                  <Icon as={FaTrash} />
+                </Button>
+                <Button
+                  colorScheme="gray"
+                  onClick={() => {
+                    if (!document.fullscreenElement) {
+                      document.body.requestFullscreen();
+                    } else {
+                      document.exitFullscreen();
+                    }
+                  }}
+                >
+                  <Icon as={FaExpandAlt} />
+                </Button>
+              </Flex>
             </Flex>
-            <Flex justifyContent="space-between" mx="1rem" my=".5rem">
-              <Button
-                colorScheme="gray"
-                onClick={() => {
-                  resetAppState();
-                  timerControls.refresh();
-                }}
-              >
-                <Icon as={FaUndoAlt} />
-              </Button>
-              <Button
-                colorScheme="gray"
-                onClick={() => performSongNavAction("delete")}
-              >
-                <Icon as={FaTrash} />
-              </Button>
-              <Button
-                colorScheme="gray"
-                onClick={() => {
-                  if (!document.fullscreenElement) {
-                    document.body.requestFullscreen();
-                  } else {
-                    document.exitFullscreen();
-                  }
-                }}
-              >
-                <Icon as={FaExpandAlt} />
-              </Button>
-            </Flex>
-          </Flex>
-        )}
-        <RouterLink to="../live/">
-          <MenuItem icon={<Icon as={FaHome} />}>Home</MenuItem>
-        </RouterLink>
-        <RouterLink to="../live/profile">
-          <MenuItem icon={<Icon as={FaUserAlt} />}>Profile</MenuItem>
-        </RouterLink>
-        <MenuItem
-          icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-          onClick={toggleColorMode}
-        >
-          {colorMode === "light" ? "Night Mode" : "Day Mode"}
-        </MenuItem>
-        {asyncSongbook?.result?.data?.is_noodle_mode && (
-          <RouterLink to="list">
-            <MenuItem icon={<Icon as={GrUnorderedList} />}>Song List</MenuItem>
+          )}
+          <RouterLink to="../live/">
+            <MenuItem icon={<Icon as={FaHome} />}>Home</MenuItem>
           </RouterLink>
-        )}
-        <MenuItem
-          color={"red.600"}
-          icon={<Icon as={FaExclamationTriangle} />}
-          onClick={() =>
-            setSongEntryFlagged(
-              asyncSongbook?.result?.data?.current_song_entry?.id,
-            )
-          }
-        >
-          Flag Song
-        </MenuItem>
-      </MenuList>
-    </Menu>
+          <RouterLink to="../live/profile">
+            <MenuItem icon={<Icon as={FaUserAlt} />}>Profile</MenuItem>
+          </RouterLink>
+          <MenuItem
+            icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+            onClick={toggleColorMode}
+          >
+            {colorMode === "light" ? "Night Mode" : "Day Mode"}
+          </MenuItem>
+          {asyncSongbook?.result?.data?.is_noodle_mode && (
+            <RouterLink to="list">
+              <MenuItem icon={<Icon as={GrUnorderedList} />}>
+                Song List
+              </MenuItem>
+            </RouterLink>
+          )}
+          <MenuItem
+            color={"red.600"}
+            icon={<Icon as={FaExclamationTriangle} />}
+            onClick={() =>
+              setSongEntryFlagged(
+                asyncSongbook?.result?.data?.current_song_entry?.id
+              )
+            }
+          >
+            Flag Song
+          </MenuItem>
+
+          <MenuItem
+            icon={<Icon as={MdOutlineMenuOpen} boxSize={4} />}
+            onClick={onOpen}
+          >
+            Jump To...
+          </MenuItem>
+        </MenuList>
+      </Menu>
+    </>
   );
 }

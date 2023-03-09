@@ -22,6 +22,7 @@ export default function SongSearchAutocomplete({
   onSubmit,
 }: SongSearchAutocompleteProps) {
   const [searchText, setSearchText] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isSubmitting, setIsSubmitting] = useBoolean(false);
   const asyncSongSearch = useAsync(async () => {
     const trimmedSearch = debouncedSearchText.trim();
@@ -31,10 +32,36 @@ export default function SongSearchAutocomplete({
     return await searchForSong(trimmedSearch);
   }, []);
   const debouncedSearchText = useDebounce(searchText, 250);
+  const updateSelectedIndexWithValidValue = (index: number) => {
+    let newIndex = index;
+    const maxIndex =
+      ((typeof asyncSongSearch?.result !== "string" &&
+        asyncSongSearch?.result?.data?.length) ||
+        0) - 1;
+    if (index < 0) {
+      newIndex = maxIndex;
+    } else if (index > maxIndex) {
+      newIndex = 0;
+    }
+    setSelectedIndex(newIndex);
+  };
 
   useEffect(() => {
     asyncSongSearch.execute();
+    setSelectedIndex(-1);
   }, [debouncedSearchText]);
+
+  const submit = async (song: Song | undefined | false) => {
+    if (!song) return;
+
+    setIsSubmitting.on();
+    const success = await onSubmit(song);
+    if (success) {
+      setSearchText("");
+    }
+    asyncSongSearch.reset();
+    setIsSubmitting.off();
+  };
 
   return (
     <>
@@ -44,6 +71,21 @@ export default function SongSearchAutocomplete({
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           disabled={isSubmitting}
+          onKeyDown={async (e) => {
+            if (e.key === "ArrowDown") {
+              updateSelectedIndexWithValidValue(selectedIndex + 1);
+              e.preventDefault();
+            } else if (e.key === "ArrowUp") {
+              updateSelectedIndexWithValidValue(selectedIndex - 1);
+              e.preventDefault();
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              const song =
+                typeof asyncSongSearch?.result !== "string" &&
+                asyncSongSearch?.result?.data?.[selectedIndex];
+              submit(song);
+            }
+          }}
         />
         <InputRightElement>
           {asyncSongSearch.loading && <Spinner />}
@@ -58,21 +100,16 @@ export default function SongSearchAutocomplete({
         >
           {typeof asyncSongSearch?.result !== "string" &&
           (asyncSongSearch?.result?.data?.length || 0) > 0 ? (
-            asyncSongSearch?.result?.data?.map((song) => (
+            asyncSongSearch?.result?.data?.map((song, index) => (
               <Box
                 key={song.id}
                 padding="1rem"
                 cursor="pointer"
                 onClick={async () => {
-                  setIsSubmitting.on();
-                  const success = await onSubmit(song);
-                  if (success) {
-                    setSearchText("");
-                  }
-                  asyncSongSearch.reset();
-                  setIsSubmitting.off();
+                  submit(song);
                 }}
-                _hover={{ bg: "gray.400" }}
+                onMouseOver={() => setSelectedIndex(index)}
+                bg={index === selectedIndex ? undefined : "gray.400"}
               >
                 <Text color="gray.900">
                   {song.artist} - {song.title}
