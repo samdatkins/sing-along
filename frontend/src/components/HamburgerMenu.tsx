@@ -129,7 +129,11 @@ export default function HamburgerMenu({
   return (
     <>
       {isJumpSearchOpen && (
-        <JumpSearch isOpen={isJumpSearchOpen} onClose={onClose} />
+        <JumpSearch
+          isOpen={isJumpSearchOpen}
+          onClose={onClose}
+          asyncSongbook={asyncSongbook}
+        />
       )}
       <Menu>
         <MenuButton

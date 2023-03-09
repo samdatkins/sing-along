@@ -12,13 +12,24 @@ import {
   Text,
   useBoolean,
 } from "@chakra-ui/react";
+import { AxiosResponse } from "axios";
 import { useState } from "react";
-import { useAsync } from "react-async-hook";
+import { useAsync, UseAsyncReturn } from "react-async-hook";
 import { useParams } from "react-router-dom";
-import { SongEntry } from "../models";
+import { Songbook, SongEntry } from "../models";
 import { getSongbookDetails, setSongbookSong } from "../services/songs";
 
-export default function JumpSearch({ isOpen, onClose }) {
+interface JumpSearchProps {
+  isOpen: boolean;
+  onClose: () => void;
+  asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
+}
+
+export default function JumpSearch({
+  isOpen,
+  onClose,
+  asyncSongbook,
+}: JumpSearchProps) {
   const { sessionKey } = useParams();
   const asyncSongbookDetails = useAsync(getSongbookDetails, [sessionKey]);
 
@@ -44,12 +55,14 @@ export default function JumpSearch({ isOpen, onClose }) {
     if (!song) return;
 
     setIsSubmitting.on();
+    asyncSongbook.reset();
     const success = await setSongbookSong(sessionKey, song.created_at);
     if (success) {
       setSearchText("");
+      onClose();
     }
+    asyncSongbook.execute();
     setIsSubmitting.off();
-    onClose();
   };
 
   const filteredSongs = asyncSongbookDetails?.result?.data?.song_entries
