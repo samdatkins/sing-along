@@ -52,6 +52,26 @@ export default function JumpSearch({ isOpen, onClose }) {
     onClose();
   };
 
+  const filteredSongs = asyncSongbookDetails?.result?.data?.song_entries
+    ?.map((songEntry, index) => ({
+      ...songEntry,
+      displayIndex: index + 1,
+    }))
+    ?.filter((songEntry) => {
+      if (searchText.length < 1) return false;
+
+      const parsedNum = parseInt(searchText);
+      if (!Number.isNaN(parsedNum)) {
+        return songEntry.displayIndex === parsedNum;
+      } else {
+        return (
+          songEntry.song.artist.toLowerCase().includes(searchText) ||
+          songEntry.song.title.toLowerCase().includes(searchText)
+        );
+      }
+    })
+    .slice(0, 5);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered={true} size="lg">
       <ModalOverlay />
@@ -80,9 +100,7 @@ export default function JumpSearch({ isOpen, onClose }) {
                       e.preventDefault();
                       const songEntry =
                         typeof asyncSongbookDetails?.result !== "string" &&
-                        asyncSongbookDetails?.result?.data?.song_entries?.[
-                          selectedIndex
-                        ];
+                        (filteredSongs || [])[selectedIndex];
                       submit(songEntry);
                     }
                   }}
@@ -105,46 +123,23 @@ export default function JumpSearch({ isOpen, onClose }) {
                   {typeof asyncSongbookDetails?.result !== "string" &&
                   (asyncSongbookDetails?.result?.data?.song_entries?.length ||
                     0) > 0 ? (
-                    asyncSongbookDetails?.result?.data?.song_entries
-                      ?.map((songEntry, index) => ({
-                        ...songEntry,
-                        displayIndex: index + 1,
-                      }))
-                      ?.filter((songEntry) => {
-                        if (searchText.length < 1) return false;
-
-                        const parsedNum = parseInt(searchText);
-                        if (!Number.isNaN(parsedNum)) {
-                          return songEntry.displayIndex === parsedNum;
-                        } else {
-                          return (
-                            songEntry.song.artist
-                              .toLowerCase()
-                              .includes(searchText) ||
-                            songEntry.song.title
-                              .toLowerCase()
-                              .includes(searchText)
-                          );
-                        }
-                      })
-                      .slice(0, 5)
-                      .map((songEntry, index) => (
-                        <Box
-                          key={songEntry.id}
-                          padding="1rem"
-                          cursor="pointer"
-                          onClick={async () => {
-                            submit(songEntry);
-                          }}
-                          onMouseOver={() => setSelectedIndex(index)}
-                          bg={index === selectedIndex ? undefined : "gray.400"}
-                        >
-                          <Text color="gray.900">
-                            {songEntry.displayIndex}: {songEntry.song.artist} -{" "}
-                            {songEntry.song.title}
-                          </Text>
-                        </Box>
-                      ))
+                    (filteredSongs || []).map((songEntry, index) => (
+                      <Box
+                        key={songEntry.id}
+                        padding="1rem"
+                        cursor="pointer"
+                        onClick={async () => {
+                          submit(songEntry);
+                        }}
+                        onMouseOver={() => setSelectedIndex(index)}
+                        bg={index === selectedIndex ? undefined : "gray.400"}
+                      >
+                        <Text color="gray.900">
+                          {songEntry.displayIndex}: {songEntry.song.artist} -{" "}
+                          {songEntry.song.title}
+                        </Text>
+                      </Box>
+                    ))
                   ) : (
                     <Box padding="1rem">
                       <Text color="gray.900">No Results Found</Text>
