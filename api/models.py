@@ -16,6 +16,15 @@ class CreatedUpdated(models.Model):
 
 
 class Songbook(SafeDeleteModel, CreatedUpdated):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["session_key"],
+                name="unique songbook session key",
+                condition=Q(deleted__isnull=True),
+            )
+        ]
+
     _safedelete_policy = SOFT_DELETE_CASCADE
     session_key = models.CharField(max_length=20, null=False, blank=False)
     current_song_timestamp = models.DateTimeField(
@@ -28,14 +37,6 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
     songs = models.ManyToManyField(
         "Song", related_name="songboooks", through="SongEntry"
     )
-
-    constraints = [
-        models.UniqueConstraint(
-            fields=["session_key"],
-            name="unique songbook session key",
-            condition=Q(deleted__isnull=True),
-        )
-    ]
 
     def get_next_song_entry(self):
         current_song_entry = self.get_current_song_entry()
