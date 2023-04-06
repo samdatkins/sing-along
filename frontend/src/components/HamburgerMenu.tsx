@@ -90,6 +90,10 @@ export default function HamburgerMenu({
     // if the add song drawer is open, ignore all typing
     if (addSongDrawerOutlet || isJumpSearchOpen) return;
 
+    if (event.metaKey || event.ctrlKey || event.altKey) {
+      return;
+    }
+
     // This first one is the only one that non-admins are allowed to use
     if (event.code === "Backquote") {
       toggleColorMode();
@@ -112,6 +116,8 @@ export default function HamburgerMenu({
       alert(`This cancels the tab view truncation AND pauses the timer.`);
     } else if (event.code === "Slash") {
       onOpen();
+    } else {
+      return;
     }
     event.preventDefault();
   };
