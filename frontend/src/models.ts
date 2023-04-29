@@ -61,3 +61,5 @@ export type ChakraAlertStatus =
   | "success"
   | "loading"
   | undefined;
+
+export const LINES_PER_COLUMN = 40;

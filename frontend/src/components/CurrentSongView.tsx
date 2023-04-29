@@ -17,13 +17,18 @@ function CurrentSongView() {
   const [applicationState, setApplicationState] = useState(
     ApplicationState.ShowSong
   );
+  const [firstColDispIndex, setFirstColDispIndex] = useState(0);
+  // const setColRef = useRef(setFirstColDispIndex);
+  const columnsToDisplay = 2;
 
   const advanceToNextAppState = () => {
+    console.log("next app state");
     switch (applicationState) {
       case ApplicationState.ShowSong:
         setApplicationState(ApplicationState.ActionPrompt);
         break;
       case ApplicationState.ActionPrompt:
+        setFirstColDispIndex(0);
         setApplicationState(ApplicationState.PrepForNextSong);
         break;
       case ApplicationState.PrepForNextSong:
@@ -39,6 +44,7 @@ function CurrentSongView() {
   });
 
   const resetAppState = () => {
+    setFirstColDispIndex(0);
     if (asyncSongbook?.result?.data?.is_noodle_mode) {
       setApplicationState(ApplicationState.ShowSong);
     } else {
@@ -61,10 +67,15 @@ function CurrentSongView() {
             advanceToNextAppState={advanceToNextAppState}
             resetAppState={resetAppState}
             applicationState={applicationState}
+            firstColDispIndex={firstColDispIndex}
+            setFirstColDispIndex={setFirstColDispIndex}
+            columnsToDisplay={columnsToDisplay}
           />
           <TabContainer
             asyncSongbook={asyncSongbook}
             applicationState={applicationState}
+            firstColDispIndex={firstColDispIndex}
+            columnsToDisplay={columnsToDisplay}
           />
         </Flex>
       </SongbookContext.Provider>

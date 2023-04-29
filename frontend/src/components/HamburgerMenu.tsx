@@ -53,6 +53,10 @@ interface HamburgerMenuProps {
   > | null;
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
   resetAppState: () => void;
+  firstColDispIndex: number;
+  setFirstColDispIndex: React.Dispatch<React.SetStateAction<number>>;
+  totalColumns: number;
+  columnsToDisplay: number;
 }
 export default function HamburgerMenu({
   isSongbookOwner,
@@ -63,6 +67,10 @@ export default function HamburgerMenu({
   resetAppState,
   addSongDrawerOutlet,
   setIsLive,
+  firstColDispIndex,
+  setFirstColDispIndex,
+  totalColumns,
+  columnsToDisplay,
 }: HamburgerMenuProps) {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
@@ -86,7 +94,7 @@ export default function HamburgerMenu({
     timerControls.refresh();
   };
   // handle what happens on key press
-  const handleKeyPress = (event: any) => {
+  const handleKeyPress = (event: KeyboardEvent) => {
     // if the add song drawer is open, ignore all typing
     if (addSongDrawerOutlet || isJumpSearchOpen) return;
 
@@ -103,12 +111,18 @@ export default function HamburgerMenu({
       setSongEntryFlagged(asyncSongbook?.result?.data?.current_song_entry?.id);
     } else if (event.code === "Space") {
       timerControls.playPauseToggle();
-      // prevents scrolling from spacebar
-      event.preventDefault();
-    } else if (event.code === "ArrowLeft") {
+    } else if (event.code === "ArrowLeft" && event.shiftKey) {
       performSongNavAction("prev");
-    } else if (event.code === "ArrowRight") {
+    } else if (event.code === "ArrowRight" && event.shiftKey) {
       performSongNavAction("next");
+    } else if (event.code === "ArrowLeft") {
+      if (firstColDispIndex - 1 >= 0) {
+        setFirstColDispIndex(firstColDispIndex - 1);
+      }
+    } else if (event.code === "ArrowRight") {
+      if (firstColDispIndex + columnsToDisplay + 1 <= totalColumns) {
+        setFirstColDispIndex(firstColDispIndex + 1);
+      }
     } else if (event.code === "KeyR") {
       resetAppState();
       timerControls.refresh();

@@ -10,7 +10,7 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
-import { ApplicationState, AppStateToTimerMap, Songbook } from "../models";
+import { ApplicationState, AppStateToTimerMap, LINES_PER_COLUMN, Songbook } from "../models";
 
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
@@ -24,12 +24,17 @@ import {
 import { nextSongbookSong } from "../services/songs";
 import HamburgerMenu from "./HamburgerMenu";
 import Timer from "./Timer";
+import { countTabColumns } from "../helpers/tab";
+import ColumnMap from "./ColumnMap";
 
 interface NavBarProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
   advanceToNextAppState: () => void;
   resetAppState: () => void;
   applicationState: ApplicationState;
+  firstColDispIndex: number;
+  setFirstColDispIndex: React.Dispatch<React.SetStateAction<number>>;
+  columnsToDisplay: number;
 }
 
 export default function NavBar({
@@ -37,6 +42,9 @@ export default function NavBar({
   advanceToNextAppState,
   resetAppState,
   applicationState,
+  firstColDispIndex,
+  setFirstColDispIndex,
+  columnsToDisplay,
 }: NavBarProps) {
   // Outlet that conditionally renders the add song drawer based on URL
   const addSongDrawerOutlet = useOutlet();
@@ -49,7 +57,7 @@ export default function NavBar({
   // state for length of countdown timer in seconds
   const navigate = useNavigate();
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
-    AppStateToTimerMap[applicationState],
+    AppStateToTimerMap[applicationState]
   );
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
@@ -59,6 +67,11 @@ export default function NavBar({
   const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
   const currentSongbook = asyncSongbook.result?.data;
+
+  const totalColumns = countTabColumns(
+    asyncSongbook.result?.data?.current_song_entry?.song?.content,
+    LINES_PER_COLUMN
+  );
 
   const timerControls = {
     playPauseToggle: () => {
@@ -116,8 +129,22 @@ export default function NavBar({
             addSongDrawerOutlet={addSongDrawerOutlet}
             asyncSongbook={asyncSongbook}
             resetAppState={resetAppState}
+            firstColDispIndex={firstColDispIndex}
+            setFirstColDispIndex={setFirstColDispIndex}
+            totalColumns={totalColumns}
+            columnsToDisplay={columnsToDisplay}
           />
         </Flex>
+        <Box pt=".5rem">
+          {!isMobileDevice && (
+            <ColumnMap
+              columnsToDisplay={columnsToDisplay}
+              firstColDispIndex={firstColDispIndex}
+              totalColumns={totalColumns}
+              setFirstColDispIndex={setFirstColDispIndex}
+            />
+          )}
+        </Box>
 
         {!isMobileDevice && (
           <Box bgColor="white" p="8px" position="fixed" right="0" bottom="0">

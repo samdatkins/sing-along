@@ -1,31 +1,20 @@
-import { Text, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
+import { Flex, Text, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import transposer from "./transposer";
-
-function formatTab(tab, toneSteps) {
-  let tabStartIndex = 0;
-  const capoArray = tab.filter((e) => e.toLowerCase().includes("capo"));
-  for (let i = 0; i < tab.length; i++) {
-    if (tab[i].includes("[ch]")) {
-      tabStartIndex = i;
-      break;
-    }
-  }
-  const trimmedTab = tab.slice(tabStartIndex, tab.length);
-  const capoDisplay = capoArray[0] || [];
-  const transposeDisplay =
-    toneSteps != 0 ? "transposed " + toneSteps + " steps" : "";
-  const capoAndTranspositionDisplay = capoDisplay + " " + transposeDisplay;
-  const fixedTab = [capoAndTranspositionDisplay, ...trimmedTab];
-  return fixedTab;
-}
+import { formatTab, splitTabIntoColumns } from "../helpers/tab";
+import { LINES_PER_COLUMN } from "../models";
 
 interface TabDisplayProps {
   tab: string | false | undefined;
-  isNoodleMode: boolean | undefined;
+  firstColDispIndex: number;
+  columnsToDisplay: number;
 }
 
-export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
+export default function TabDisplay({
+  tab,
+  firstColDispIndex,
+  columnsToDisplay,
+}: TabDisplayProps) {
   const [toneSteps, setToneSteps] = useState(0);
   const [usesSharps, setUsesSharps] = useState(true);
 
@@ -66,34 +55,22 @@ export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
     setUsesSharps(true);
   }, [setToneSteps, setUsesSharps, tab]);
 
-  const splitTab = (tab || "")
-    .replaceAll("[tab]", "")
-    .replaceAll("[/tab]", "")
-    .replaceAll("\r\n", "\n")
-    .split("\n");
-
-  const fixedTabArray = formatTab(splitTab, toneSteps);
-  const truncatedSplitTabArray = fixedTabArray && fixedTabArray?.slice(0, 120);
+  const formattedTabArray = formatTab(tab, toneSteps);
+  const tabColumns = splitTabIntoColumns(formattedTabArray, LINES_PER_COLUMN);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
-  /*
-    truncatedSplitTab &&
-      truncatedSplitTab?.splice(
-        Math.floor(truncatedSplitTab.length / 2 - 1),
-        0,
-        "FIX CHORDS ON BOTTOM OF SCREEN -- TBD",
-      );
-    */
-  const tabToDisplay = isNoodleMode ? fixedTabArray : truncatedSplitTabArray;
+
   return (
     <>
-      {tabToDisplay &&
+      {tabColumns &&
         (isSmallerThan900 ? (
-          <TabWithoutChords tabToDisplay={tabToDisplay} />
+          <TabWithoutChords tabToDisplay={formattedTabArray} />
         ) : (
           <TabWithChords
-            tabToDisplay={tabToDisplay}
+            tabToDisplay={tabColumns}
             toneSteps={toneSteps}
             usesSharps={usesSharps}
+            firstColDispIndex={firstColDispIndex}
+            columnsToDisplay={columnsToDisplay}
           />
         ))}
     </>
@@ -101,52 +78,68 @@ export default function TabDisplay({ tab, isNoodleMode }: TabDisplayProps) {
 }
 
 type TabWithChordsProps = {
-  tabToDisplay: any[];
+  tabToDisplay: string[][];
   toneSteps: number;
   usesSharps: boolean;
+  firstColDispIndex: number;
+  columnsToDisplay: number;
 };
 
 function TabWithChords({
   tabToDisplay,
   toneSteps,
   usesSharps,
+  firstColDispIndex,
+  columnsToDisplay,
 }: TabWithChordsProps) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
 
   return (
-    <pre style={{ fontSize: "1rem", fontFamily: "Ubuntu Mono" }}>
-      {tabToDisplay?.map((tabLine: string) => {
-        if (tabLine.includes("[ch]")) {
-          return (
-            <Text color={chordColor} key={window.crypto.randomUUID()}>
-              {transposer(tabLine, toneSteps, usesSharps)}
+    <Flex direction="row" width="100%">
+      {tabToDisplay &&
+        tabToDisplay
+          .slice(firstColDispIndex, firstColDispIndex + columnsToDisplay)
+          .map((column) => (
+            <Text
+              as="pre"
+              style={{ fontSize: "1rem", fontFamily: "Ubuntu Mono" }}
+              w={`${100 / columnsToDisplay}%`}
+            >
+              {column.map((tabLine) => {
+                if (tabLine.includes("[ch]")) {
+                  return (
+                    <Text color={chordColor} key={window.crypto.randomUUID()}>
+                      {transposer(tabLine, toneSteps, usesSharps)}
+                    </Text>
+                  );
+                } else {
+                  return (
+                    <Text key={window.crypto.randomUUID()}>
+                      {tabLine.length > 0 ? tabLine : " "}
+                    </Text>
+                  );
+                }
+              })}
             </Text>
-          );
-        } else {
-          return (
-            <Text key={window.crypto.randomUUID()}>
-              {tabLine.length > 0 ? tabLine : " "}
-            </Text>
-          );
-        }
-      })}
-    </pre>
+          ))}
+    </Flex>
   );
 }
 
-function TabWithoutChords({ tabToDisplay }) {
+function TabWithoutChords({ tabToDisplay }: { tabToDisplay: string[] }) {
   return (
     <pre style={{ fontSize: "1rem", fontFamily: "Helvetica" }}>
-      {tabToDisplay?.map((tabLine: string) => {
-        if (!tabLine.includes("[ch]")) {
-          return (
-            <Text key={window.crypto.randomUUID()}>
-              {tabLine.length > 0 ? tabLine : " "}
-            </Text>
-          );
-        }
-        return;
-      })}
+      {tabToDisplay &&
+        tabToDisplay.map((tabLine: string) => {
+          if (!tabLine.includes("[ch]")) {
+            return (
+              <Text key={window.crypto.randomUUID()}>
+                {tabLine.length > 0 ? tabLine : " "}
+              </Text>
+            );
+          }
+          return;
+        })}
     </pre>
   );
 }
