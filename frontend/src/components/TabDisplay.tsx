@@ -66,6 +66,7 @@ export default function TabDisplay({
           <TabWithoutChords tabToDisplay={formattedTabArray} />
         ) : (
           <TabWithChords
+            isLoading={!!tab}
             tabToDisplay={tabColumns}
             toneSteps={toneSteps}
             usesSharps={usesSharps}
@@ -78,6 +79,7 @@ export default function TabDisplay({
 }
 
 type TabWithChordsProps = {
+  isLoading: boolean;
   tabToDisplay: string[][];
   toneSteps: number;
   usesSharps: boolean;
@@ -91,19 +93,29 @@ function TabWithChords({
   usesSharps,
   firstColDispIndex,
   columnsToDisplay,
+  isLoading,
 }: TabWithChordsProps) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
+  const totalPercentageWidthOfScreen =
+    100 * (tabToDisplay?.length / columnsToDisplay);
 
   return (
-    <Flex direction="row" width="100%">
+    <Flex
+      direction="row"
+      left={`-${50 * firstColDispIndex}%`}
+      width={`${totalPercentageWidthOfScreen}%`}
+      position="relative"
+      transition={isLoading ? "left 0.4s ease" : ""}
+    >
       {tabToDisplay &&
         tabToDisplay
-          .slice(firstColDispIndex, firstColDispIndex + columnsToDisplay)
+          // .slice(firstColDispIndex, firstColDispIndex + columnsToDisplay)
           .map((column) => (
             <Text
               as="pre"
               style={{ fontSize: "1rem", fontFamily: "Ubuntu Mono" }}
               w={`${100 / columnsToDisplay}%`}
+              pl="1rem"
             >
               {column.map((tabLine) => {
                 if (tabLine.includes("[ch]")) {

@@ -9,8 +9,13 @@ import {
   useBoolean,
   useMediaQuery,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
-import { ApplicationState, AppStateToTimerMap, LINES_PER_COLUMN, Songbook } from "../models";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ApplicationState,
+  AppStateToTimerMap,
+  LINES_PER_COLUMN,
+  Songbook,
+} from "../models";
 
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
@@ -68,9 +73,16 @@ export default function NavBar({
 
   const currentSongbook = asyncSongbook.result?.data;
 
-  const totalColumns = countTabColumns(
-    asyncSongbook.result?.data?.current_song_entry?.song?.content,
-    LINES_PER_COLUMN
+  const totalColumns = useMemo(
+    () =>
+      countTabColumns(
+        asyncSongbook.result?.data?.current_song_entry?.song?.content,
+        LINES_PER_COLUMN
+      ),
+    [
+      asyncSongbook.result?.data?.current_song_entry?.song?.content,
+      LINES_PER_COLUMN,
+    ]
   );
 
   const timerControls = {
