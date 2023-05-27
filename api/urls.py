@@ -4,6 +4,9 @@ from rest_framework import routers
 from api.views.song import SongViewSet
 from api.views.song_entry import SongEntryViewSet
 from api.views.songbook import SongbookViewSet
+from api.views.user import UserView
+
+urlpatterns = [path("users/", UserView.as_view(), name="user-detail")]
 
 router = routers.DefaultRouter()
 
@@ -11,4 +14,4 @@ router.register(r"songs", SongViewSet)
 router.register(r"song_entries", SongEntryViewSet)
 router.register(r"songbooks", SongbookViewSet)
 
-urlpatterns = router.urls
+urlpatterns += router.urls
