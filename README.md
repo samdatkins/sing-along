@@ -32,6 +32,7 @@
   - Go to the `frontend` folder in a terminal
   - Run `yarn install && yarn start`
   - To view the web application, go to `localhost:3000` in a browser
+  - Note: To login to auth0, you'll need to access `localhost:8080` first
 
 ## Stack Brainstorming
 

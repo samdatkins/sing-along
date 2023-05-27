@@ -37,6 +37,7 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
     songs = models.ManyToManyField(
         "Song", related_name="songboooks", through="SongEntry"
     )
+    jackfield = models.CharField()
 
     def get_next_song_entry(self):
         current_song_entry = self.get_current_song_entry()
