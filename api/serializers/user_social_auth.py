@@ -11,4 +11,6 @@ class UserSocialAuthSerializer(serializers.ModelSerializer):
         fields = ["picture"]
 
     def get_picture(self, obj):
-        return obj.extra_data["picture"]
+        if "picture" in obj.extra_data:
+            return obj.extra_data["picture"]
+        return None
