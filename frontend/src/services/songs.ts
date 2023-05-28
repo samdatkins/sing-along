@@ -13,39 +13,27 @@ export async function getUserDetails() {
     return await axios.get<User>(`/api/users/`);
   } catch (error) {
     console.error(`Couldn't retrieve user details: ${error}`);
+    return false;
   }
 }
 
 export async function getCurrentSong(sessionKey: string | undefined) {
-  try {
-    return await axios.get<Songbook>(`/api/songbooks/${sessionKey}/`);
-  } catch (error) {
-    console.error(`Couldn't get song details: ${error}`);
-  }
+  return await axios.get<Songbook>(`/api/songbooks/${sessionKey}/`);
 }
 
 export async function getSongbookDetails(sessionKey: string | undefined) {
-  try {
-    return await axios.get<SongbookDetails>(
-      `/api/songbooks/${sessionKey}/details/`,
-    );
-  } catch (error) {
-    console.error(`Couldn't get songbook details: ${error}`);
-  }
+  return await axios.get<SongbookDetails>(
+    `/api/songbooks/${sessionKey}/details/`,
+  );
 }
 
 export async function getAllSongbooks() {
-  try {
-    return await axios.get<DjangoPaginatedResponse<Songbook>>(
-      `/api/songbooks/`,
-    );
-  } catch (error) {
-    console.error(`Couldn't get list of songbooks: ${error}`);
-  }
+  return await axios.get<DjangoPaginatedResponse<Songbook>>(`/api/songbooks/`);
 }
 
 export async function nextSongbookSong(sessionKey: string | undefined) {
   if (!sessionKey) return;
+
   try {
     await axios.patch<Songbook>(`/api/songbooks/${sessionKey}/next-song/`);
     return true;

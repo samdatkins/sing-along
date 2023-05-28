@@ -1,19 +1,14 @@
-import {
-  Box,
-  Button,
-  Flex,
-  ListItem,
-  Text,
-  UnorderedList,
-} from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Text } from "@chakra-ui/react";
 import { useAsync } from "react-async-hook";
 import { Link } from "react-router-dom";
-import { getAllSongbooks } from "../services/songs";
+import { getAllSongbooks, getUserDetails } from "../services/songs";
 import SongbookIndexTable from "./SongbookIndexTable";
 
 export default function WelcomePage() {
   const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
   const songbooks = asyncSongbooks.result?.data.results;
+  const asyncUser = useAsync(async () => getUserDetails(), []);
+  const user = asyncUser.result && asyncUser.result.data;
   return (
     <Box>
       <Text
@@ -21,25 +16,21 @@ export default function WelcomePage() {
         align="center"
         fontFamily="Ubuntu Mono"
         color="blue.600"
-        pt="2rem"
-        pb="2rem"
+        pt="1rem"
+        pb="1rem"
       >
         livepowerhour.com
       </Text>
+      {user && <Center>Welcome, {user?.first_name}!</Center>}
+      <Center>
+        <Link to={`/live/profile/`}>
+          <Button colorScheme="blue" m="1rem">
+            Your Profile
+          </Button>
+        </Link>
+      </Center>
       <Flex justifyContent="center">
         <Flex alignItems="center" direction="column">
-          <Text
-            mb="1rem"
-            fontSize="2rem"
-            color="gray.400"
-            fontFamily="Ubuntu Mono"
-          >
-            Upcoming Features
-          </Text>
-          <UnorderedList mb="2rem">
-            <ListItem>User Profile, Settings, and Stats</ListItem>
-            <ListItem>Spotify & Shazam Integration</ListItem>
-          </UnorderedList>
           <Text
             mb="1rem"
             fontSize="2rem"
@@ -49,14 +40,10 @@ export default function WelcomePage() {
           >
             Your Songbooks
           </Text>
-          <Text mb="1rem">
-            <Link to={`/live/createsongbook/`}>
-              <Button colorScheme="blue">Create a New Songbook</Button>
-            </Link>
-          </Text>
-          <Text mb="1rem">
-            <SongbookIndexTable songbooks={songbooks} />
-          </Text>
+          <SongbookIndexTable songbooks={songbooks} />
+          <Link to={`/live/createsongbook/`}>
+            <Button colorScheme="blue">Create a New Songbook</Button>
+          </Link>
         </Flex>
       </Flex>
     </Box>

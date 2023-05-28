@@ -1,45 +1,52 @@
-import {
-  Box,
-  Button,
-  Flex,
-  ListItem,
-  Text,
-  UnorderedList,
-} from "@chakra-ui/react";
+import { Avatar, Button, Center, Flex, Text } from "@chakra-ui/react";
+import { useAsync } from "react-async-hook";
 import { Link } from "react-router-dom";
+import { getUserDetails } from "../services/songs";
 
 export default function UserProfile() {
+  const asyncUser = useAsync(async () => getUserDetails(), []);
+  const user = asyncUser.result && asyncUser.result.data;
+  const joinedDate =
+    user && user.date_joined
+      ? new Date(user?.date_joined)
+      : new Date(Date.now());
   return (
     <>
-      <Text
-        fontSize="3rem"
-        align="center"
-        fontFamily="Ubuntu Mono"
-        color="blue.600"
-        pt="2rem"
-        pb="2rem"
-      >
-        Your User Profile
-      </Text>
-      <Flex justifyContent="center">
-        <Box>
-          <Text mb="1rem" fontFamily="Ubuntu Mono" fontSize="1.5rem">
-            Upcoming personalizations:
-          </Text>
-          <UnorderedList mb="2rem" alignItems="center">
-            <ListItem>Toggle Night Mode</ListItem>
-            <ListItem>Toggle Chord Display</ListItem>
-            <ListItem>Set 1, 2, or 3 Columns</ListItem>
-            <ListItem>Your Requested Songs</ListItem>
-            <ListItem>Your Songbooks</ListItem>
-          </UnorderedList>
-          <Flex justifyContent="center">
-            <Link to="/live">
-              <Button colorScheme="blue">Back to Home</Button>
-            </Link>
+      {user ? (
+        <>
+          <Flex direction="row" justifyContent="center">
+            <Text
+              fontSize="3rem"
+              align="center"
+              fontFamily="Ubuntu Mono"
+              color="blue.600"
+              pt="2rem"
+              pb="2rem"
+            >
+              {user?.first_name} {user?.last_name}'s Profile
+            </Text>
           </Flex>
-        </Box>
-      </Flex>
+          <Center>
+            <Avatar
+              referrerPolicy="no-referrer"
+              size="xl"
+              name={`${user?.first_name} ${user?.last_name}`}
+              src={user?.social.picture}
+            />
+          </Center>
+          <Center>{user?.email}</Center>
+          <Center>Member since {joinedDate.toDateString()}</Center>
+          <Center>
+            <Link to="/live">
+              <Button mt="20px" colorScheme="blue">
+                Back to Home
+              </Button>
+            </Link>
+          </Center>
+        </>
+      ) : (
+        <></>
+      )}
     </>
   );
 }
