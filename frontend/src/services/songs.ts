@@ -5,25 +5,47 @@ import {
   Songbook,
   SongbookDetails,
   SongEntry,
+  User,
 } from "../models";
 
+export async function getUserDetails() {
+  try {
+    return await axios.get<User>(`/api/users/`);
+  } catch (error) {
+    console.error(`Couldn't retrieve user details: ${error}`);
+  }
+}
+
 export async function getCurrentSong(sessionKey: string | undefined) {
-  return await axios.get<Songbook>(`/api/songbooks/${sessionKey}/`);
+  try {
+    return await axios.get<Songbook>(`/api/songbooks/${sessionKey}/`);
+  } catch (error) {
+    console.error(`Couldn't get song details: ${error}`);
+  }
 }
 
 export async function getSongbookDetails(sessionKey: string | undefined) {
-  return await axios.get<SongbookDetails>(
-    `/api/songbooks/${sessionKey}/details/`
-  );
+  try {
+    return await axios.get<SongbookDetails>(
+      `/api/songbooks/${sessionKey}/details/`,
+    );
+  } catch (error) {
+    console.error(`Couldn't get songbook details: ${error}`);
+  }
 }
 
 export async function getAllSongbooks() {
-  return await axios.get<DjangoPaginatedResponse<Songbook>>(`/api/songbooks/`);
+  try {
+    return await axios.get<DjangoPaginatedResponse<Songbook>>(
+      `/api/songbooks/`,
+    );
+  } catch (error) {
+    console.error(`Couldn't get list of songbooks: ${error}`);
+  }
 }
 
 export async function nextSongbookSong(sessionKey: string | undefined) {
   if (!sessionKey) return;
-
   try {
     await axios.patch<Songbook>(`/api/songbooks/${sessionKey}/next-song/`);
     return true;
@@ -37,7 +59,7 @@ export async function createNewSongbook(
   sessionKey: string | undefined,
   maxActiveSongs: string | undefined,
   songbookTitle: string | undefined,
-  isNoodleMode: boolean | undefined
+  isNoodleMode: boolean | undefined,
 ) {
   try {
     await axios.post<Songbook>(`/api/songbooks/`, {
@@ -56,7 +78,7 @@ export async function createNewSongbook(
 
 export async function setSongbookSong(
   sessionKey: string | undefined,
-  songCreatedTime: string | undefined
+  songCreatedTime: string | undefined,
 ) {
   if (!sessionKey || !songCreatedTime) return;
 
@@ -115,7 +137,7 @@ export async function searchForSong(q: string) {
 
 export async function addSongToSongbook(
   song?: Song | undefined,
-  songbookId?: number
+  songbookId?: number,
 ) {
   try {
     return await axios.post<SongEntry>(`/api/song_entries/`, {
