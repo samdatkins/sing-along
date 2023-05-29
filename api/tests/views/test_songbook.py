@@ -95,7 +95,7 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             response = self.client.get(
                 reverse(
                     "songbook-detail",
@@ -114,7 +114,7 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             response = self.client.get(
                 reverse(
                     "songbook-detail",
@@ -235,7 +235,7 @@ class TestSongbookView(APITestCase):
         )
         self.assertEqual(response.status_code, 409)
 
-    def test_next_song_failure_with_unowned_songbook(self):
+    def test_next_song_failure_when_not_a_member_of_songbook(self):
         # Arrange
         session_key = self.not_my_songbook.session_key
         self.client.force_authenticate(user=self.user)
@@ -250,7 +250,7 @@ class TestSongbookView(APITestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_previous_song_failure_with_unowned_songbook(self):
+    def test_previous_song_failure_when_not_a_member_of_songbook(self):
         # Arrange
         session_key = self.not_my_songbook.session_key
         self.client.force_authenticate(user=self.user)
@@ -301,7 +301,7 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             response = self.client.get(
                 reverse(
                     "songbook-details",
@@ -328,6 +328,6 @@ class TestSongbookView(APITestCase):
 
         # Assert
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(
-            self.user.id, Songbook.objects.get(session_key="newlist").members.first().id
-        )
+        membership = Songbook.objects.get(session_key="newlist").membership_set.first()
+        self.assertEqual(self.user.id, membership.user.id)
+        self.assertEqual(Membership.MemberType.OWNER.value, membership.type)

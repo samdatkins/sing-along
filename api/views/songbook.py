@@ -19,13 +19,13 @@ class OnlyAllowSongbookOwnersToModify(permissions.BasePermission):
         return bool(request.user and request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
         try:
             membership = obj.membership_set.get(user=request.user)
         except:
             return False
+
+        if request.method in permissions.SAFE_METHODS:
+            return True
 
         if membership.type != Membership.MemberType.OWNER.value:
             return False
