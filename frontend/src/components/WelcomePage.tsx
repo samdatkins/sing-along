@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, Button, Center, Flex, Text } from "@chakra-ui/react";
+import { Alert, Button, Center, Flex, Text } from "@chakra-ui/react";
 import { useAsync } from "react-async-hook";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllSongbooks, getUserDetails } from "../services/songs";
@@ -9,9 +9,13 @@ export default function WelcomePage() {
   const songbooks = asyncSongbooks.result?.data.results;
   const asyncUser = useAsync(async () => getUserDetails(), []);
   const user = asyncUser.result && asyncUser.result.data;
+  const liveSongbooks = songbooks?.filter(
+    (songbook) => songbook.is_noodle_mode === false,
+  );
   const navigate = useNavigate();
   return (
     <>
+      <pre>{JSON.stringify(liveSongbooks, null, 2)}</pre>
       <Flex justifyContent="center">
         <Flex alignItems="center" direction="column">
           <Text
@@ -24,16 +28,21 @@ export default function WelcomePage() {
             livepowerhour.com
           </Text>
           {user && <Center>Welcome, {user?.first_name}!</Center>}
-          <Alert
-            status="warning"
-            margin="1rem"
-            justifyContent="center"
-            cursor="pointer"
-            onClick={() => navigate("/live/sams-test")}
-          >
-            <AlertIcon />
-            Click here to return to your active power hour!
-          </Alert>
+          {liveSongbooks &&
+            liveSongbooks.length &&
+            liveSongbooks.map((songbook) => (
+              <Alert
+                margin="1rem"
+                status="warning"
+                textAlign="center"
+                width="28rem"
+                padding="2rem"
+                cursor="pointer"
+                onClick={() => navigate("/live/sams-test")}
+              >
+                Return to your recent power hour: {songbook.title}
+              </Alert>
+            ))}
           <Text
             mb="1rem"
             fontSize="2rem"
