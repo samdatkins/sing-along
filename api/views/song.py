@@ -14,9 +14,9 @@ from api.serializers.song import SongSerializer
 logger = logging.getLogger(__name__)
 
 
-class SongViewSet(viewsets.ModelViewSet):
+class SongViewSet(viewsets.GenericViewSet):
     """
-    API endpoint that allows all standard interactions with Songs.
+    API endpoint that only allows searching Songs.
     """
 
     queryset = Song.objects.all()

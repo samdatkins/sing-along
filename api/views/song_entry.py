@@ -1,20 +1,39 @@
-from rest_framework import status, viewsets
-from rest_framework.exceptions import NotFound
+from rest_framework import mixins, permissions, status, viewsets
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 
-from api.models import Song, Songbook, SongEntry
+from api.models import Membership, Song, Songbook, SongEntry
 from api.serializers.song_entry import SongEntrySerializer
 from api.views.custom_exceptions import ConflictingStates, DuplicateValue
 from sing_along.utils.tabs import TabScraper
 
 
-class SongEntryViewSet(viewsets.ModelViewSet):
+class OnlyAllowSongbookParticipantsToModify(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated)
+
+    def has_object_permission(self, request, view, obj):
+        try:
+            obj.songbook.membership_set.get(user=request.user)
+        except:
+            return False
+
+        return True
+
+
+class SongEntryViewSet(
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     """
     API endpoint that allows all standard interactions with SongEntries.
     """
 
     queryset = SongEntry.objects.all()
     serializer_class = SongEntrySerializer
+    permission_classes = [OnlyAllowSongbookParticipantsToModify]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -30,6 +49,11 @@ class SongEntryViewSet(viewsets.ModelViewSet):
                 pk=serializer.validated_data["songbook_id"]
             )
         except (Song.DoesNotExist, Songbook.DoesNotExist) as e:
+            raise NotFound("No such song and/or songbook")
+
+        try:
+            songbook.membership_set.get(user=request.user)
+        except:
             raise NotFound("No such song and/or songbook")
 
         if (

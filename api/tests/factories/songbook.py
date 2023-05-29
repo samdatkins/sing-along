@@ -1,7 +1,7 @@
 import factory
 from django.utils import timezone
 
-from api.models import Songbook
+from api.models import Membership, Songbook
 
 
 class SongbookFactory(factory.django.DjangoModelFactory):

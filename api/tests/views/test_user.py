@@ -1,15 +1,14 @@
 import factory.random
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from django.urls import reverse
-from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 
 from api.tests.factories.user import UserFactory
 from api.tests.factories.user_social_auth import UserSocialAuthFactory
 from api.views.user import UserView
 
 
-class TestUser(TestCase):
+class TestUser(APITestCase):
     def setUp(self):
         factory.random.reseed_random("lol so random")
         self.user_social_auth = UserSocialAuthFactory()
@@ -17,13 +16,12 @@ class TestUser(TestCase):
 
     def test_authed_requests_succeed(self):
         # Arrange
-        api_factory = APIRequestFactory()
-        view = UserView.as_view()
-        request = api_factory.get(reverse("user-detail"))
-        force_authenticate(request, user=self.user)
+        self.client.force_authenticate(user=self.user)
 
         # Act
-        response = view(request)
+        response = self.client.get(
+            reverse("user-detail"),
+        )
 
         # Assert
         self.assertEqual(response.status_code, 200)
@@ -31,28 +29,24 @@ class TestUser(TestCase):
 
     def test_unauthed_requests_fail(self):
         # Arrange
-        api_factory = APIRequestFactory()
-        view = UserView.as_view()
-        request = api_factory.get(reverse("user-detail"))
 
         # Act
-        response = view(request)
+        response = self.client.get(
+            reverse("user-detail"),
+        )
 
         # Assert
         self.assertEqual(response.status_code, 403)
 
     def test_edit_succeeds(self):
         # Arrange
+        self.client.force_authenticate(user=self.user)
         new_first_name = "my brand new first name"
-        api_factory = APIRequestFactory()
-        view = UserView.as_view()
-        request = api_factory.patch(
-            reverse("user-detail"), {"first_name": new_first_name}
-        )
-        force_authenticate(request, user=self.user)
 
         # Act
-        response = view(request)
+        response = self.client.patch(
+            reverse("user-detail"), data={"first_name": new_first_name}
+        )
 
         # Assert
         self.assertEqual(response.status_code, 200)
@@ -65,13 +59,10 @@ class TestUser(TestCase):
         # Arrange
         new_id = 9999999
         old_id = self.user.pk
-        api_factory = APIRequestFactory()
-        view = UserView.as_view()
-        request = api_factory.patch(reverse("user-detail"), {"id": new_id})
-        force_authenticate(request, user=self.user)
+        self.client.force_authenticate(user=self.user)
 
         # Act
-        response = view(request)
+        response = self.client.patch(reverse("user-detail"), data={"id": new_id})
 
         # Assert
         self.assertEqual(response.status_code, 200)
