@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.models import Songbook
+from api.models import Membership, Songbook
 from api.serializers.song_entry import SongEntrySerializer
 
 
@@ -52,6 +52,7 @@ class SongbookListSerializer(serializers.ModelSerializer):
 
 class SongbookDetailSerializer(serializers.ModelSerializer):
     song_entries = SongEntrySerializer(many=True)
+    is_user_owner = serializers.SerializerMethodField()
 
     class Meta:
         model = Songbook
@@ -62,4 +63,13 @@ class SongbookDetailSerializer(serializers.ModelSerializer):
             "is_noodle_mode",
             "song_entries",
             "current_song_timestamp",
+            "is_user_owner",
         ]
+
+    def get_is_user_owner(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        membership = obj.membership_set.get(user=user)
+        return membership.type == Membership.MemberType.OWNER.value

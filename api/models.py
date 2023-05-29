@@ -163,6 +163,15 @@ class Membership(SafeDeleteModel, CreatedUpdated):
         OWNER = "OW"
         PARTICIPANT = "PT"
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["songbook", "user"],
+                name="unique membership entry",
+                condition=Q(deleted__isnull=True),
+            )
+        ]
+
     songbook = models.ForeignKey(Songbook, on_delete=models.CASCADE)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     type = models.CharField(

@@ -113,7 +113,8 @@ class SongbookViewSet(
         instance = self.get_object()
 
         return Response(
-            status=status.HTTP_200_OK, data=SongbookDetailSerializer(instance).data
+            status=status.HTTP_200_OK,
+            data=SongbookDetailSerializer(instance, context={"request": request}).data,
         )
 
     def perform_create(self, serializer):

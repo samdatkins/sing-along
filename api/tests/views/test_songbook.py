@@ -295,9 +295,28 @@ class TestSongbookView(APITestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    def test_songbook_details(self):
+    def test_songbook_details_as_owner(self):
         # Arrange
         session_key = self.nonempty_songbook.session_key
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        with self.assertNumQueries(5):
+            response = self.client.get(
+                reverse(
+                    "songbook-details",
+                    kwargs={"session_key": session_key},
+                ),
+            )
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["song_entries"]), 3)
+        self.assertEqual(response.data["is_user_owner"], True)
+
+    def test_songbook_details_as_participant(self):
+        # Arrange
+        session_key = self.participant_songbook.session_key
         self.client.force_authenticate(user=self.user)
 
         # Act
@@ -311,7 +330,8 @@ class TestSongbookView(APITestCase):
 
         # Assert
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data["song_entries"]), 3)
+        self.assertEqual(len(response.data["song_entries"]), 0)
+        self.assertEqual(response.data["is_user_owner"], False)
 
     def test_songbook_create(self):
         # Arrange
