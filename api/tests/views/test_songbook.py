@@ -1,8 +1,8 @@
 import factory.random
-from django.test import TestCase
 from django.urls import reverse
-from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 
+from api.models import Membership, Songbook
 from api.tests.factories.song_entry import SongEntryFactory
 from api.tests.factories.songbook import SongbookFactory
 from api.tests.factories.user import UserFactory
@@ -10,11 +10,16 @@ from api.tests.helpers import get_datetime_x_seconds_ago
 from api.views.songbook import SongbookViewSet
 
 
-class TestSongbookView(TestCase):
+class TestSongbookView(APITestCase):
     def setUp(self):
         factory.random.reseed_random("lol so random")
         self.user = UserFactory.create()
         self.empty_songbook = SongbookFactory.create()
+        Membership.objects.create(
+            user=self.user,
+            songbook=self.empty_songbook,
+            type=Membership.MemberType.OWNER.value,
+        )
 
         self.first_song_entry = SongEntryFactory.create()
         self.first_song_entry.created_at = get_datetime_x_seconds_ago(5)
@@ -23,6 +28,20 @@ class TestSongbookView(TestCase):
         self.nonempty_songbook = self.first_song_entry.songbook
         self.nonempty_songbook.current_song_timestamp = get_datetime_x_seconds_ago(60)
         self.nonempty_songbook.save()
+        Membership.objects.create(
+            user=self.user,
+            songbook=self.nonempty_songbook,
+            type=Membership.MemberType.OWNER.value,
+        )
+
+        self.not_my_songbook = SongbookFactory.create(session_key="notmine")
+
+        self.participant_songbook = SongbookFactory.create(session_key="participant")
+        Membership.objects.create(
+            user=self.user,
+            songbook=self.participant_songbook,
+            type=Membership.MemberType.PARTICIPANT.value,
+        )
 
         self.second_song_entry = SongEntryFactory.create(
             songbook=self.nonempty_songbook
@@ -36,28 +55,36 @@ class TestSongbookView(TestCase):
 
     def test_authed_requests_succeed(self):
         # Arrange
-        api_factory = APIRequestFactory()
-        view = SongbookViewSet.as_view({"get": "list"})
-        request = api_factory.get(reverse("songbook-list"))
-        force_authenticate(request, user=self.user)
+        self.client.force_authenticate(user=self.user)
 
         # Act
         # Should run one query for pagniation purposes, then one more query
         # to actually pull the songbooks
         with self.assertNumQueries(2):
-            response = view(request)
+            response = self.client.get(reverse("songbook-list"))
 
         # Assert
         self.assertEqual(response.status_code, 200)
 
-    def test_unauthed_requests_fail(self):
+    def test_list_has_correct_count(self):
         # Arrange
-        api_factory = APIRequestFactory()
-        view = SongbookViewSet.as_view({"get": "list"})
-        request = api_factory.get(reverse("songbook-list"))
+        self.client.force_authenticate(user=self.user)
 
         # Act
-        response = view(request)
+        # Should run one query for pagniation purposes, then one more query
+        # to actually pull the songbooks
+        with self.assertNumQueries(2):
+            response = self.client.get(reverse("songbook-list"))
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 3)
+
+    def test_unauthed_requests_fail(self):
+        # Arrange
+
+        # Act
+        response = self.client.get(reverse("songbook-list"))
 
         # Assert
         self.assertEqual(response.status_code, 403)
@@ -65,19 +92,16 @@ class TestSongbookView(TestCase):
     def test_detail_has_correct_number_of_songs(self):
         # Arrange
         session_key = self.empty_songbook.session_key
-        api_factory = APIRequestFactory()
-        view = SongbookViewSet.as_view({"get": "retrieve"})
-        request = api_factory.get(
-            reverse(
-                "songbook-detail",
-                kwargs={"session_key": session_key},
-            ),
-        )
-        force_authenticate(request, user=self.user)
+        self.client.force_authenticate(user=self.user)
 
         # Act
         with self.assertNumQueries(2):
-            response = view(request, session_key=session_key)
+            response = self.client.get(
+                reverse(
+                    "songbook-detail",
+                    kwargs={"session_key": session_key},
+                )
+            )
 
         # Assert
         self.assertEqual(response.status_code, 200)
@@ -87,19 +111,16 @@ class TestSongbookView(TestCase):
     def test_detail_with_nonempty_songbook(self):
         # Arrange
         session_key = self.nonempty_songbook.session_key
-        api_factory = APIRequestFactory()
-        view = SongbookViewSet.as_view({"get": "retrieve"})
-        request = api_factory.get(
-            reverse(
-                "songbook-detail",
-                kwargs={"session_key": session_key},
-            ),
-        )
-        force_authenticate(request, user=self.user)
+        self.client.force_authenticate(user=self.user)
 
         # Act
         with self.assertNumQueries(3):
-            response = view(request, session_key=session_key)
+            response = self.client.get(
+                reverse(
+                    "songbook-detail",
+                    kwargs={"session_key": session_key},
+                )
+            )
 
         # Assert
         self.assertEqual(response.status_code, 200)
@@ -118,18 +139,15 @@ class TestSongbookView(TestCase):
     def test_next_song_success_with_nonempty_songbook(self):
         # Arrange
         session_key = self.nonempty_songbook.session_key
-        api_factory = APIRequestFactory()
-        view = SongbookViewSet.as_view({"patch": "next_song"})
-        request = api_factory.patch(
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.patch(
             reverse(
                 "songbook-next-song",
                 kwargs={"session_key": session_key},
-            ),
+            )
         )
-        force_authenticate(request, user=self.user)
-
-        # Act
-        response = view(request, session_key=session_key)
         self.nonempty_songbook.refresh_from_db()
 
         # Assert
@@ -146,19 +164,17 @@ class TestSongbookView(TestCase):
             self.nonempty_songbook.get_current_song_entry(), self.third_song_entry
         )
 
+        # Arrange
         session_key = self.nonempty_songbook.session_key
-        api_factory = APIRequestFactory()
-        view = SongbookViewSet.as_view({"patch": "previous_song"})
-        request = api_factory.patch(
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.patch(
             reverse(
                 "songbook-previous-song",
                 kwargs={"session_key": session_key},
-            ),
+            )
         )
-        force_authenticate(request, user=self.user)
-
-        # Act
-        response = view(request, session_key=session_key)
         self.nonempty_songbook.refresh_from_db()
 
         # Assert
@@ -170,20 +186,27 @@ class TestSongbookView(TestCase):
     def test_next_song_failure_with_nonempty_songbook(self):
         # Arrange
         session_key = self.nonempty_songbook.session_key
-        api_factory = APIRequestFactory()
-        view = SongbookViewSet.as_view({"patch": "next_song"})
-        request = api_factory.patch(
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        self.client.patch(
             reverse(
                 "songbook-next-song",
                 kwargs={"session_key": session_key},
-            ),
+            )
         )
-        force_authenticate(request, user=self.user)
-
-        # Act
-        view(request, session_key=session_key)
-        view(request, session_key=session_key)
-        response = view(request, session_key=session_key)
+        self.client.patch(
+            reverse(
+                "songbook-next-song",
+                kwargs={"session_key": session_key},
+            )
+        )
+        response = self.client.patch(
+            reverse(
+                "songbook-next-song",
+                kwargs={"session_key": session_key},
+            )
+        )
         self.nonempty_songbook.refresh_from_db()
 
         # Assert
@@ -195,18 +218,15 @@ class TestSongbookView(TestCase):
     def test_previous_song_failure_with_nonempty_songbook(self):
         # Arrange
         session_key = self.nonempty_songbook.session_key
-        api_factory = APIRequestFactory()
-        view = SongbookViewSet.as_view({"patch": "previous_song"})
-        request = api_factory.patch(
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.patch(
             reverse(
                 "songbook-previous-song",
                 kwargs={"session_key": session_key},
-            ),
+            )
         )
-        force_authenticate(request, user=self.user)
-
-        # Act
-        response = view(request, session_key=session_key)
         self.nonempty_songbook.refresh_from_db()
 
         # Assert
@@ -215,23 +235,99 @@ class TestSongbookView(TestCase):
         )
         self.assertEqual(response.status_code, 409)
 
+    def test_next_song_failure_with_unowned_songbook(self):
+        # Arrange
+        session_key = self.not_my_songbook.session_key
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.patch(
+            reverse(
+                "songbook-next-song",
+                kwargs={"session_key": session_key},
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_previous_song_failure_with_unowned_songbook(self):
+        # Arrange
+        session_key = self.not_my_songbook.session_key
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.patch(
+            reverse(
+                "songbook-previous-song",
+                kwargs={"session_key": session_key},
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_next_song_failure_with_participant_songbook(self):
+        # Arrange
+        session_key = self.participant_songbook.session_key
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.patch(
+            reverse(
+                "songbook-next-song",
+                kwargs={"session_key": session_key},
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_previous_song_failure_with_participant_songbook(self):
+        # Arrange
+        session_key = self.participant_songbook.session_key
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.patch(
+            reverse(
+                "songbook-previous-song",
+                kwargs={"session_key": session_key},
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
     def test_songbook_details(self):
         # Arrange
         session_key = self.nonempty_songbook.session_key
-        api_factory = APIRequestFactory()
-        view = SongbookViewSet.as_view({"get": "songbook_details"})
-        request = api_factory.get(
-            reverse(
-                "songbook-details",
-                kwargs={"session_key": session_key},
-            ),
-        )
-        force_authenticate(request, user=self.user)
+        self.client.force_authenticate(user=self.user)
 
         # Act
         with self.assertNumQueries(3):
-            response = view(request, session_key=session_key)
+            response = self.client.get(
+                reverse(
+                    "songbook-details",
+                    kwargs={"session_key": session_key},
+                ),
+            )
 
         # Assert
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["song_entries"]), 3)
+
+    def test_songbook_create(self):
+        # Arrange
+        session_key = self.nonempty_songbook.session_key
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.post(
+            reverse(
+                "songbook-list",
+            ),
+            data={"session_key": "newlist", "title": "my title"},
+        )
+
+        # Assert
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(
+            self.user.id, Songbook.objects.get(session_key="newlist").members.first().id
+        )

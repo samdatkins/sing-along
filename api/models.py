@@ -1,5 +1,6 @@
 from operator import attrgetter
 
+from django.contrib.auth import get_user_model
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.db.models import Q
@@ -37,6 +38,7 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
     songs = models.ManyToManyField(
         "Song", related_name="songboooks", through="SongEntry"
     )
+    members = models.ManyToManyField(get_user_model(), through="Membership")
 
     def get_next_song_entry(self):
         current_song_entry = self.get_current_song_entry()
@@ -154,3 +156,15 @@ class SongEntry(SafeDeleteModel, CreatedUpdated):
         max_digits=8, decimal_places=2, null=True, blank=True
     )
     is_flagged = models.BooleanField(null=True, blank=True)
+
+
+class Membership(SafeDeleteModel, CreatedUpdated):
+    class MemberType(models.TextChoices):
+        OWNER = "OW"
+        PARTICIPANT = "PT"
+
+    songbook = models.ForeignKey(Songbook, on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    type = models.CharField(
+        max_length=2, choices=MemberType.choices, default=MemberType.PARTICIPANT
+    )

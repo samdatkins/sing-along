@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from .models import Song, Songbook, SongEntry
+from .models import Membership, Song, Songbook, SongEntry
+
+
+class MembershipInline(admin.TabularInline):
+    model = Membership
+    extra = 1
 
 
 class SongAdmin(admin.ModelAdmin):
@@ -9,8 +14,10 @@ class SongAdmin(admin.ModelAdmin):
 
 
 class SongbookAdmin(admin.ModelAdmin):
+    list_filter = ["members"]
     list_display = ("session_key", "title", "is_noodle_mode")
     search_fields = ("session_key", "title")
+    inlines = (MembershipInline,)
 
 
 class SongEntryAdmin(admin.ModelAdmin):
