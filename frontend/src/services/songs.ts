@@ -5,7 +5,17 @@ import {
   Songbook,
   SongbookDetails,
   SongEntry,
+  User,
 } from "../models";
+
+export async function getUserDetails() {
+  try {
+    return await axios.get<User>(`/api/users/`);
+  } catch (error) {
+    console.error(`Couldn't retrieve user details: ${error}`);
+    return false;
+  }
+}
 
 export async function getCurrentSong(sessionKey: string | undefined) {
   return await axios.get<Songbook>(`/api/songbooks/${sessionKey}/`);
@@ -13,7 +23,7 @@ export async function getCurrentSong(sessionKey: string | undefined) {
 
 export async function getSongbookDetails(sessionKey: string | undefined) {
   return await axios.get<SongbookDetails>(
-    `/api/songbooks/${sessionKey}/details/`
+    `/api/songbooks/${sessionKey}/details/`,
   );
 }
 
@@ -37,7 +47,7 @@ export async function createNewSongbook(
   sessionKey: string | undefined,
   maxActiveSongs: string | undefined,
   songbookTitle: string | undefined,
-  isNoodleMode: boolean | undefined
+  isNoodleMode: boolean | undefined,
 ) {
   try {
     await axios.post<Songbook>(`/api/songbooks/`, {
@@ -56,7 +66,7 @@ export async function createNewSongbook(
 
 export async function setSongbookSong(
   sessionKey: string | undefined,
-  songCreatedTime: string | undefined
+  songCreatedTime: string | undefined,
 ) {
   if (!sessionKey || !songCreatedTime) return;
 
@@ -115,7 +125,7 @@ export async function searchForSong(q: string) {
 
 export async function addSongToSongbook(
   song?: Song | undefined,
-  songbookId?: number
+  songbookId?: number,
 ) {
   try {
     return await axios.post<SongEntry>(`/api/song_entries/`, {

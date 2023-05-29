@@ -1,45 +1,70 @@
 import {
-  Box,
   Button,
   Flex,
-  ListItem,
+  Image,
+  Skeleton,
+  SkeletonCircle,
+  Stack,
   Text,
-  UnorderedList,
 } from "@chakra-ui/react";
+import { useAsync } from "react-async-hook";
 import { Link } from "react-router-dom";
+import { getUserDetails } from "../services/songs";
 
 export default function UserProfile() {
+  const asyncUser = useAsync(getUserDetails, []);
+  const user = asyncUser.result && asyncUser.result.data;
+  const joinedDate =
+    user && user.date_joined
+      ? new Date(user?.date_joined)
+      : new Date(Date.now());
   return (
     <>
-      <Text
-        fontSize="3rem"
-        align="center"
-        fontFamily="Ubuntu Mono"
-        color="blue.600"
-        pt="2rem"
-        pb="2rem"
-      >
-        Your User Profile
-      </Text>
-      <Flex justifyContent="center">
-        <Box>
-          <Text mb="1rem" fontFamily="Ubuntu Mono" fontSize="1.5rem">
-            Upcoming personalizations:
-          </Text>
-          <UnorderedList mb="2rem" alignItems="center">
-            <ListItem>Toggle Night Mode</ListItem>
-            <ListItem>Toggle Chord Display</ListItem>
-            <ListItem>Set 1, 2, or 3 Columns</ListItem>
-            <ListItem>Your Requested Songs</ListItem>
-            <ListItem>Your Songbooks</ListItem>
-          </UnorderedList>
-          <Flex justifyContent="center">
+      {user ? (
+        <>
+          <Flex direction="column" justifyContent="center">
+            <Text
+              fontSize="3rem"
+              align="center"
+              fontFamily="Ubuntu Mono"
+              color="blue.600"
+              pt="2rem"
+              pb="2rem"
+            >
+              {user?.first_name} {user?.last_name}'s Profile
+            </Text>
+          </Flex>
+          <Flex direction="column" alignItems="center">
+            <Image
+              referrerPolicy="no-referrer"
+              src={user?.social.picture}
+              rounded="100%"
+            />
+            <Text>
+              {user?.first_name} {user?.last_name}
+            </Text>
+            <Text>{user?.email}</Text>
+            <Text>Joined on {joinedDate.toDateString()}</Text>
             <Link to="/live">
-              <Button colorScheme="blue">Back to Home</Button>
+              <Button mt="20px" colorScheme="blue">
+                Back to Home
+              </Button>
             </Link>
           </Flex>
-        </Box>
-      </Flex>
+        </>
+      ) : (
+        <>
+          <Flex direction="column" alignItems="center" mt="70px">
+            <Stack width="80%" alignSelf="center">
+              <Skeleton height="50px" mt="20px" />
+              <SkeletonCircle alignSelf="center" size="10" />
+              <Skeleton height="20px" />
+              <Skeleton height="20px" />
+              <Skeleton height="20px" />
+            </Stack>
+          </Flex>
+        </>
+      )}
     </>
   );
 }
