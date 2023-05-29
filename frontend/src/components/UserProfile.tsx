@@ -1,10 +1,18 @@
-import { Avatar, Button, Center, Flex, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Image,
+  Skeleton,
+  SkeletonCircle,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { useAsync } from "react-async-hook";
 import { Link } from "react-router-dom";
 import { getUserDetails } from "../services/songs";
 
 export default function UserProfile() {
-  const asyncUser = useAsync(async () => getUserDetails(), []);
+  const asyncUser = useAsync(getUserDetails, []);
   const user = asyncUser.result && asyncUser.result.data;
   const joinedDate =
     user && user.date_joined
@@ -14,7 +22,7 @@ export default function UserProfile() {
     <>
       {user ? (
         <>
-          <Flex direction="row" justifyContent="center">
+          <Flex direction="column" justifyContent="center">
             <Text
               fontSize="3rem"
               align="center"
@@ -26,26 +34,36 @@ export default function UserProfile() {
               {user?.first_name} {user?.last_name}'s Profile
             </Text>
           </Flex>
-          <Center>
-            <Avatar
+          <Flex direction="column" alignItems="center">
+            <Image
               referrerPolicy="no-referrer"
-              size="xl"
-              name={`${user?.first_name} ${user?.last_name}`}
               src={user?.social.picture}
+              rounded="100%"
             />
-          </Center>
-          <Center>{user?.email}</Center>
-          <Center>Member since {joinedDate.toDateString()}</Center>
-          <Center>
+            <Text>
+              {user?.first_name} {user?.last_name}
+            </Text>
+            <Text>{user?.email}</Text>
+            <Text>Joined on {joinedDate.toDateString()}</Text>
             <Link to="/live">
               <Button mt="20px" colorScheme="blue">
                 Back to Home
               </Button>
             </Link>
-          </Center>
+          </Flex>
         </>
       ) : (
-        <></>
+        <>
+          <Flex direction="column" alignItems="center" mt="70px">
+            <Stack width="80%" alignSelf="center">
+              <Skeleton height="50px" mt="20px" />
+              <SkeletonCircle alignSelf="center" size="10" />
+              <Skeleton height="20px" />
+              <Skeleton height="20px" />
+              <Skeleton height="20px" />
+            </Stack>
+          </Flex>
+        </>
       )}
     </>
   );
