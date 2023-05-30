@@ -41,11 +41,9 @@ export default function UserProfile() {
   );
 
   const handleColumnSwitch = () => {
-    console.log("fired columns");
     toggleUserColumnsDisplay(columns);
   };
   const handleChordSwitch = () => {
-    console.log("fired chords");
     toggleUserChordsDisplay(showingChords);
   };
 
