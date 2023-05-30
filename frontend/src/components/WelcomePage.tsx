@@ -1,11 +1,5 @@
-import {
-  Alert,
-  AlertIcon,
-  Button,
-  Flex,
-  Heading,
-  Text,
-} from "@chakra-ui/react";
+import { WarningIcon } from "@chakra-ui/icons";
+import { Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { useAsync } from "react-async-hook";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllSongbooks, getUserDetails } from "../services/songs";
@@ -40,25 +34,22 @@ export default function WelcomePage() {
           </Text>
           {user && <Heading size="md">Welcome, {user?.first_name}!</Heading>}
           <Link to={`/live/profile/`}>
-            <Button margin="2rem" colorScheme="blue">
+            <Button margin="1rem" colorScheme="blue">
               Profile
             </Button>
           </Link>
           {activePowerHours &&
             activePowerHours.map((songbook) => (
-              <Alert
+              <Button
                 key={songbook.session_key}
                 margin="1rem"
-                status="warning"
+                leftIcon={<WarningIcon />}
+                colorScheme="yellow"
                 textAlign="center"
-                width="28rem"
-                padding="2rem"
-                cursor="pointer"
                 onClick={() => navigate(`/live/${songbook.session_key}`)}
               >
-                <AlertIcon key={songbook.id} />
-                Return to power hour: {songbook.title}
-              </Alert>
+                "{songbook.title}" is live!
+              </Button>
             ))}
           <Text
             mb="1rem"
