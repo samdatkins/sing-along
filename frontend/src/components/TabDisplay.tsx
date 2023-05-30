@@ -1,8 +1,8 @@
 import { Flex, Text, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
-import transposer from "./transposer";
 import { formatTab, splitTabIntoColumns } from "../helpers/tab";
 import { LINES_PER_COLUMN } from "../models";
+import transposer from "./transposer";
 
 interface TabDisplayProps {
   tab: string | false | undefined;
@@ -37,7 +37,7 @@ export default function TabDisplay({
         setUsesSharps(!usesSharps);
       }
     },
-    [handleTransposeChange, usesSharps, setUsesSharps]
+    [handleTransposeChange, usesSharps, setUsesSharps],
   );
 
   useEffect(() => {
@@ -110,8 +110,9 @@ function TabWithChords({
       {tabToDisplay &&
         tabToDisplay
           // .slice(firstColDispIndex, firstColDispIndex + columnsToDisplay)
-          .map((column) => (
+          .map((column, idx) => (
             <Text
+              key={idx}
               as="pre"
               style={{ fontSize: "1rem", fontFamily: "Ubuntu Mono" }}
               w={`${100 / columnsToDisplay}%`}

@@ -13,15 +13,15 @@ export default function SongbookIndexTable({ songbooks }) {
   return (
     <Tabs isFitted variant="enclosed-colored" width="26rem">
       <TabList>
-        <Tab>Power Hour</Tab>
-        <Tab>Noodle Mode</Tab>
+        <Tab>Songbooks</Tab>
+        <Tab>Power Hours</Tab>
       </TabList>
       <TabPanels>
         <TabPanel>
           <UnorderedList>
             {songbooks &&
               songbooks
-                .filter(({ is_noodle_mode }) => !is_noodle_mode)
+                .filter(({ is_noodle_mode }) => is_noodle_mode)
                 .map(({ title, session_key }) => (
                   <ListItem key={session_key}>
                     <Link to={`/live/${session_key}/`}>{title}</Link>
@@ -33,7 +33,7 @@ export default function SongbookIndexTable({ songbooks }) {
           <UnorderedList>
             {songbooks &&
               songbooks
-                .filter(({ is_noodle_mode }) => is_noodle_mode)
+                .filter(({ is_noodle_mode }) => !is_noodle_mode)
                 .map(({ title, session_key }) => (
                   <ListItem key={session_key}>
                     <Link to={`/live/${session_key}/`}>{title}</Link>
