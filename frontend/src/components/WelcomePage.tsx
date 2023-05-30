@@ -1,4 +1,11 @@
-import { Alert, Button, Center, Flex, Text } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertIcon,
+  Button,
+  Flex,
+  Heading,
+  Text,
+} from "@chakra-ui/react";
 import { useAsync } from "react-async-hook";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllSongbooks, getUserDetails } from "../services/songs";
@@ -15,7 +22,7 @@ export default function WelcomePage() {
   const navigate = useNavigate();
   return (
     <>
-      <pre>{JSON.stringify(liveSongbooks, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(liveSongbooks, null, 2)}</pre> */}
       <Flex justifyContent="center">
         <Flex alignItems="center" direction="column">
           <Text
@@ -27,7 +34,12 @@ export default function WelcomePage() {
           >
             livepowerhour.com
           </Text>
-          {user && <Center>Welcome, {user?.first_name}!</Center>}
+          {user && <Heading size="md">Welcome, {user?.first_name}!</Heading>}
+          <Link to={`/live/profile/`}>
+            <Button margin="2rem" colorScheme="blue">
+              Profile
+            </Button>
+          </Link>
           {liveSongbooks &&
             liveSongbooks.length &&
             liveSongbooks.map((songbook) => (
@@ -40,7 +52,8 @@ export default function WelcomePage() {
                 cursor="pointer"
                 onClick={() => navigate("/live/sams-test")}
               >
-                Return to your recent power hour: {songbook.title}
+                <AlertIcon />
+                Return to power hour: {songbook.title}
               </Alert>
             ))}
           <Text
