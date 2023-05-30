@@ -17,6 +17,30 @@ export async function getUserDetails() {
   }
 }
 
+export async function toggleUserChordsDisplay(isShowingChords) {
+  try {
+    await axios.patch<User>(`/api/users/`, {
+      is_showing_chords: isShowingChords,
+    });
+  } catch (error) {
+    console.error(
+      `Couldn't toggle user's chords display preferences: ${error}`,
+    );
+  }
+}
+
+export async function toggleUserColumnsDisplay(columnsToDisplay) {
+  try {
+    await axios.patch<User>(`/api/users/`, {
+      columns_to_display: columnsToDisplay,
+    });
+  } catch (error) {
+    console.error(
+      `Couldn't toggle user's columns display preferences: ${error}`,
+    );
+  }
+}
+
 export async function getCurrentSong(sessionKey: string | undefined) {
   return await axios.get<Songbook>(`/api/songbooks/${sessionKey}/`);
 }

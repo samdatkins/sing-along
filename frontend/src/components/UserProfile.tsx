@@ -14,7 +14,11 @@ import {
 import { useState } from "react";
 import { useAsync } from "react-async-hook";
 import { Link } from "react-router-dom";
-import { getUserDetails } from "../services/songs";
+import {
+  getUserDetails,
+  toggleUserChordsDisplay,
+  toggleUserColumnsDisplay,
+} from "../services/songs";
 
 export default function UserProfile() {
   const asyncUser = useAsync(getUserDetails, []);
@@ -35,6 +39,15 @@ export default function UserProfile() {
   const [columns, setColumns] = useState<number>(
     newUserProperties.columns_to_display,
   );
+
+  const handleColumnSwitch = () => {
+    console.log("fired columns");
+    toggleUserColumnsDisplay(columns);
+  };
+  const handleChordSwitch = () => {
+    console.log("fired chords");
+    toggleUserChordsDisplay(showingChords);
+  };
 
   return (
     <>
@@ -79,7 +92,10 @@ export default function UserProfile() {
                 <Switch
                   id="show-chords"
                   isChecked={showingChords}
-                  onChange={() => setShowingChords(!showingChords)}
+                  onChange={() => {
+                    setShowingChords(!showingChords);
+                    handleChordSwitch();
+                  }}
                 />
               </Flex>
               <Flex
@@ -100,6 +116,7 @@ export default function UserProfile() {
                     } else {
                       setColumns(2);
                     }
+                    handleColumnSwitch();
                   }}
                 />
               </Flex>
