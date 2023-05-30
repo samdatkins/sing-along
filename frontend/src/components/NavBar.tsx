@@ -11,8 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ApplicationState,
   AppStateToTimerMap,
+  ApplicationState,
   LINES_PER_COLUMN,
   Songbook,
 } from "../models";
@@ -26,11 +26,11 @@ import {
   useOutlet,
   useParams,
 } from "react-router-dom";
+import { countTabColumns } from "../helpers/tab";
 import { nextSongbookSong } from "../services/songs";
+import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
 import Timer from "./Timer";
-import { countTabColumns } from "../helpers/tab";
-import ColumnMap from "./ColumnMap";
 
 interface NavBarProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
@@ -62,7 +62,7 @@ export default function NavBar({
   // state for length of countdown timer in seconds
   const navigate = useNavigate();
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
-    AppStateToTimerMap[applicationState]
+    AppStateToTimerMap[applicationState],
   );
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
@@ -77,12 +77,12 @@ export default function NavBar({
     () =>
       countTabColumns(
         asyncSongbook.result?.data?.current_song_entry?.song?.content,
-        LINES_PER_COLUMN
+        LINES_PER_COLUMN,
       ),
     [
       asyncSongbook.result?.data?.current_song_entry?.song?.content,
       LINES_PER_COLUMN,
-    ]
+    ],
   );
 
   const timerControls = {
@@ -181,18 +181,22 @@ export default function NavBar({
               >
                 <Link
                   fontWeight="bold"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   href={currentSongbook.current_song_entry?.song.url}
                 >
                   "{currentSongbook.current_song_entry?.song.title}" by{" "}
                   {currentSongbook.current_song_entry?.song.artist}
                 </Link>{" "}
               </Text>
-              <Text align="center" fontSize="1.5xl">
-                {currentSongbook.title}
-                {" - "} ({"song "}
-                {currentSongbook.current_song_position} of{" "}
-                {currentSongbook.total_songs})
-              </Text>
+              <RouterLink to={`/live/${currentSongbook.session_key}/list`}>
+                <Text align="center" fontSize="1.5xl">
+                  {currentSongbook.title}
+                  {" - "} ({"song "}
+                  {currentSongbook.current_song_position} of{" "}
+                  {currentSongbook.total_songs})
+                </Text>
+              </RouterLink>
             </>
           ) : (
             <Skeleton
