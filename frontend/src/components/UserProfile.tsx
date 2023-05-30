@@ -1,12 +1,17 @@
 import {
   Button,
   Flex,
+  FormLabel,
+  Heading,
   Image,
   Skeleton,
   SkeletonCircle,
   Stack,
+  Switch,
   Text,
+  useColorMode,
 } from "@chakra-ui/react";
+import { useState } from "react";
 import { useAsync } from "react-async-hook";
 import { Link } from "react-router-dom";
 import { getUserDetails } from "../services/songs";
@@ -18,6 +23,19 @@ export default function UserProfile() {
     user && user.date_joined
       ? new Date(user?.date_joined)
       : new Date(Date.now());
+  const newUserProperties = {
+    is_night_mode: false,
+    is_showing_chords: true,
+    columns_to_display: 2,
+  };
+  const { colorMode, toggleColorMode } = useColorMode();
+  const [showingChords, setShowingChords] = useState<boolean>(
+    newUserProperties.is_showing_chords,
+  );
+  const [columns, setColumns] = useState<number>(
+    newUserProperties.columns_to_display,
+  );
+
   return (
     <>
       {user ? (
@@ -45,6 +63,64 @@ export default function UserProfile() {
             </Text>
             <Text>{user?.email}</Text>
             <Text>Joined on {joinedDate.toDateString()}</Text>
+            <Heading margin="1rem" mt="2rem" textAlign="center" size="lg">
+              Preferences
+            </Heading>
+            <Flex direction="column" alignItems="space-between" width="200px">
+              <Flex
+                direction="row"
+                margin="1rem"
+                justifyContent="space-between"
+              >
+                <FormLabel htmlFor="show-chords" mb="0">
+                  {showingChords && <>Showing chords</>}
+                  {!showingChords && <>Hiding chords</>}
+                </FormLabel>
+                <Switch
+                  id="show-chords"
+                  isChecked={showingChords}
+                  onChange={() => setShowingChords(!showingChords)}
+                />
+              </Flex>
+              <Flex
+                direction="row"
+                margin="1rem"
+                justifyContent="space-between"
+              >
+                <FormLabel htmlFor="number-of-columns" mb="0">
+                  {columns === 1 && <>Single column</>}
+                  {columns === 2 && <>Two columns</>}
+                </FormLabel>
+                <Switch
+                  id="number-of-columns"
+                  isChecked={columns > 1}
+                  onChange={() => {
+                    if (columns > 1) {
+                      setColumns(1);
+                    } else {
+                      setColumns(2);
+                    }
+                  }}
+                />
+              </Flex>
+              <Flex
+                direction="row"
+                margin="1rem"
+                justifyContent="space-between"
+              >
+                <FormLabel htmlFor="night-mode" mb="0">
+                  {colorMode === "light" && <>Day mode</>}
+                  {colorMode === "dark" && <>Night mode</>}
+                </FormLabel>
+                <Switch
+                  id="night-mode"
+                  isChecked={colorMode !== "light"}
+                  onChange={() => {
+                    toggleColorMode();
+                  }}
+                />
+              </Flex>
+            </Flex>
             <Link to="/live">
               <Button mt="20px" colorScheme="blue">
                 Back to Home
