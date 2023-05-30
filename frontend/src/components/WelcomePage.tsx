@@ -16,13 +16,17 @@ export default function WelcomePage() {
   const songbooks = asyncSongbooks.result?.data.results;
   const asyncUser = useAsync(async () => getUserDetails(), []);
   const user = asyncUser.result && asyncUser.result.data;
-  const liveSongbooks = songbooks?.filter(
-    (songbook) => songbook.is_noodle_mode === false,
-  );
+  const activePowerHours = songbooks?.filter((songbook) => {
+    const currentTime = new Date(Date.now()).getTime();
+    const songbookTime = new Date(songbook["current_song_timestamp"]).getTime();
+    return (
+      songbook.is_noodle_mode === false &&
+      (currentTime - songbookTime) / (1000 * 60 * 60) < 8
+    );
+  });
   const navigate = useNavigate();
   return (
     <>
-      {/* <pre>{JSON.stringify(liveSongbooks, null, 2)}</pre> */}
       <Flex justifyContent="center">
         <Flex alignItems="center" direction="column">
           <Text
@@ -40,19 +44,19 @@ export default function WelcomePage() {
               Profile
             </Button>
           </Link>
-          {liveSongbooks &&
-            liveSongbooks.length &&
-            liveSongbooks.map((songbook) => (
+          {activePowerHours &&
+            activePowerHours.map((songbook) => (
               <Alert
+                key={songbook.session_key}
                 margin="1rem"
                 status="warning"
                 textAlign="center"
                 width="28rem"
                 padding="2rem"
                 cursor="pointer"
-                onClick={() => navigate("/live/sams-test")}
+                onClick={() => navigate(`/live/${songbook.session_key}`)}
               >
-                <AlertIcon />
+                <AlertIcon key={songbook.id} />
                 Return to power hour: {songbook.title}
               </Alert>
             ))}
@@ -67,7 +71,9 @@ export default function WelcomePage() {
           </Text>
           <SongbookIndexTable songbooks={songbooks} />
           <Link to={`/live/createsongbook/`}>
-            <Button colorScheme="blue">Create a New Songbook</Button>
+            <Button margin="2rem" colorScheme="blue">
+              Create a New Songbook
+            </Button>
           </Link>
         </Flex>
       </Flex>

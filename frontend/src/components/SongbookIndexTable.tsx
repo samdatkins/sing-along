@@ -47,7 +47,7 @@ export default function SongbookIndexTable({ songbooks }) {
               songbooks
                 .filter(({ is_noodle_mode }) => !is_noodle_mode)
                 .map(({ title, session_key }) => (
-                  <ListItem>
+                  <ListItem key={session_key}>
                     <Link to={`/live/${session_key}/`}>{title}</Link>
                   </ListItem>
                 ))}
