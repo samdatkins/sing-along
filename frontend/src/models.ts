@@ -54,6 +54,12 @@ export type DjangoPaginatedResponse<T> = {
   results: T[];
 };
 
+export type UserProfile = {
+  is_showing_chords: boolean;
+  columns_to_display: number;
+  is_day_mode: boolean;
+};
+
 export type User = {
   id: number;
   first_name: string;
@@ -64,6 +70,7 @@ export type User = {
   };
   last_login: string;
   date_joined: string;
+  userprofile: UserProfile;
 };
 
 export type ChakraAlertStatus =

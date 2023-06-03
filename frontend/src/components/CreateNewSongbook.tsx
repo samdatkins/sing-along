@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { createNewSongbook } from "../services/songs";
 
 export default function CreateNewSongbook() {
-  const [key, setKey] = useState("");
   const [maxSongs, setMaxSongs] = useState("");
   const [title, setTitle] = useState("");
   const [noodleMode, setNoodleMode] = useState(false);
@@ -22,15 +21,6 @@ export default function CreateNewSongbook() {
             value={title}
             onChange={(e) =>
               e.target.value.length <= 40 && setTitle(e.target.value)
-            }
-          />
-        </Text>
-        <Text mb="1rem">
-          Session Key (<i>alphanumeric plus dashes</i>):
-          <Input
-            value={key}
-            onChange={(e) =>
-              e.target.value.length <= 20 && setKey(e.target.value)
             }
           />
         </Text>
@@ -54,20 +44,13 @@ export default function CreateNewSongbook() {
         </Text>
         <Button
           disabled={
-            key.length < 1 ||
-            title.length < 1 ||
-            (maxSongs.length > 0 && isNaN(parsedSongCap))
+            title.length < 1 || (maxSongs.length > 0 && isNaN(parsedSongCap))
           }
           onClick={async (e) => {
             e.preventDefault();
-            const result = await createNewSongbook(
-              key,
-              maxSongs,
-              title,
-              noodleMode,
-            );
-            if (result === true) {
-              navigate(`/live/${key}`);
+            const result = await createNewSongbook(maxSongs, title, noodleMode);
+            if (result !== false) {
+              navigate(`/live/${result.data.session_key}`);
             } else {
               console.log("Couldn't create new songbook.");
             }

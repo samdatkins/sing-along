@@ -1,15 +1,15 @@
 import { WarningIcon } from "@chakra-ui/icons";
-import { Button, Flex, Heading, Text } from "@chakra-ui/react";
+import { Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
+import { useState } from "react";
 import { useAsync } from "react-async-hook";
 import { Link, useNavigate } from "react-router-dom";
-import { getAllSongbooks, getUserDetails } from "../services/songs";
+import { getAllSongbooks } from "../services/songs";
 import SongbookIndexTable from "./SongbookIndexTable";
 
 export default function WelcomePage() {
+  const [sessionKey, setSessionKey] = useState<string>("");
   const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
   const songbooks = asyncSongbooks.result?.data.results;
-  const asyncUser = useAsync(async () => getUserDetails(), []);
-  const user = asyncUser.result && asyncUser.result.data;
   const activePowerHours = songbooks?.filter((songbook) => {
     const currentTime = new Date(Date.now()).getTime();
     const songbookTime = new Date(songbook["current_song_timestamp"]).getTime();
@@ -19,6 +19,7 @@ export default function WelcomePage() {
     );
   });
   const navigate = useNavigate();
+
   return (
     <>
       <Flex justifyContent="center">
@@ -32,17 +33,24 @@ export default function WelcomePage() {
           >
             livepowerhour.com
           </Text>
-          {user && <Heading size="md">Welcome, {user?.first_name}!</Heading>}
-          <Link to={`/live/profile/`}>
-            <Button margin="1rem" colorScheme="blue">
-              Profile
-            </Button>
-          </Link>
+          <Flex direction="column" mb="2rem">
+            <Heading textAlign="center">Join a Power Hour:</Heading>
+            <Flex direction="row">
+              <Input
+                value={sessionKey}
+                mr="1rem"
+                onChange={(e) => setSessionKey(e.target.value)}
+              ></Input>
+              <Button onClick={() => navigate(`/live/${sessionKey}`)}>
+                Join
+              </Button>
+            </Flex>
+          </Flex>
           {activePowerHours &&
             activePowerHours.map((songbook) => (
               <Button
                 key={songbook.session_key}
-                margin="1rem"
+                margin="2rem"
                 leftIcon={<WarningIcon />}
                 colorScheme="yellow"
                 textAlign="center"

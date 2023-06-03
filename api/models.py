@@ -177,3 +177,10 @@ class Membership(SafeDeleteModel, CreatedUpdated):
     type = models.CharField(
         max_length=2, choices=MemberType.choices, default=MemberType.PARTICIPANT
     )
+
+
+class UserProfile(SafeDeleteModel, CreatedUpdated):
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+    is_showing_chords = models.BooleanField(blank=True, null=False, default=True)
+    columns_to_display = models.IntegerField(blank=True, null=False, default=1)
+    is_day_mode = models.BooleanField(blank=True, null=False, default=True)
