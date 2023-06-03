@@ -17,7 +17,7 @@ import { Link } from "react-router-dom";
 import {
   getUserDetails,
   toggleUserChordsDisplay,
-  toggleUserColumnsDisplay,
+  setUserColumnsDisplay,
 } from "../services/songs";
 
 export default function UserProfile() {
@@ -41,7 +41,7 @@ export default function UserProfile() {
   );
 
   const handleColumnSwitch = () => {
-    toggleUserColumnsDisplay(columns);
+    setUserColumnsDisplay(columns);
   };
   const handleChordSwitch = () => {
     toggleUserChordsDisplay(showingChords);

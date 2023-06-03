@@ -17,7 +17,7 @@ export async function getUserDetails() {
   }
 }
 
-export async function toggleUserChordsDisplay(isShowingChords) {
+export async function toggleUserChordsDisplay(isShowingChords: boolean) {
   try {
     await axios.patch<User>(`/api/users/`, {
       is_showing_chords: isShowingChords,
@@ -29,14 +29,14 @@ export async function toggleUserChordsDisplay(isShowingChords) {
   }
 }
 
-export async function toggleUserColumnsDisplay(columnsToDisplay) {
+export async function setUserColumnsDisplay(columnsToDisplay: number) {
   try {
     await axios.patch<User>(`/api/users/`, {
       columns_to_display: columnsToDisplay,
     });
   } catch (error) {
     console.error(
-      `Couldn't toggle user's columns display preferences: ${error}`,
+      `Couldn't set user's columns display preferences: ${error}`,
     );
   }
 }
