@@ -39,7 +39,8 @@ export default function WelcomePage() {
               <Input
                 value={sessionKey}
                 mr="1rem"
-                onChange={(e) => setSessionKey(e.target.value)}
+                maxLength={4}
+                onChange={(e) => setSessionKey(e.target.value.toUpperCase())}
               ></Input>
               <Button onClick={() => navigate(`/live/${sessionKey}`)}>
                 Join

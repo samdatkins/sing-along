@@ -4,9 +4,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.db.models import Q
+from django.utils.crypto import get_random_string
 from safedelete.config import SOFT_DELETE_CASCADE
 from safedelete.models import SafeDeleteModel
-from django.utils.crypto import get_random_string
+
 
 class CreatedUpdated(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -18,7 +19,8 @@ class CreatedUpdated(models.Model):
 
 class Songbook(SafeDeleteModel, CreatedUpdated):
     def _generate_session_key(self):
-        return get_random_string(length=32).upper()
+        return get_random_string(length=4).upper()
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -29,7 +31,9 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
         ]
 
     _safedelete_policy = SOFT_DELETE_CASCADE
-    session_key = models.CharField(max_length=6, null=False, blank=True, default=_generate_session_key)
+    session_key = models.CharField(
+        max_length=4, null=False, blank=True, default=_generate_session_key
+    )
     current_song_timestamp = models.DateTimeField(
         null=False, blank=True, auto_now_add=True
     )
