@@ -11,13 +11,13 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { Link } from "react-router-dom";
 import {
   getUserDetails,
-  toggleUserChordsDisplay,
   setUserColumnsDisplay,
+  toggleUserChordsDisplay,
 } from "../services/songs";
 
 export default function UserProfile() {
@@ -27,25 +27,15 @@ export default function UserProfile() {
     user && user.date_joined
       ? new Date(user?.date_joined)
       : new Date(Date.now());
-  const newUserProperties = {
-    is_night_mode: false,
-    is_showing_chords: true,
-    columns_to_display: 2,
-  };
-  const { colorMode, toggleColorMode } = useColorMode();
-  const [showingChords, setShowingChords] = useState<boolean>(
-    newUserProperties.is_showing_chords,
-  );
-  const [columns, setColumns] = useState<number>(
-    newUserProperties.columns_to_display,
-  );
 
-  const handleColumnSwitch = () => {
-    setUserColumnsDisplay(columns);
-  };
-  const handleChordSwitch = () => {
-    toggleUserChordsDisplay(showingChords);
-  };
+  useEffect(() => {
+    user && setShowingChords(user.userprofile.is_showing_chords);
+    user && setColumns(user.userprofile.columns_to_display);
+  }, [user]);
+
+  const { colorMode, toggleColorMode } = useColorMode();
+  const [showingChords, setShowingChords] = useState<boolean>(false);
+  const [columns, setColumns] = useState<number>(1);
 
   return (
     <>
@@ -91,8 +81,9 @@ export default function UserProfile() {
                   id="show-chords"
                   isChecked={showingChords}
                   onChange={() => {
-                    setShowingChords(!showingChords);
-                    handleChordSwitch();
+                    const newChords = !showingChords;
+                    toggleUserChordsDisplay(newChords);
+                    setShowingChords(newChords);
                   }}
                 />
               </Flex>
@@ -109,12 +100,14 @@ export default function UserProfile() {
                   id="number-of-columns"
                   isChecked={columns > 1}
                   onChange={() => {
+                    let newColumns: number;
                     if (columns > 1) {
-                      setColumns(1);
+                      newColumns = 1;
                     } else {
-                      setColumns(2);
+                      newColumns = 2;
                     }
-                    handleColumnSwitch();
+                    setUserColumnsDisplay(newColumns);
+                    setColumns(newColumns);
                   }}
                 />
               </Flex>

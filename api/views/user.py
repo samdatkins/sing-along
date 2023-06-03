@@ -28,3 +28,4 @@ class UserView(generics.RetrieveUpdateAPIView):
             profile = UserProfile.objects.create(user=user)
 
         return user
+
