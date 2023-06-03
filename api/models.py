@@ -18,7 +18,8 @@ class CreatedUpdated(models.Model):
 
 
 class Songbook(SafeDeleteModel, CreatedUpdated):
-    def _generate_session_key(self):
+    @staticmethod
+    def _generate_session_key():
         return get_random_string(length=4).upper()
 
     class Meta:

@@ -116,10 +116,10 @@ class SongbookViewSet(
             instance.membership_set.get(user=request.user)
         except:
             Membership.objects.create(
-                songbook=songbook,
+                songbook=instance,
                 user=self.request.user,
                 type=Membership.MemberType.PARTICIPANT.value,
-            )    
+            )
 
         return Response(
             status=status.HTTP_200_OK,
