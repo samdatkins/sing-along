@@ -20,7 +20,7 @@ export async function getUserDetails() {
 export async function toggleUserChordsDisplay(isShowingChords: boolean) {
   try {
     await axios.patch<User>(`/api/users/`, {
-      is_showing_chords: isShowingChords,
+      userprofile: {is_showing_chords: isShowingChords},
     });
   } catch (error) {
     console.error(
@@ -32,7 +32,7 @@ export async function toggleUserChordsDisplay(isShowingChords: boolean) {
 export async function setUserColumnsDisplay(columnsToDisplay: number) {
   try {
     await axios.patch<User>(`/api/users/`, {
-      columns_to_display: columnsToDisplay,
+      userprofile: {columns_to_display: columnsToDisplay},
     });
   } catch (error) {
     console.error(
