@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import Q
 from safedelete.config import SOFT_DELETE_CASCADE
 from safedelete.models import SafeDeleteModel
-
+from django.utils.crypto import get_random_string
 
 class CreatedUpdated(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -17,6 +17,8 @@ class CreatedUpdated(models.Model):
 
 
 class Songbook(SafeDeleteModel, CreatedUpdated):
+    def _generate_session_key(self):
+        return get_random_string(length=32).upper()
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -27,7 +29,7 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
         ]
 
     _safedelete_policy = SOFT_DELETE_CASCADE
-    session_key = models.CharField(max_length=20, null=False, blank=False)
+    session_key = models.CharField(max_length=6, null=False, blank=True, default=_generate_session_key)
     current_song_timestamp = models.DateTimeField(
         null=False, blank=True, auto_now_add=True
     )

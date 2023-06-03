@@ -112,6 +112,15 @@ class SongbookViewSet(
     def songbook_details(self, request, session_key=None):
         instance = self.get_object()
 
+        try:
+            instance.membership_set.get(user=request.user)
+        except:
+            Membership.objects.create(
+                songbook=songbook,
+                user=self.request.user,
+                type=Membership.MemberType.PARTICIPANT.value,
+            )    
+
         return Response(
             status=status.HTTP_200_OK,
             data=SongbookDetailSerializer(instance, context={"request": request}).data,
