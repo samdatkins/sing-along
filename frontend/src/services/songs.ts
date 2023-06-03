@@ -66,20 +66,17 @@ export async function nextSongbookSong(sessionKey: string | undefined) {
 }
 
 export async function createNewSongbook(
-  sessionKey: string | undefined,
   maxActiveSongs: string | undefined,
   songbookTitle: string | undefined,
   isNoodleMode: boolean | undefined,
 ) {
   try {
-    await axios.post<Songbook>(`/api/songbooks/`, {
-      session_key: sessionKey,
+    return await axios.post<Songbook>(`/api/songbooks/`, {
       max_active_songs:
         maxActiveSongs && maxActiveSongs.length > 0 ? maxActiveSongs : null,
       title: songbookTitle,
       is_noodle_mode: isNoodleMode,
     });
-    return true;
   } catch (error) {
     console.error(`Couldn't create new songbook: ${error}`);
     return false;
