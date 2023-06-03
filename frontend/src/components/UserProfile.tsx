@@ -1,15 +1,24 @@
 import {
   Button,
   Flex,
+  FormLabel,
+  Heading,
   Image,
   Skeleton,
   SkeletonCircle,
   Stack,
+  Switch,
   Text,
+  useColorMode,
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { Link } from "react-router-dom";
-import { getUserDetails } from "../services/songs";
+import {
+  getUserDetails,
+  setUserColumnsDisplay,
+  toggleUserChordsDisplay,
+} from "../services/songs";
 
 export default function UserProfile() {
   const asyncUser = useAsync(getUserDetails, []);
@@ -18,6 +27,16 @@ export default function UserProfile() {
     user && user.date_joined
       ? new Date(user?.date_joined)
       : new Date(Date.now());
+
+  useEffect(() => {
+    user && setShowingChords(user.userprofile.is_showing_chords);
+    user && setColumns(user.userprofile.columns_to_display);
+  }, [user]);
+
+  const { colorMode, toggleColorMode } = useColorMode();
+  const [showingChords, setShowingChords] = useState<boolean>(false);
+  const [columns, setColumns] = useState<number>(1);
+
   return (
     <>
       {user ? (
@@ -45,6 +64,71 @@ export default function UserProfile() {
             </Text>
             <Text>{user?.email}</Text>
             <Text>Joined on {joinedDate.toDateString()}</Text>
+            <Heading margin="1rem" mt="2rem" textAlign="center" size="lg">
+              Preferences
+            </Heading>
+            <Flex direction="column" alignItems="space-between" width="200px">
+              <Flex
+                direction="row"
+                margin="1rem"
+                justifyContent="space-between"
+              >
+                <FormLabel htmlFor="show-chords" mb="0">
+                  {showingChords && <>Showing chords</>}
+                  {!showingChords && <>Hiding chords</>}
+                </FormLabel>
+                <Switch
+                  id="show-chords"
+                  isChecked={showingChords}
+                  onChange={() => {
+                    const newChords = !showingChords;
+                    toggleUserChordsDisplay(newChords);
+                    setShowingChords(newChords);
+                  }}
+                />
+              </Flex>
+              <Flex
+                direction="row"
+                margin="1rem"
+                justifyContent="space-between"
+              >
+                <FormLabel htmlFor="number-of-columns" mb="0">
+                  {columns === 1 && <>Single column</>}
+                  {columns === 2 && <>Two columns</>}
+                </FormLabel>
+                <Switch
+                  id="number-of-columns"
+                  isChecked={columns > 1}
+                  onChange={() => {
+                    let newColumns: number;
+                    if (columns > 1) {
+                      newColumns = 1;
+                    } else {
+                      newColumns = 2;
+                    }
+                    setUserColumnsDisplay(newColumns);
+                    setColumns(newColumns);
+                  }}
+                />
+              </Flex>
+              <Flex
+                direction="row"
+                margin="1rem"
+                justifyContent="space-between"
+              >
+                <FormLabel htmlFor="night-mode" mb="0">
+                  {colorMode === "light" && <>Day mode</>}
+                  {colorMode === "dark" && <>Night mode</>}
+                </FormLabel>
+                <Switch
+                  id="night-mode"
+                  isChecked={colorMode !== "light"}
+                  onChange={() => {
+                    toggleColorMode();
+                  }}
+                />
+              </Flex>
+            </Flex>
             <Link to="/live">
               <Button mt="20px" colorScheme="blue">
                 Back to Home

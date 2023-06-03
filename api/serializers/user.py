@@ -1,11 +1,13 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from api.serializers.user_profile import UserProfileSerializer
 from api.serializers.user_social_auth import UserSocialAuthSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
     social = serializers.SerializerMethodField()
+    userprofile = UserProfileSerializer()
 
     class Meta:
         model = get_user_model()
@@ -17,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
             "social",
             "last_login",
             "date_joined",
+            "userprofile",
         ]
 
     def get_social(self, obj):

@@ -17,6 +17,28 @@ export async function getUserDetails() {
   }
 }
 
+export async function toggleUserChordsDisplay(isShowingChords: boolean) {
+  try {
+    await axios.patch<User>(`/api/user_profiles/`, {
+      is_showing_chords: isShowingChords,
+    });
+  } catch (error) {
+    console.error(
+      `Couldn't toggle user's chords display preferences: ${error}`,
+    );
+  }
+}
+
+export async function setUserColumnsDisplay(columnsToDisplay: number) {
+  try {
+    await axios.patch<User>(`/api/user_profiles/`, {
+      columns_to_display: columnsToDisplay,
+    });
+  } catch (error) {
+    console.error(`Couldn't set user's columns display preferences: ${error}`);
+  }
+}
+
 export async function getCurrentSong(sessionKey: string | undefined) {
   return await axios.get<Songbook>(`/api/songbooks/${sessionKey}/`);
 }
@@ -44,20 +66,17 @@ export async function nextSongbookSong(sessionKey: string | undefined) {
 }
 
 export async function createNewSongbook(
-  sessionKey: string | undefined,
   maxActiveSongs: string | undefined,
   songbookTitle: string | undefined,
   isNoodleMode: boolean | undefined,
 ) {
   try {
-    await axios.post<Songbook>(`/api/songbooks/`, {
-      session_key: sessionKey,
+    return await axios.post<Songbook>(`/api/songbooks/`, {
       max_active_songs:
         maxActiveSongs && maxActiveSongs.length > 0 ? maxActiveSongs : null,
       title: songbookTitle,
       is_noodle_mode: isNoodleMode,
     });
-    return true;
   } catch (error) {
     console.error(`Couldn't create new songbook: ${error}`);
     return false;
