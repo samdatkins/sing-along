@@ -6,7 +6,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.db.models import Q
-from django.utils.crypto import get_random_string
 from safedelete.config import SOFT_DELETE_CASCADE
 from safedelete.models import SafeDeleteModel
 

@@ -370,7 +370,6 @@ class TestSongbookView(APITestCase):
 
         # Assert
         self.assertEqual(response.status_code, 200)
-        print(response.data)
         membership = (
             Songbook.objects.get(session_key=response.data["session_key"])
             .membership_set.filter(user__id=self.user.id)
