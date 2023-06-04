@@ -1,19 +1,19 @@
 import datetime
 
-from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Count, F, Prefetch
+from django.contrib.auth import get_user_model
+from django.db.models import Count, Prefetch, Q
 from django.utils import timezone
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.models import Membership, Song, Songbook, SongEntry
+from api.models import Membership, Songbook, SongEntry
 from api.serializers.songbook import (
     SongbookDetailSerializer,
     SongbookListSerializer,
     SongbookSerializer,
 )
-from api.serializers.user import UserSerializer
+from api.serializers.user import PublicUserSerializer
 
 
 class OnlyAllowSongbookOwnersToModify(permissions.BasePermission):
@@ -141,18 +141,35 @@ class SongbookViewSet(
     def songbook_stats(self, request, session_key=None):
         instance = self.get_object()
 
-        song_entries_per_user = SongEntry.objects.filter(
-            songbook_id=instance.id, requested_by__isnull=False
-        ).annotate(unique_user=Count("requested_by"))
+        user_ids_with_counts = (
+            instance.song_entries.values("requested_by")
+            .annotate(count=Count("id", distinct=True))
+            .filter(~Q(requested_by=None))
+            .values_list("requested_by", "count")
+        )
+
+        user_ids = [user_id for user_id, _ in user_ids_with_counts]
+        users_list = list(
+            get_user_model()
+            .objects.filter(pk__in=user_ids)
+            .prefetch_related("social_auth")
+        )
+        users_with_counts = [
+            {
+                "user": [user for user in users_list if user.id == user_id][0],
+                "count": count,
+            }
+            for user_id, count in user_ids_with_counts
+        ]
 
         return Response(
             status=status.HTTP_200_OK,
             data=[
                 {
-                    "user": UserSerializer(song_entry.requested_by).data,
-                    "songs_requested": song_entry.unique_user,
+                    "user": PublicUserSerializer(user_and_count["user"]).data,
+                    "songs_requested": user_and_count["count"],
                 }
-                for song_entry in song_entries_per_user
+                for user_and_count in users_with_counts
             ],
         )
 

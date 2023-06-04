@@ -21,3 +21,16 @@ class UserSerializer(serializers.ModelSerializer):
             "date_joined",
             "userprofile",
         ]
+
+
+class PublicUserSerializer(serializers.ModelSerializer):
+    social_auth = UserSocialAuthSerializer(many=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "social_auth",
+        ]
