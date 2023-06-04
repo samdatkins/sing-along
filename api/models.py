@@ -164,7 +164,7 @@ class SongEntry(SafeDeleteModel, CreatedUpdated):
         max_digits=8, decimal_places=2, null=True, blank=True
     )
     is_flagged = models.BooleanField(null=True, blank=True)
-    requested_by = models.OneToOneField(
+    requested_by = models.ForeignKey(
         get_user_model(), null=True, blank=True, on_delete=models.DO_NOTHING
     )
 
