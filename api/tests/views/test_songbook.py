@@ -34,9 +34,9 @@ class TestSongbookView(APITestCase):
             type=Membership.MemberType.OWNER.value,
         )
 
-        self.not_my_songbook = SongbookFactory.create(session_key="notmine")
+        self.not_my_songbook = SongbookFactory.create(session_key="nome")
 
-        self.participant_songbook = SongbookFactory.create(session_key="participant")
+        self.participant_songbook = SongbookFactory.create(session_key="part")
         Membership.objects.create(
             user=self.user,
             songbook=self.participant_songbook,
@@ -343,11 +343,36 @@ class TestSongbookView(APITestCase):
             reverse(
                 "songbook-list",
             ),
-            data={"session_key": "newlist", "title": "my title"},
+            data={"session_key": "NO", "title": "my title"},
         )
 
         # Assert
         self.assertEqual(response.status_code, 201)
-        membership = Songbook.objects.get(session_key="newlist").membership_set.first()
+        self.assertNotEqual(response.data["session_key"], "NO")
+        membership = Songbook.objects.get(
+            session_key=response.data["session_key"]
+        ).membership_set.first()
         self.assertEqual(self.user.id, membership.user.id)
         self.assertEqual(Membership.MemberType.OWNER.value, membership.type)
+
+    def test_retrieve_adds_membership(self):
+        # Arrange
+        session_key = self.not_my_songbook.session_key
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.get(
+            reverse(
+                "songbook-detail",
+                kwargs={"session_key": session_key},
+            )
+        )
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        membership = (
+            Songbook.objects.get(session_key=response.data["session_key"])
+            .membership_set.filter(user__id=self.user.id)
+            .first()
+        )
+        self.assertEqual(Membership.MemberType.PARTICIPANT.value, membership.type)

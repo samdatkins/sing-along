@@ -1,3 +1,5 @@
+import random
+import string
 from operator import attrgetter
 
 from django.contrib.auth import get_user_model
@@ -17,6 +19,10 @@ class CreatedUpdated(models.Model):
 
 
 class Songbook(SafeDeleteModel, CreatedUpdated):
+    @staticmethod
+    def _generate_session_key():
+        return "".join(random.choice(string.ascii_uppercase) for _ in range(4))
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -27,7 +33,9 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
         ]
 
     _safedelete_policy = SOFT_DELETE_CASCADE
-    session_key = models.CharField(max_length=20, null=False, blank=False)
+    session_key = models.CharField(
+        max_length=4, null=False, blank=True, default=_generate_session_key
+    )
     current_song_timestamp = models.DateTimeField(
         null=False, blank=True, auto_now_add=True
     )

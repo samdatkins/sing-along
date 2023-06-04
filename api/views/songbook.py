@@ -19,6 +19,9 @@ class OnlyAllowSongbookOwnersToModify(permissions.BasePermission):
         return bool(request.user and request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
+        if view.action == "retrieve":
+            return True
+
         try:
             membership = obj.membership_set.get(user=request.user)
         except:
@@ -49,10 +52,14 @@ class SongbookViewSet(
     permission_classes = [OnlyAllowSongbookOwnersToModify]
 
     def get_queryset(self):
-        queryset = self.queryset.filter(members__id=self.request.user.id)
         if self.action == "retrieve":
-            return queryset.prefetch_related("song_entries").all()
-        elif self.action == "songbook_details":
+            # Don't filter for retrieve, users get access to all songbooks
+            # when retrieving (since session key is the password)
+            return self.queryset.prefetch_related("song_entries").all()
+
+        queryset = self.queryset.filter(members__id=self.request.user.id)
+
+        if self.action == "songbook_details":
             return queryset.prefetch_related(
                 Prefetch(
                     "song_entries",
@@ -67,6 +74,12 @@ class SongbookViewSet(
         if self.action == "retrieve":
             return SongbookSerializer
         return SongbookListSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self._check_and_add_membership(instance, request.user)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     @action(methods=["patch"], detail=True, url_path="next-song", url_name="next-song")
     def next_song(self, request, session_key=None):
@@ -124,3 +137,13 @@ class SongbookViewSet(
             user=self.request.user,
             type=Membership.MemberType.OWNER.value,
         )
+
+    def _check_and_add_membership(self, instance, user):
+        try:
+            instance.membership_set.get(user=user)
+        except:
+            Membership.objects.create(
+                songbook=instance,
+                user=self.request.user,
+                type=Membership.MemberType.PARTICIPANT.value,
+            )

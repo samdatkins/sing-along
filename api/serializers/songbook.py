@@ -23,6 +23,8 @@ class SongbookSerializer(serializers.ModelSerializer):
             "current_song_timestamp",
         ]
 
+        extra_kwargs = {"session_key": {"read_only": True}}
+
     def get_total_songs(self, obj):
         return obj.get_total_song_count()
 
@@ -49,6 +51,8 @@ class SongbookListSerializer(serializers.ModelSerializer):
             "current_song_timestamp",
         ]
 
+        extra_kwargs = {"session_key": {"read_only": True}}
+
 
 class SongbookDetailSerializer(serializers.ModelSerializer):
     song_entries = SongEntrySerializer(many=True)
@@ -65,6 +69,8 @@ class SongbookDetailSerializer(serializers.ModelSerializer):
             "current_song_timestamp",
             "is_user_owner",
         ]
+
+        extra_kwargs = {"session_key": {"read_only": True}}
 
     def get_is_user_owner(self, obj):
         user = None
