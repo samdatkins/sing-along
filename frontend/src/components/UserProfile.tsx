@@ -1,7 +1,6 @@
 import {
   Flex,
   FormLabel,
-  Heading,
   Image,
   Modal,
   ModalBody,
@@ -65,7 +64,7 @@ export default function UserProfile() {
           <ModalOverlay />
           <ModalContent>
             <ModalHeader textAlign="center">
-              <Heading>Your Preferences</Heading>
+              <Text>Profile & Settings</Text>
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
