@@ -31,6 +31,7 @@ import { nextSongbookSong } from "../services/songs";
 import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
 import Timer from "./Timer";
+import UserProfile from "./UserProfile";
 
 interface NavBarProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
@@ -65,6 +66,7 @@ export default function NavBar({
     AppStateToTimerMap[applicationState],
   );
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
+  const [isSongbookOwner, setIsSongbookOwner] = useState<boolean>(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   const isMobileDevice = isSmallerThan900;
 
@@ -104,7 +106,15 @@ export default function NavBar({
     },
   };
 
-  const isSongbookOwner = true;
+  useEffect(() => {
+    // const asyncUser = useAsync(getUserDetails, []);
+    // const user = asyncUser.result && asyncUser.result.data;
+    //get owners of songbook through songbook object
+    // const owners = asyncSongbook && asyncSongbook.result?.data
+    //determine if viewing user id matches an owner id
+    // user && setIsSongbookOwner(user.)
+    setIsSongbookOwner(true);
+  }, []);
 
   useEffect(() => {
     async function appStateChanged() {
@@ -191,7 +201,7 @@ export default function NavBar({
               </Text>
               <RouterLink to={`/live/${currentSongbook.session_key}/list`}>
                 <Text align="center" fontSize="1.5xl">
-                  {currentSongbook.title}
+                  {currentSongbook.title} {currentSongbook.session_key}
                   {" - "} ({"song "}
                   {currentSongbook.current_song_position} of{" "}
                   {currentSongbook.total_songs})
@@ -211,7 +221,7 @@ export default function NavBar({
       <Flex w="33%" justifyContent="space-between">
         <Flex></Flex>
         <Flex>
-          <Flex>
+          <Flex justifyContent="center">
             {!isMobileDevice &&
               !asyncSongbook?.result?.data?.is_noodle_mode && (
                 <>
@@ -230,9 +240,14 @@ export default function NavBar({
               )}
           </Flex>
         </Flex>
-        <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
-          <AddIcon />
-        </Button>
+        <Flex w="34%" justifyContent="end">
+          <Button mt="1rem" colorScheme="blue" as={RouterLink} to={"add-song"}>
+            <AddIcon />
+          </Button>
+        </Flex>
+        <Flex w="33%">
+          <UserProfile />
+        </Flex>
         {addSongDrawerOutlet}
       </Flex>
     </Flex>

@@ -5,6 +5,7 @@ import { useAsync } from "react-async-hook";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllSongbooks } from "../services/songs";
 import SongbookIndexTable from "./SongbookIndexTable";
+import UserProfile from "./UserProfile";
 
 export default function WelcomePage() {
   const [sessionKey, setSessionKey] = useState<string>("");
@@ -22,6 +23,9 @@ export default function WelcomePage() {
 
   return (
     <>
+      <Flex direction="row" justifyContent="end">
+        <UserProfile />
+      </Flex>
       <Flex justifyContent="center">
         <Flex alignItems="center" direction="column">
           <Text

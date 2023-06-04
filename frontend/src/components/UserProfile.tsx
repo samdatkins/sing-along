@@ -1,19 +1,22 @@
 import {
-  Button,
   Flex,
   FormLabel,
   Heading,
   Image,
-  Skeleton,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   SkeletonCircle,
-  Stack,
   Switch,
   Text,
   useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useAsync } from "react-async-hook";
-import { Link } from "react-router-dom";
 import {
   getUserDetails,
   setUserColumnsDisplay,
@@ -21,6 +24,7 @@ import {
 } from "../services/songs";
 
 export default function UserProfile() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const asyncUser = useAsync(getUserDetails, []);
   const user = asyncUser.result && asyncUser.result.data;
   const joinedDate =
@@ -40,114 +44,108 @@ export default function UserProfile() {
   return (
     <>
       {user ? (
-        <>
-          <Flex direction="column" justifyContent="center">
-            <Text
-              fontSize="3rem"
-              align="center"
-              fontFamily="Ubuntu Mono"
-              color="blue.600"
-              pt="2rem"
-              pb="2rem"
-            >
-              {user?.first_name} {user?.last_name}'s Profile
-            </Text>
-          </Flex>
-          <Flex direction="column" alignItems="center">
-            <Image
-              referrerPolicy="no-referrer"
-              src={user?.social.picture}
-              rounded="100%"
-            />
-            <Text>
-              {user?.first_name} {user?.last_name}
-            </Text>
-            <Text>{user?.email}</Text>
-            <Text>Joined on {joinedDate.toDateString()}</Text>
-            <Heading margin="1rem" mt="2rem" textAlign="center" size="lg">
-              Preferences
-            </Heading>
-            <Flex direction="column" alignItems="space-between" width="200px">
-              <Flex
-                direction="row"
-                margin="1rem"
-                justifyContent="space-between"
-              >
-                <FormLabel htmlFor="show-chords" mb="0">
-                  {showingChords && <>Showing chords</>}
-                  {!showingChords && <>Hiding chords</>}
-                </FormLabel>
-                <Switch
-                  id="show-chords"
-                  isChecked={showingChords}
-                  onChange={() => {
-                    const newChords = !showingChords;
-                    toggleUserChordsDisplay(newChords);
-                    setShowingChords(newChords);
-                  }}
-                />
-              </Flex>
-              <Flex
-                direction="row"
-                margin="1rem"
-                justifyContent="space-between"
-              >
-                <FormLabel htmlFor="number-of-columns" mb="0">
-                  {columns === 1 && <>Single column</>}
-                  {columns === 2 && <>Two columns</>}
-                </FormLabel>
-                <Switch
-                  id="number-of-columns"
-                  isChecked={columns > 1}
-                  onChange={() => {
-                    let newColumns: number;
-                    if (columns > 1) {
-                      newColumns = 1;
-                    } else {
-                      newColumns = 2;
-                    }
-                    setUserColumnsDisplay(newColumns);
-                    setColumns(newColumns);
-                  }}
-                />
-              </Flex>
-              <Flex
-                direction="row"
-                margin="1rem"
-                justifyContent="space-between"
-              >
-                <FormLabel htmlFor="night-mode" mb="0">
-                  {colorMode === "light" && <>Day mode</>}
-                  {colorMode === "dark" && <>Night mode</>}
-                </FormLabel>
-                <Switch
-                  id="night-mode"
-                  isChecked={colorMode !== "light"}
-                  onChange={() => {
-                    toggleColorMode();
-                  }}
-                />
-              </Flex>
-            </Flex>
-            <Link to="/live">
-              <Button mt="20px" colorScheme="blue">
-                Back to Home
-              </Button>
-            </Link>
-          </Flex>
-        </>
+        <Image
+          referrerPolicy="no-referrer"
+          src={user?.social.picture}
+          position="fixed"
+          top="0px"
+          right="0px"
+          rounded="100%"
+          margin="1rem"
+          height="75px"
+          cursor="pointer"
+          onClick={onOpen}
+        />
       ) : (
-        <>
-          <Flex direction="column" alignItems="center" mt="70px">
-            <Stack width="80%" alignSelf="center">
-              <Skeleton height="50px" mt="20px" />
-              <SkeletonCircle alignSelf="center" size="10" />
-              <Skeleton height="20px" />
-              <Skeleton height="20px" />
-              <Skeleton height="20px" />
-            </Stack>
-          </Flex>
-        </>
+        <SkeletonCircle alignSelf="center" margin="1rem" size="20" />
+      )}
+
+      {user && (
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader textAlign="center">
+              <Heading>Your Preferences</Heading>
+            </ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Flex direction="column" alignItems="center">
+                <Text>
+                  {user?.first_name} {user?.last_name}{" "}
+                </Text>
+                <Text>{user?.email}</Text>
+                <Text mb="1rem">Joined on {joinedDate.toDateString()}</Text>
+                <Flex
+                  direction="column"
+                  alignItems="space-between"
+                  width="200px"
+                >
+                  <Flex
+                    direction="row"
+                    margin="1rem"
+                    justifyContent="space-between"
+                  >
+                    <FormLabel htmlFor="show-chords" mb="0">
+                      {showingChords && <>Showing chords</>}
+                      {!showingChords && <>Hiding chords</>}
+                    </FormLabel>
+                    <Switch
+                      id="show-chords"
+                      isChecked={showingChords}
+                      onChange={() => {
+                        const newChords = !showingChords;
+                        toggleUserChordsDisplay(newChords);
+                        setShowingChords(newChords);
+                      }}
+                    />
+                  </Flex>
+                  <Flex
+                    direction="row"
+                    margin="1rem"
+                    justifyContent="space-between"
+                  >
+                    <FormLabel htmlFor="number-of-columns" mb="0">
+                      {columns === 1 && <>Single column</>}
+                      {columns === 2 && <>Two columns</>}
+                    </FormLabel>
+                    <Switch
+                      id="number-of-columns"
+                      isChecked={columns > 1}
+                      onChange={() => {
+                        let newColumns: number;
+                        if (columns > 1) {
+                          newColumns = 1;
+                        } else {
+                          newColumns = 2;
+                        }
+                        setUserColumnsDisplay(newColumns);
+                        setColumns(newColumns);
+                      }}
+                    />
+                  </Flex>
+                  <Flex
+                    direction="row"
+                    margin="1rem"
+                    justifyContent="space-between"
+                    mb="2rem"
+                  >
+                    <FormLabel htmlFor="night-mode" mb="0">
+                      {colorMode === "light" && <>Day mode</>}
+                      {colorMode === "dark" && <>Night mode</>}
+                    </FormLabel>
+                    <Switch
+                      id="night-mode"
+                      isChecked={colorMode !== "light"}
+                      onChange={() => {
+                        toggleColorMode();
+                      }}
+                    />
+                  </Flex>
+                </Flex>
+              </Flex>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       )}
     </>
   );
