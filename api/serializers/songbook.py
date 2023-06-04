@@ -8,6 +8,7 @@ class SongbookSerializer(serializers.ModelSerializer):
     total_songs = serializers.SerializerMethodField()
     current_song_position = serializers.SerializerMethodField()
     current_song_entry = serializers.SerializerMethodField()
+    is_songbook_owner = serializers.SerializerMethodField()
 
     class Meta:
         model = Songbook
@@ -21,6 +22,7 @@ class SongbookSerializer(serializers.ModelSerializer):
             "current_song_entry",
             "id",
             "current_song_timestamp",
+            "is_songbook_owner",
         ]
 
         extra_kwargs = {"session_key": {"read_only": True}}
@@ -36,6 +38,14 @@ class SongbookSerializer(serializers.ModelSerializer):
         if song_entry is None:
             return None
         return SongEntrySerializer(song_entry).data
+
+    def get_is_songbook_owner(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        membership = obj.membership_set.get(user=user)
+        return membership.type == Membership.MemberType.OWNER.value
 
 
 class SongbookListSerializer(serializers.ModelSerializer):
@@ -56,7 +66,6 @@ class SongbookListSerializer(serializers.ModelSerializer):
 
 class SongbookDetailSerializer(serializers.ModelSerializer):
     song_entries = SongEntrySerializer(many=True)
-    is_user_owner = serializers.SerializerMethodField()
 
     class Meta:
         model = Songbook
@@ -67,15 +76,6 @@ class SongbookDetailSerializer(serializers.ModelSerializer):
             "is_noodle_mode",
             "song_entries",
             "current_song_timestamp",
-            "is_user_owner",
         ]
 
         extra_kwargs = {"session_key": {"read_only": True}}
-
-    def get_is_user_owner(self, obj):
-        user = None
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            user = request.user
-        membership = obj.membership_set.get(user=user)
-        return membership.type == Membership.MemberType.OWNER.value
