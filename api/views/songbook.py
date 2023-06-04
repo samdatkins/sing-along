@@ -1,6 +1,7 @@
 import datetime
 
-from django.db.models import Prefetch
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import Count, F, Prefetch
 from django.utils import timezone
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -12,6 +13,7 @@ from api.serializers.songbook import (
     SongbookListSerializer,
     SongbookSerializer,
 )
+from api.serializers.user import UserSerializer
 
 
 class OnlyAllowSongbookOwnersToModify(permissions.BasePermission):
@@ -128,6 +130,30 @@ class SongbookViewSet(
         return Response(
             status=status.HTTP_200_OK,
             data=SongbookDetailSerializer(instance, context={"request": request}).data,
+        )
+
+    @action(
+        methods=["get"],
+        detail=True,
+        url_path="stats",
+        url_name="stats",
+    )
+    def songbook_stats(self, request, session_key=None):
+        instance = self.get_object()
+
+        song_entries_per_user = SongEntry.objects.filter(
+            songbook_id=instance.id, requested_by__isnull=False
+        ).annotate(unique_user=Count("requested_by"))
+
+        return Response(
+            status=status.HTTP_200_OK,
+            data=[
+                {
+                    "user": UserSerializer(song_entry.requested_by).data,
+                    "songs_requested": song_entry.unique_user,
+                }
+                for song_entry in song_entries_per_user
+            ],
         )
 
     def perform_create(self, serializer):

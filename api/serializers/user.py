@@ -6,7 +6,7 @@ from api.serializers.user_social_auth import UserSocialAuthSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
-    social = serializers.SerializerMethodField()
+    social_auth = UserSocialAuthSerializer(many=True)
     userprofile = UserProfileSerializer()
 
     class Meta:
@@ -16,11 +16,8 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "social",
+            "social_auth",
             "last_login",
             "date_joined",
             "userprofile",
         ]
-
-    def get_social(self, obj):
-        return UserSocialAuthSerializer(obj.social).data
