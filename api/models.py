@@ -1,3 +1,5 @@
+import random
+import string
 from operator import attrgetter
 
 from django.contrib.auth import get_user_model
@@ -20,7 +22,7 @@ class CreatedUpdated(models.Model):
 class Songbook(SafeDeleteModel, CreatedUpdated):
     @staticmethod
     def _generate_session_key():
-        return get_random_string(length=4).upper()
+        return "".join(random.choice(string.ascii_uppercase) for _ in range(4))
 
     class Meta:
         constraints = [
