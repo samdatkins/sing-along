@@ -18,11 +18,11 @@ class CreatedUpdated(models.Model):
         abstract = True
 
 
-class Songbook(SafeDeleteModel, CreatedUpdated):
-    @staticmethod
-    def _generate_session_key():
-        return "".join(random.choice(string.ascii_uppercase) for _ in range(4))
+def _generate_session_key():
+    return "".join(random.choice(string.ascii_uppercase) for _ in range(4))
 
+
+class Songbook(SafeDeleteModel, CreatedUpdated):
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -164,6 +164,9 @@ class SongEntry(SafeDeleteModel, CreatedUpdated):
         max_digits=8, decimal_places=2, null=True, blank=True
     )
     is_flagged = models.BooleanField(null=True, blank=True)
+    requested_by = models.OneToOneField(
+        get_user_model(), null=True, blank=True, on_delete=models.DO_NOTHING
+    )
 
 
 class Membership(SafeDeleteModel, CreatedUpdated):

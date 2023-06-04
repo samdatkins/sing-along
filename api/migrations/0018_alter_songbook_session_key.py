@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name="session_key",
             field=models.CharField(
                 blank=True,
-                default=api.models.Songbook._generate_session_key,
+                default=api.models._generate_session_key,
                 max_length=4,
             ),
         ),
