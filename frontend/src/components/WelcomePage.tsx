@@ -1,12 +1,34 @@
 import { WarningIcon } from "@chakra-ui/icons";
-import { Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Heading,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
+import { AxiosResponse } from "axios";
 import { useState } from "react";
-import { useAsync } from "react-async-hook";
-import { Link, useNavigate } from "react-router-dom";
+import { UseAsyncReturn, useAsync } from "react-async-hook";
+import { useNavigate } from "react-router-dom";
+import { User } from "../models";
 import { getAllSongbooks } from "../services/songs";
+import CreateNewSongbook from "./CreateNewSongbook";
 import SongbookIndexTable from "./SongbookIndexTable";
+import UserProfile from "./AvatarProfileLink";
 
-export default function WelcomePage() {
+interface WelcomePageProps {
+  asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
+}
+
+export default function WelcomePage({ asyncUser }: WelcomePageProps) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [sessionKey, setSessionKey] = useState<string>("");
   const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
   const songbooks = asyncSongbooks.result?.data.results;
@@ -22,6 +44,9 @@ export default function WelcomePage() {
 
   return (
     <>
+      <Flex position="fixed" top="0px" right="0px">
+        <UserProfile asyncUser={asyncUser} />
+      </Flex>
       <Flex justifyContent="center">
         <Flex alignItems="center" direction="column">
           <Text
@@ -70,13 +95,21 @@ export default function WelcomePage() {
             Your Songbooks
           </Text>
           <SongbookIndexTable songbooks={songbooks} />
-          <Link to={`/live/createsongbook/`}>
-            <Button margin="2rem" colorScheme="blue">
-              Create a New Songbook
-            </Button>
-          </Link>
+          <Button margin="2rem" colorScheme="blue" onClick={onOpen}>
+            Create a New Songbook
+          </Button>
         </Flex>
       </Flex>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader textAlign="center">Create a New Songbook</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <CreateNewSongbook />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

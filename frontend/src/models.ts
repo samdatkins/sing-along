@@ -25,6 +25,7 @@ export type Songbook = {
   total_songs: number;
   current_song_position: number;
   current_song_entry: SongEntry;
+  is_songbook_owner: boolean;
 };
 
 export type SongbookDetails = {

@@ -1,22 +1,27 @@
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { useAsync } from "react-async-hook";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import AddSongDrawer from "./components/AddSongDrawer";
-import CreateNewSongbook from "./components/CreateNewSongbook";
 import CurrentSongView from "./components/CurrentSongView";
 import SongbookList from "./components/SongbookList";
-import UserProfile from "./components/UserProfile";
 import WelcomePage from "./components/WelcomePage";
+import { getUserDetails } from "./services/songs";
 
 function App() {
+  const asyncUser = useAsync(getUserDetails, [], {
+    setLoading: (state) => ({ ...state, loading: true }),
+  });
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/live/:sessionKey/" element={<CurrentSongView />}>
+        <Route
+          path="/live/:sessionKey/"
+          element={<CurrentSongView asyncUser={asyncUser} />}
+        >
           <Route path="add-song" element={<AddSongDrawer />} />
         </Route>
-        <Route path="/live/profile" element={<UserProfile />} />
-        <Route path="/live/createsongbook" element={<CreateNewSongbook />} />
         <Route path="/live/:sessionKey/list" element={<SongbookList />} />
-        <Route path="/live" element={<WelcomePage />} />
+        <Route path="/live" element={<WelcomePage asyncUser={asyncUser} />} />
         <Route path="/" element={<Navigate to="/live" />} />
       </Routes>
     </BrowserRouter>

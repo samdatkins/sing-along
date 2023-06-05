@@ -1,10 +1,11 @@
 import { Flex } from "@chakra-ui/react";
 import { useState } from "react";
-import { useAsync } from "react-async-hook";
-import { ApplicationState } from "../models";
+import { UseAsyncReturn, useAsync } from "react-async-hook";
+import { ApplicationState, User } from "../models";
 import NavBar from "./NavBar";
 import TabContainer from "./TabContainer";
 
+import { AxiosResponse } from "axios";
 import { useParams } from "react-router-dom";
 import { useInterval } from "usehooks-ts";
 import SongbookContext from "../contexts/SongbookContext";
@@ -12,14 +13,19 @@ import { getCurrentSong } from "../services/songs";
 
 const SONGBOOK_POLL_INTERVAL = 1 * 2000;
 
-function CurrentSongView() {
+interface CurrentSongViewProps {
+  asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
+}
+
+function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
+  const user = asyncUser.result && asyncUser.result.data;
   // state for showing ActionPrompt component instead of lyrics
   const [applicationState, setApplicationState] = useState(
     ApplicationState.ShowSong,
   );
   const [firstColDispIndex, setFirstColDispIndex] = useState(0);
   // const setColRef = useRef(setFirstColDispIndex);
-  const columnsToDisplay = 2;
+  const columnsToDisplay = user ? user.userprofile.columns_to_display : 1;
 
   const advanceToNextAppState = () => {
     console.log("next app state");
@@ -70,9 +76,11 @@ function CurrentSongView() {
             firstColDispIndex={firstColDispIndex}
             setFirstColDispIndex={setFirstColDispIndex}
             columnsToDisplay={columnsToDisplay}
+            asyncUser={asyncUser}
           />
           <TabContainer
             asyncSongbook={asyncSongbook}
+            asyncUser={asyncUser}
             applicationState={applicationState}
             firstColDispIndex={firstColDispIndex}
             columnsToDisplay={columnsToDisplay}

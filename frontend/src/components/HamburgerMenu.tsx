@@ -1,4 +1,4 @@
-import { HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import {
   Button,
   Flex,
@@ -28,8 +28,9 @@ import {
 } from "react-icons/fa";
 import { GrUnorderedList } from "react-icons/gr";
 import { MdOutlineMenuOpen } from "react-icons/md";
-import { Link as RouterLink } from "react-router-dom";
-import { Songbook } from "../models";
+import QRCode from "react-qr-code";
+import { Link as RouterLink, useParams } from "react-router-dom";
+import { Songbook, User } from "../models";
 import {
   deleteSongbookSong,
   nextSongbookSong,
@@ -37,9 +38,9 @@ import {
   setSongEntryFlagged,
 } from "../services/songs";
 import JumpSearch from "./JumpSearch";
+import ProfileModal from "./ProfileModal";
 
 interface HamburgerMenuProps {
-  isSongbookOwner: boolean;
   isMobileDevice: boolean;
   timerControls: {
     playPauseToggle: () => void;
@@ -57,9 +58,9 @@ interface HamburgerMenuProps {
   setFirstColDispIndex: React.Dispatch<React.SetStateAction<number>>;
   totalColumns: number;
   columnsToDisplay: number;
+  asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
 }
 export default function HamburgerMenu({
-  isSongbookOwner,
   isMobileDevice,
   timerControls,
   isLive,
@@ -71,9 +72,21 @@ export default function HamburgerMenu({
   setFirstColDispIndex,
   totalColumns,
   columnsToDisplay,
+  asyncUser,
 }: HamburgerMenuProps) {
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { toggleColorMode } = useColorMode();
   const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isProfileOpen,
+    onOpen: onProfileOpen,
+    onClose: onProfileClose,
+  } = useDisclosure();
+
+  const isSongbookOwner = asyncSongbook.result
+    ? asyncSongbook.result.data.is_songbook_owner
+    : false;
+  const { sessionKey } = useParams();
+  const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
   const performSongNavAction = async (action: "next" | "prev" | "delete") => {
     const sessionKey = asyncSongbook?.result?.data?.session_key;
@@ -85,7 +98,7 @@ export default function HamburgerMenu({
       await prevSongbookSong(sessionKey);
     } else {
       await deleteSongbookSong(
-        asyncSongbook?.result?.data?.current_song_entry?.id,
+        asyncSongbook?.result?.data?.current_song_entry?.id
       );
     }
     asyncSongbook.execute();
@@ -96,7 +109,7 @@ export default function HamburgerMenu({
   // handle what happens on key press
   const handleKeyPress = async (event: KeyboardEvent) => {
     // if the add song drawer is open, ignore all typing
-    if (addSongDrawerOutlet || isJumpSearchOpen) return;
+    if (addSongDrawerOutlet || isJumpSearchOpen || !isSongbookOwner) return;
 
     if (event.metaKey || event.ctrlKey || event.altKey) {
       return;
@@ -109,7 +122,7 @@ export default function HamburgerMenu({
       performSongNavAction("delete");
     } else if (event.key === "!") {
       await setSongEntryFlagged(
-        asyncSongbook?.result?.data?.current_song_entry?.id,
+        asyncSongbook?.result?.data?.current_song_entry?.id
       );
       asyncSongbook.execute();
     } else if (event.code === "Space") {
@@ -226,14 +239,14 @@ export default function HamburgerMenu({
           <RouterLink to="../live/">
             <MenuItem icon={<Icon as={FaHome} />}>Home</MenuItem>
           </RouterLink>
-          <RouterLink to="../live/profile">
-            <MenuItem icon={<Icon as={FaUserAlt} />}>Profile</MenuItem>
-          </RouterLink>
           <MenuItem
-            icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-            onClick={toggleColorMode}
+            onClick={() => {
+              onProfileOpen();
+            }}
+            cursor="pointer"
+            icon={<Icon as={FaUserAlt} />}
           >
-            {colorMode === "light" ? "Night Mode" : "Day Mode"}
+            Profile
           </MenuItem>
           {asyncSongbook?.result?.data?.is_noodle_mode && (
             <RouterLink to="list">
@@ -247,7 +260,7 @@ export default function HamburgerMenu({
             icon={<Icon as={FaExclamationTriangle} />}
             onClick={async () => {
               await setSongEntryFlagged(
-                asyncSongbook?.result?.data?.current_song_entry?.id,
+                asyncSongbook?.result?.data?.current_song_entry?.id
               );
               asyncSongbook.execute();
             }}
@@ -261,8 +274,22 @@ export default function HamburgerMenu({
           >
             Jump To...
           </MenuItem>
+
+          <Flex
+            bgColor="white"
+            justifyContent="center"
+            border="8px solid white"
+            width="auto"
+          >
+            <QRCode size={150} value={addSongUrl} />
+          </Flex>
         </MenuList>
       </Menu>
+      <ProfileModal
+        asyncUser={asyncUser}
+        isOpen={isProfileOpen}
+        onClose={onProfileClose}
+      />
     </>
   );
 }

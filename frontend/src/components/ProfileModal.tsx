@@ -1,27 +1,33 @@
 import {
-  Button,
   Flex,
   FormLabel,
-  Heading,
   Image,
-  Skeleton,
-  SkeletonCircle,
-  Stack,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Switch,
   Text,
   useColorMode,
 } from "@chakra-ui/react";
+import { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
-import { useAsync } from "react-async-hook";
-import { Link } from "react-router-dom";
+import { UseAsyncReturn } from "react-async-hook";
+import { User } from "../models";
 import {
-  getUserDetails,
   setUserColumnsDisplay,
   toggleUserChordsDisplay,
 } from "../services/songs";
 
-export default function UserProfile() {
-  const asyncUser = useAsync(getUserDetails, []);
+interface ProfileModalProps {
+  asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const ProfileModal = ({ asyncUser, isOpen, onClose }: ProfileModalProps) => {
   const user = asyncUser.result && asyncUser.result.data;
   const joinedDate =
     user && user.date_joined
@@ -37,36 +43,28 @@ export default function UserProfile() {
   const [showingChords, setShowingChords] = useState<boolean>(false);
   const [columns, setColumns] = useState<number>(1);
 
-  return (
-    <>
-      {user ? (
-        <>
-          <Flex direction="column" justifyContent="center">
-            <Text
-              fontSize="3rem"
-              align="center"
-              fontFamily="Ubuntu Mono"
-              color="blue.600"
-              pt="2rem"
-              pb="2rem"
-            >
-              {user?.first_name} {user?.last_name}'s Profile
-            </Text>
-          </Flex>
+  return user ? (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader textAlign="center">
+          <Text>Profile & Settings</Text>
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
           <Flex direction="column" alignItems="center">
             <Image
               referrerPolicy="no-referrer"
               src={user?.social_auth.picture}
               rounded="100%"
+              height="75px"
+              mb="1rem"
             />
             <Text>
-              {user?.first_name} {user?.last_name}
+              {user?.first_name} {user?.last_name}{" "}
             </Text>
             <Text>{user?.email}</Text>
-            <Text>Joined on {joinedDate.toDateString()}</Text>
-            <Heading margin="1rem" mt="2rem" textAlign="center" size="lg">
-              Preferences
-            </Heading>
+            <Text mb="1rem">Joined on {joinedDate.toDateString()}</Text>
             <Flex direction="column" alignItems="space-between" width="200px">
               <Flex
                 direction="row"
@@ -80,10 +78,11 @@ export default function UserProfile() {
                 <Switch
                   id="show-chords"
                   isChecked={showingChords}
-                  onChange={() => {
+                  onChange={async () => {
                     const newChords = !showingChords;
-                    toggleUserChordsDisplay(newChords);
                     setShowingChords(newChords);
+                    await toggleUserChordsDisplay(newChords);
+                    asyncUser.execute();
                   }}
                 />
               </Flex>
@@ -98,16 +97,18 @@ export default function UserProfile() {
                 </FormLabel>
                 <Switch
                   id="number-of-columns"
-                  isChecked={columns > 1}
-                  onChange={() => {
+                  isChecked={columns > 1 && showingChords}
+                  isDisabled={!showingChords}
+                  onChange={async () => {
                     let newColumns: number;
                     if (columns > 1) {
                       newColumns = 1;
                     } else {
                       newColumns = 2;
                     }
-                    setUserColumnsDisplay(newColumns);
                     setColumns(newColumns);
+                    await setUserColumnsDisplay(newColumns);
+                    asyncUser.execute();
                   }}
                 />
               </Flex>
@@ -115,6 +116,7 @@ export default function UserProfile() {
                 direction="row"
                 margin="1rem"
                 justifyContent="space-between"
+                mb="2rem"
               >
                 <FormLabel htmlFor="night-mode" mb="0">
                   {colorMode === "light" && <>Day mode</>}
@@ -129,26 +131,12 @@ export default function UserProfile() {
                 />
               </Flex>
             </Flex>
-            <Link to="/live">
-              <Button mt="20px" colorScheme="blue">
-                Back to Home
-              </Button>
-            </Link>
           </Flex>
-        </>
-      ) : (
-        <>
-          <Flex direction="column" alignItems="center" mt="70px">
-            <Stack width="80%" alignSelf="center">
-              <Skeleton height="50px" mt="20px" />
-              <SkeletonCircle alignSelf="center" size="10" />
-              <Skeleton height="20px" />
-              <Skeleton height="20px" />
-              <Skeleton height="20px" />
-            </Stack>
-          </Flex>
-        </>
-      )}
-    </>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  ) : (
+    <></>
   );
-}
+};
+export default ProfileModal;
