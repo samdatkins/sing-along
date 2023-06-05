@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Flex,
+  Heading,
   Link,
   Skeleton,
   Text,
@@ -15,17 +16,12 @@ import {
   ApplicationState,
   LINES_PER_COLUMN,
   Songbook,
+  User,
 } from "../models";
 
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
-import QRCode from "react-qr-code";
-import {
-  Link as RouterLink,
-  useNavigate,
-  useOutlet,
-  useParams,
-} from "react-router-dom";
+import { Link as RouterLink, useOutlet } from "react-router-dom";
 import { countTabColumns } from "../helpers/tab";
 import { nextSongbookSong } from "../services/songs";
 import ColumnMap from "./ColumnMap";
@@ -40,6 +36,7 @@ interface NavBarProps {
   firstColDispIndex: number;
   setFirstColDispIndex: React.Dispatch<React.SetStateAction<number>>;
   columnsToDisplay: number;
+  asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
 }
 
 export default function NavBar({
@@ -50,6 +47,7 @@ export default function NavBar({
   firstColDispIndex,
   setFirstColDispIndex,
   columnsToDisplay,
+  asyncUser,
 }: NavBarProps) {
   // Outlet that conditionally renders the add song drawer based on URL
   const addSongDrawerOutlet = useOutlet();
@@ -60,16 +58,13 @@ export default function NavBar({
   // state for whether time is running or not
   const [isLive, setIsLive] = useState(true);
   // state for length of countdown timer in seconds
-  const navigate = useNavigate();
+
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
     AppStateToTimerMap[applicationState],
   );
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   const isMobileDevice = isSmallerThan900;
-
-  const { sessionKey } = useParams();
-  const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
   const currentSongbook = asyncSongbook.result?.data;
 
@@ -104,8 +99,6 @@ export default function NavBar({
     },
   };
 
-  const isSongbookOwner = true;
-
   useEffect(() => {
     async function appStateChanged() {
       setIsLive(false);
@@ -133,7 +126,6 @@ export default function NavBar({
       <Flex w="33%" justifyContent="space-between">
         <Flex paddingRight="1rem">
           <HamburgerMenu
-            isSongbookOwner={isSongbookOwner}
             isMobileDevice={isMobileDevice}
             timerControls={timerControls}
             isLive={isLive}
@@ -145,6 +137,7 @@ export default function NavBar({
             setFirstColDispIndex={setFirstColDispIndex}
             totalColumns={totalColumns}
             columnsToDisplay={columnsToDisplay}
+            asyncUser={asyncUser}
           />
         </Flex>
         <Box pt=".5rem">
@@ -158,15 +151,18 @@ export default function NavBar({
           )}
         </Box>
 
-        {!isMobileDevice && (
-          <Box bgColor="white" p="8px" position="fixed" right="0" bottom="0">
-            <Link onClick={() => navigate(`add-song`)}>
-              <QRCode size={200} value={addSongUrl} />
-            </Link>
+        {currentSongbook &&
+        currentSongbook.is_songbook_owner &&
+        !currentSongbook.is_noodle_mode ? (
+          <Box>
+            <Heading fontFamily="Ubuntu Mono">
+              {" "}
+              {currentSongbook.session_key}
+            </Heading>
           </Box>
+        ) : (
+          <Flex></Flex>
         )}
-
-        <Flex></Flex>
       </Flex>
       {/* MIDDLE COLUMN */}
       <Flex w="34%" alignContent="center" justifyContent="center">
@@ -211,9 +207,10 @@ export default function NavBar({
       <Flex w="33%" justifyContent="space-between">
         <Flex></Flex>
         <Flex>
-          <Flex>
+          <Flex justifyContent="center">
             {!isMobileDevice &&
-              !asyncSongbook?.result?.data?.is_noodle_mode && (
+              !asyncSongbook?.result?.data?.is_noodle_mode &&
+              currentSongbook?.is_songbook_owner && (
                 <>
                   {isTimerVisible ? (
                     <Timer
@@ -230,9 +227,11 @@ export default function NavBar({
               )}
           </Flex>
         </Flex>
-        <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
-          <AddIcon />
-        </Button>
+        <Flex w="34%" justifyContent="end">
+          <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
+            <AddIcon />
+          </Button>
+        </Flex>
         {addSongDrawerOutlet}
       </Flex>
     </Flex>

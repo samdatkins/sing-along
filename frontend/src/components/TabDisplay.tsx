@@ -1,22 +1,29 @@
-import { Flex, Text, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
+import { Flex, Text, useColorModeValue } from "@chakra-ui/react";
+import { AxiosResponse } from "axios";
 import { useCallback, useEffect, useState } from "react";
+import { UseAsyncReturn } from "react-async-hook";
 import { formatTab, splitTabIntoColumns } from "../helpers/tab";
-import { LINES_PER_COLUMN } from "../models";
+import { LINES_PER_COLUMN, User } from "../models";
 import transposer from "./transposer";
 
 interface TabDisplayProps {
   tab: string | false | undefined;
   firstColDispIndex: number;
   columnsToDisplay: number;
+  asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
 }
 
 export default function TabDisplay({
   tab,
   firstColDispIndex,
   columnsToDisplay,
+  asyncUser,
 }: TabDisplayProps) {
   const [toneSteps, setToneSteps] = useState(0);
   const [usesSharps, setUsesSharps] = useState(true);
+
+  const user = asyncUser.result && asyncUser.result.data;
+  const showChords = user ? user.userprofile.is_showing_chords : false;
 
   function handleTransposeChange(num) {
     let newTone = toneSteps + num;
@@ -57,12 +64,11 @@ export default function TabDisplay({
 
   const formattedTabArray = formatTab(tab, toneSteps);
   const tabColumns = splitTabIntoColumns(formattedTabArray, LINES_PER_COLUMN);
-  const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
 
   return (
     <>
       {tabColumns &&
-        (isSmallerThan900 ? (
+        (!showChords ? (
           <TabWithoutChords tabToDisplay={formattedTabArray} />
         ) : (
           <TabWithChords

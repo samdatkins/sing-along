@@ -1,7 +1,7 @@
 import { Box, SkeletonText } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
-import { ApplicationState, Songbook } from "../models";
+import { ApplicationState, Songbook, User } from "../models";
 
 import ActionPrompt from "./ActionPrompt";
 import TabDisplay from "./TabDisplay";
@@ -11,6 +11,7 @@ interface TabsProps {
   applicationState: ApplicationState;
   firstColDispIndex: number;
   columnsToDisplay: number;
+  asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
 }
 
 function TabContainer({
@@ -18,6 +19,7 @@ function TabContainer({
   applicationState,
   firstColDispIndex,
   columnsToDisplay,
+  asyncUser,
 }: TabsProps) {
   const tab = asyncSongbook.result?.data?.current_song_entry?.song?.content;
 
@@ -39,6 +41,7 @@ function TabContainer({
           tab={tab}
           firstColDispIndex={firstColDispIndex}
           columnsToDisplay={columnsToDisplay}
+          asyncUser={asyncUser}
         />
       </Box>
     </>
