@@ -6,16 +6,16 @@ import NavBar from "./NavBar";
 import TabContainer from "./TabContainer";
 
 import { useParams } from "react-router-dom";
-import { getCurrentSong } from "../services/songs";
 import { useInterval } from "usehooks-ts";
 import SongbookContext from "../contexts/SongbookContext";
+import { getCurrentSong } from "../services/songs";
 
 const SONGBOOK_POLL_INTERVAL = 1 * 2000;
 
 function CurrentSongView() {
   // state for showing ActionPrompt component instead of lyrics
   const [applicationState, setApplicationState] = useState(
-    ApplicationState.ShowSong
+    ApplicationState.ShowSong,
   );
   const [firstColDispIndex, setFirstColDispIndex] = useState(0);
   // const setColRef = useRef(setFirstColDispIndex);

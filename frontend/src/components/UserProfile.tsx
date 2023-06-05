@@ -56,7 +56,7 @@ export default function UserProfile() {
           <Flex direction="column" alignItems="center">
             <Image
               referrerPolicy="no-referrer"
-              src={user?.social.picture}
+              src={user?.social_auth.picture}
               rounded="100%"
             />
             <Text>
