@@ -21,13 +21,7 @@ import {
 
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
-import QRCode from "react-qr-code";
-import {
-  Link as RouterLink,
-  useNavigate,
-  useOutlet,
-  useParams,
-} from "react-router-dom";
+import { Link as RouterLink, useOutlet } from "react-router-dom";
 import { countTabColumns } from "../helpers/tab";
 import { nextSongbookSong } from "../services/songs";
 import ColumnMap from "./ColumnMap";
@@ -64,7 +58,6 @@ export default function NavBar({
   // state for whether time is running or not
   const [isLive, setIsLive] = useState(true);
   // state for length of countdown timer in seconds
-  const navigate = useNavigate();
 
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
     AppStateToTimerMap[applicationState],
@@ -72,9 +65,6 @@ export default function NavBar({
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   const isMobileDevice = isSmallerThan900;
-
-  const { sessionKey } = useParams();
-  const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
   const currentSongbook = asyncSongbook.result?.data;
 
@@ -172,14 +162,6 @@ export default function NavBar({
           </Box>
         ) : (
           <Flex></Flex>
-        )}
-
-        {!isMobileDevice && (
-          <Box bgColor="white" p="8px" position="fixed" right="0" bottom="0">
-            <Link onClick={() => navigate(`add-song`)}>
-              <QRCode size={200} value={addSongUrl} />
-            </Link>
-          </Box>
         )}
       </Flex>
       {/* MIDDLE COLUMN */}

@@ -28,7 +28,8 @@ import {
 } from "react-icons/fa";
 import { GrUnorderedList } from "react-icons/gr";
 import { MdOutlineMenuOpen } from "react-icons/md";
-import { Link as RouterLink } from "react-router-dom";
+import QRCode from "react-qr-code";
+import { Link as RouterLink, useParams } from "react-router-dom";
 import { Songbook, User } from "../models";
 import {
   deleteSongbookSong,
@@ -84,6 +85,8 @@ export default function HamburgerMenu({
   const isSongbookOwner = asyncSongbook.result
     ? asyncSongbook.result.data.is_songbook_owner
     : false;
+  const { sessionKey } = useParams();
+  const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
   const performSongNavAction = async (action: "next" | "prev" | "delete") => {
     const sessionKey = asyncSongbook?.result?.data?.session_key;
@@ -267,6 +270,15 @@ export default function HamburgerMenu({
           >
             Jump To...
           </MenuItem>
+
+          <Flex
+            bgColor="white"
+            justifyContent="center"
+            border="8px solid white"
+            width="auto"
+          >
+            <QRCode size={150} value={addSongUrl} />
+          </Flex>
         </MenuList>
       </Menu>
       <ProfileModal
