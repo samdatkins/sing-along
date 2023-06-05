@@ -12,7 +12,9 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
+import { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
+import { UseAsyncReturn } from "react-async-hook";
 import { User } from "../models";
 import {
   setUserColumnsDisplay,
@@ -20,12 +22,13 @@ import {
 } from "../services/songs";
 
 interface ProfileModalProps {
-  user: User;
+  asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const ProfileModal = ({ user, isOpen, onClose }: ProfileModalProps) => {
+const ProfileModal = ({ asyncUser, isOpen, onClose }: ProfileModalProps) => {
+  const user = asyncUser.result && asyncUser.result.data;
   const joinedDate =
     user && user.date_joined
       ? new Date(user?.date_joined)
@@ -40,7 +43,7 @@ const ProfileModal = ({ user, isOpen, onClose }: ProfileModalProps) => {
   const [showingChords, setShowingChords] = useState<boolean>(false);
   const [columns, setColumns] = useState<number>(1);
 
-  return (
+  return user ? (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
@@ -75,10 +78,11 @@ const ProfileModal = ({ user, isOpen, onClose }: ProfileModalProps) => {
                 <Switch
                   id="show-chords"
                   isChecked={showingChords}
-                  onChange={() => {
+                  onChange={async () => {
                     const newChords = !showingChords;
-                    toggleUserChordsDisplay(newChords);
                     setShowingChords(newChords);
+                    await toggleUserChordsDisplay(newChords);
+                    asyncUser.execute();
                   }}
                 />
               </Flex>
@@ -93,16 +97,18 @@ const ProfileModal = ({ user, isOpen, onClose }: ProfileModalProps) => {
                 </FormLabel>
                 <Switch
                   id="number-of-columns"
-                  isChecked={columns > 1}
-                  onChange={() => {
+                  isChecked={columns > 1 && showingChords}
+                  isDisabled={!showingChords}
+                  onChange={async () => {
                     let newColumns: number;
                     if (columns > 1) {
                       newColumns = 1;
                     } else {
                       newColumns = 2;
                     }
-                    setUserColumnsDisplay(newColumns);
                     setColumns(newColumns);
+                    await setUserColumnsDisplay(newColumns);
+                    asyncUser.execute();
                   }}
                 />
               </Flex>
@@ -129,6 +135,8 @@ const ProfileModal = ({ user, isOpen, onClose }: ProfileModalProps) => {
         </ModalBody>
       </ModalContent>
     </Modal>
+  ) : (
+    <></>
   );
 };
 export default ProfileModal;

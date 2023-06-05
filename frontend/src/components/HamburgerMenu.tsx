@@ -26,10 +26,10 @@ import {
   FaUndoAlt,
   FaUserAlt,
 } from "react-icons/fa";
-import { MdOutlineMenuOpen } from "react-icons/md";
 import { GrUnorderedList } from "react-icons/gr";
+import { MdOutlineMenuOpen } from "react-icons/md";
 import { Link as RouterLink } from "react-router-dom";
-import { Songbook } from "../models";
+import { Songbook, User } from "../models";
 import {
   deleteSongbookSong,
   nextSongbookSong,
@@ -37,9 +37,9 @@ import {
   setSongEntryFlagged,
 } from "../services/songs";
 import JumpSearch from "./JumpSearch";
+import ProfileModal from "./ProfileModal";
 
 interface HamburgerMenuProps {
-  isSongbookOwner: boolean;
   isMobileDevice: boolean;
   timerControls: {
     playPauseToggle: () => void;
@@ -57,9 +57,9 @@ interface HamburgerMenuProps {
   setFirstColDispIndex: React.Dispatch<React.SetStateAction<number>>;
   totalColumns: number;
   columnsToDisplay: number;
+  asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
 }
 export default function HamburgerMenu({
-  isSongbookOwner,
   isMobileDevice,
   timerControls,
   isLive,
@@ -71,9 +71,19 @@ export default function HamburgerMenu({
   setFirstColDispIndex,
   totalColumns,
   columnsToDisplay,
+  asyncUser,
 }: HamburgerMenuProps) {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isProfileOpen,
+    onOpen: onProfileOpen,
+    onClose: onProfileClose,
+  } = useDisclosure();
+
+  const isSongbookOwner = asyncSongbook.result
+    ? asyncSongbook.result.data.is_songbook_owner
+    : false;
 
   const performSongNavAction = async (action: "next" | "prev" | "delete") => {
     const sessionKey = asyncSongbook?.result?.data?.session_key;
@@ -85,7 +95,7 @@ export default function HamburgerMenu({
       await prevSongbookSong(sessionKey);
     } else {
       await deleteSongbookSong(
-        asyncSongbook?.result?.data?.current_song_entry?.id
+        asyncSongbook?.result?.data?.current_song_entry?.id,
       );
     }
     asyncSongbook.execute();
@@ -223,9 +233,16 @@ export default function HamburgerMenu({
           <RouterLink to="../live/">
             <MenuItem icon={<Icon as={FaHome} />}>Home</MenuItem>
           </RouterLink>
-          <RouterLink to="../live/profile">
-            <MenuItem icon={<Icon as={FaUserAlt} />}>Profile</MenuItem>
-          </RouterLink>
+          <MenuItem
+            onClick={() => {
+              onProfileOpen();
+            }}
+            cursor="pointer"
+            icon={<Icon as={FaUserAlt} />}
+          >
+            Profile
+          </MenuItem>
+
           <MenuItem
             icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
             onClick={toggleColorMode}
@@ -244,7 +261,7 @@ export default function HamburgerMenu({
             icon={<Icon as={FaExclamationTriangle} />}
             onClick={() =>
               setSongEntryFlagged(
-                asyncSongbook?.result?.data?.current_song_entry?.id
+                asyncSongbook?.result?.data?.current_song_entry?.id,
               )
             }
           >
@@ -259,6 +276,11 @@ export default function HamburgerMenu({
           </MenuItem>
         </MenuList>
       </Menu>
+      <ProfileModal
+        asyncUser={asyncUser}
+        isOpen={isProfileOpen}
+        onClose={onProfileClose}
+      />
     </>
   );
 }

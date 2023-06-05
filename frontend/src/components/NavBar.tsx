@@ -15,6 +15,7 @@ import {
   ApplicationState,
   LINES_PER_COLUMN,
   Songbook,
+  User,
 } from "../models";
 
 import { AxiosResponse } from "axios";
@@ -31,7 +32,6 @@ import { nextSongbookSong } from "../services/songs";
 import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
 import Timer from "./Timer";
-import UserProfile from "./UserProfile";
 
 interface NavBarProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
@@ -41,6 +41,7 @@ interface NavBarProps {
   firstColDispIndex: number;
   setFirstColDispIndex: React.Dispatch<React.SetStateAction<number>>;
   columnsToDisplay: number;
+  asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
 }
 
 export default function NavBar({
@@ -51,6 +52,7 @@ export default function NavBar({
   firstColDispIndex,
   setFirstColDispIndex,
   columnsToDisplay,
+  asyncUser,
 }: NavBarProps) {
   // Outlet that conditionally renders the add song drawer based on URL
   const addSongDrawerOutlet = useOutlet();
@@ -66,7 +68,6 @@ export default function NavBar({
     AppStateToTimerMap[applicationState],
   );
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
-  const [isSongbookOwner, setIsSongbookOwner] = useState<boolean>(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   const isMobileDevice = isSmallerThan900;
 
@@ -107,16 +108,6 @@ export default function NavBar({
   };
 
   useEffect(() => {
-    // const asyncUser = useAsync(getUserDetails, []);
-    // const user = asyncUser.result && asyncUser.result.data;
-    //get owners of songbook through songbook object
-    // const owners = asyncSongbook && asyncSongbook.result?.data
-    //determine if viewing user id matches an owner id
-    // user && setIsSongbookOwner(user.)
-    setIsSongbookOwner(true);
-  }, []);
-
-  useEffect(() => {
     async function appStateChanged() {
       setIsLive(false);
 
@@ -143,7 +134,6 @@ export default function NavBar({
       <Flex w="33%" justifyContent="space-between">
         <Flex paddingRight="1rem">
           <HamburgerMenu
-            isSongbookOwner={isSongbookOwner}
             isMobileDevice={isMobileDevice}
             timerControls={timerControls}
             isLive={isLive}
@@ -155,6 +145,7 @@ export default function NavBar({
             setFirstColDispIndex={setFirstColDispIndex}
             totalColumns={totalColumns}
             columnsToDisplay={columnsToDisplay}
+            asyncUser={asyncUser}
           />
         </Flex>
         <Box pt=".5rem">
@@ -241,12 +232,9 @@ export default function NavBar({
           </Flex>
         </Flex>
         <Flex w="34%" justifyContent="end">
-          <Button mt="1rem" colorScheme="blue" as={RouterLink} to={"add-song"}>
+          <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
             <AddIcon />
           </Button>
-        </Flex>
-        <Flex w="33%">
-          <UserProfile />
         </Flex>
         {addSongDrawerOutlet}
       </Flex>

@@ -13,15 +13,21 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
+import { AxiosResponse } from "axios";
 import { useState } from "react";
-import { useAsync } from "react-async-hook";
+import { UseAsyncReturn, useAsync } from "react-async-hook";
 import { useNavigate } from "react-router-dom";
+import { User } from "../models";
 import { getAllSongbooks } from "../services/songs";
 import CreateNewSongbook from "./CreateNewSongbook";
 import SongbookIndexTable from "./SongbookIndexTable";
 import UserProfile from "./UserProfile";
 
-export default function WelcomePage() {
+interface WelcomePageProps {
+  asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
+}
+
+export default function WelcomePage({ asyncUser }: WelcomePageProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [sessionKey, setSessionKey] = useState<string>("");
   const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
@@ -38,8 +44,8 @@ export default function WelcomePage() {
 
   return (
     <>
-      <Flex direction="row" justifyContent="end">
-        <UserProfile />
+      <Flex position="fixed" top="0px" right="0px">
+        <UserProfile asyncUser={asyncUser} />
       </Flex>
       <Flex justifyContent="center">
         <Flex alignItems="center" direction="column">
