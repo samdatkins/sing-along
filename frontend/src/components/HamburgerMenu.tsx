@@ -1,4 +1,4 @@
-import { HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import {
   Button,
   Flex,
@@ -73,7 +73,7 @@ export default function HamburgerMenu({
   columnsToDisplay,
   asyncUser,
 }: HamburgerMenuProps) {
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { toggleColorMode } = useColorMode();
   const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isProfileOpen,
@@ -106,7 +106,7 @@ export default function HamburgerMenu({
   // handle what happens on key press
   const handleKeyPress = (event: KeyboardEvent) => {
     // if the add song drawer is open, ignore all typing
-    if (addSongDrawerOutlet || isJumpSearchOpen) return;
+    if (addSongDrawerOutlet || isJumpSearchOpen || !isSongbookOwner) return;
 
     if (event.metaKey || event.ctrlKey || event.altKey) {
       return;
@@ -241,13 +241,6 @@ export default function HamburgerMenu({
             icon={<Icon as={FaUserAlt} />}
           >
             Profile
-          </MenuItem>
-
-          <MenuItem
-            icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-            onClick={toggleColorMode}
-          >
-            {colorMode === "light" ? "Night Mode" : "Day Mode"}
           </MenuItem>
           {asyncSongbook?.result?.data?.is_noodle_mode && (
             <RouterLink to="list">

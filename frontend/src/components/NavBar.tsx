@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Flex,
+  Heading,
   Link,
   Skeleton,
   Text,
@@ -64,6 +65,7 @@ export default function NavBar({
   const [isLive, setIsLive] = useState(true);
   // state for length of countdown timer in seconds
   const navigate = useNavigate();
+
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
     AppStateToTimerMap[applicationState],
   );
@@ -159,6 +161,19 @@ export default function NavBar({
           )}
         </Box>
 
+        {currentSongbook &&
+        currentSongbook.is_songbook_owner &&
+        !currentSongbook.is_noodle_mode ? (
+          <Box>
+            <Heading fontFamily="Ubuntu Mono">
+              {" "}
+              {currentSongbook.session_key}
+            </Heading>
+          </Box>
+        ) : (
+          <Flex></Flex>
+        )}
+
         {!isMobileDevice && (
           <Box bgColor="white" p="8px" position="fixed" right="0" bottom="0">
             <Link onClick={() => navigate(`add-song`)}>
@@ -166,8 +181,6 @@ export default function NavBar({
             </Link>
           </Box>
         )}
-
-        <Flex></Flex>
       </Flex>
       {/* MIDDLE COLUMN */}
       <Flex w="34%" alignContent="center" justifyContent="center">
@@ -192,7 +205,7 @@ export default function NavBar({
               </Text>
               <RouterLink to={`/live/${currentSongbook.session_key}/list`}>
                 <Text align="center" fontSize="1.5xl">
-                  {currentSongbook.title} {currentSongbook.session_key}
+                  {currentSongbook.title}
                   {" - "} ({"song "}
                   {currentSongbook.current_song_position} of{" "}
                   {currentSongbook.total_songs})
@@ -214,7 +227,8 @@ export default function NavBar({
         <Flex>
           <Flex justifyContent="center">
             {!isMobileDevice &&
-              !asyncSongbook?.result?.data?.is_noodle_mode && (
+              !asyncSongbook?.result?.data?.is_noodle_mode &&
+              currentSongbook?.is_songbook_owner && (
                 <>
                   {isTimerVisible ? (
                     <Timer
