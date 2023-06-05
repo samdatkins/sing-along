@@ -21,7 +21,7 @@ class TestSongbookView(APITestCase):
             type=Membership.MemberType.OWNER.value,
         )
 
-        self.first_song_entry = SongEntryFactory.create()
+        self.first_song_entry = SongEntryFactory.create(requested_by=self.user)
         self.first_song_entry.created_at = get_datetime_x_seconds_ago(5)
         self.first_song_entry.save()
 
@@ -44,14 +44,62 @@ class TestSongbookView(APITestCase):
         )
 
         self.second_song_entry = SongEntryFactory.create(
-            songbook=self.nonempty_songbook
+            songbook=self.nonempty_songbook, requested_by=self.user
         )
         self.second_song_entry.created_at = get_datetime_x_seconds_ago(3)
         self.second_song_entry.save()
 
-        self.third_song_entry = SongEntryFactory.create(songbook=self.nonempty_songbook)
+        self.third_song_entry = SongEntryFactory.create(
+            songbook=self.nonempty_songbook, requested_by=self.user
+        )
         self.third_song_entry.created_at = get_datetime_x_seconds_ago(1)
         self.third_song_entry.save()
+
+        self.user2 = UserFactory.create()
+        self.user3 = UserFactory.create()
+        self.user4 = UserFactory.create()
+        self.multi_user_songbook = SongbookFactory.create(session_key="mult")
+        Membership.objects.create(
+            user=self.user,
+            songbook=self.multi_user_songbook,
+            type=Membership.MemberType.OWNER.value,
+        )
+        Membership.objects.create(
+            user=self.user2,
+            songbook=self.multi_user_songbook,
+            type=Membership.MemberType.PARTICIPANT.value,
+        )
+        Membership.objects.create(
+            user=self.user3,
+            songbook=self.multi_user_songbook,
+            type=Membership.MemberType.PARTICIPANT.value,
+        )
+        Membership.objects.create(
+            user=self.user4,
+            songbook=self.multi_user_songbook,
+            type=Membership.MemberType.PARTICIPANT.value,
+        )
+        SongEntryFactory.create(
+            songbook=self.multi_user_songbook, requested_by=self.user
+        )
+        SongEntryFactory.create(
+            songbook=self.multi_user_songbook, requested_by=self.user
+        )
+        SongEntryFactory.create(
+            songbook=self.multi_user_songbook, requested_by=self.user
+        )
+        SongEntryFactory.create(
+            songbook=self.multi_user_songbook, requested_by=self.user
+        )
+        SongEntryFactory.create(
+            songbook=self.multi_user_songbook, requested_by=self.user2
+        )
+        SongEntryFactory.create(
+            songbook=self.multi_user_songbook, requested_by=self.user3
+        )
+        SongEntryFactory.create(
+            songbook=self.multi_user_songbook, requested_by=self.user4
+        )
 
     def test_authed_requests_succeed(self):
         # Arrange
@@ -78,7 +126,7 @@ class TestSongbookView(APITestCase):
 
         # Assert
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data["results"]), 3)
+        self.assertEqual(len(response.data["results"]), 4)
 
     def test_unauthed_requests_fail(self):
         # Arrange
@@ -410,3 +458,29 @@ class TestSongbookView(APITestCase):
             .first()
         )
         self.assertEqual(Membership.MemberType.PARTICIPANT.value, membership.type)
+
+    def test_stats_are_accurate(self):
+        # Arrange
+        session_key = self.multi_user_songbook.session_key
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        with self.assertNumQueries(5):
+            response = self.client.get(
+                reverse(
+                    "songbook-stats",
+                    kwargs={"session_key": session_key},
+                )
+            )
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 4)
+        self.assertEqual(
+            [
+                response["songs_requested"]
+                for response in response.data
+                if response["user"]["id"] == self.user.id
+            ][0],
+            4,
+        )
