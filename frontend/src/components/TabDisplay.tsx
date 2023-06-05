@@ -23,7 +23,7 @@ export default function TabDisplay({
   const [usesSharps, setUsesSharps] = useState(true);
 
   const user = asyncUser.result && asyncUser.result.data;
-  const showTabs = user ? user.userprofile.is_showing_chords : false;
+  const showChords = user ? user.userprofile.is_showing_chords : false;
 
   function handleTransposeChange(num) {
     let newTone = toneSteps + num;
@@ -68,7 +68,7 @@ export default function TabDisplay({
   return (
     <>
       {tabColumns &&
-        (!showTabs ? (
+        (!showChords ? (
           <TabWithoutChords tabToDisplay={formattedTabArray} />
         ) : (
           <TabWithChords

@@ -21,7 +21,7 @@ import { User } from "../models";
 import { getAllSongbooks } from "../services/songs";
 import CreateNewSongbook from "./CreateNewSongbook";
 import SongbookIndexTable from "./SongbookIndexTable";
-import UserProfile from "./UserProfile";
+import UserProfile from "./AvatarProfileLink";
 
 interface WelcomePageProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;

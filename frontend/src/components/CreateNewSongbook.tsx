@@ -13,9 +13,9 @@ import { createNewSongbook } from "../services/songs";
 
 export default function CreateNewSongbook() {
   const [maxSongs, setMaxSongs] = useState("");
-  const [title, setTitle] = useState<string>("");
-  const [actionVerb, setActionVerb] = useState<string>("DANCE");
-  const [isNoodleMode, setIsNoodleMode] = useState<boolean>(false);
+  const [title, setTitle] = useState("");
+  const [actionVerb, setActionVerb] = useState("DANCE");
+  const [isNoodleMode, setIsNoodleMode] = useState(false);
   const navigate = useNavigate();
   const parsedSongCap = parseInt(maxSongs);
   return (
@@ -54,7 +54,7 @@ export default function CreateNewSongbook() {
           mb="1rem"
           mt="1rem"
         >
-          <FormLabel htmlFor="night-mode" mb="0">
+          <FormLabel htmlFor="noodle-mode" mb="0">
             <Text>
               Songbook Type:{" "}
               {isNoodleMode ? (
