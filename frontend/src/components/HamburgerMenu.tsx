@@ -98,7 +98,7 @@ export default function HamburgerMenu({
       await prevSongbookSong(sessionKey);
     } else {
       await deleteSongbookSong(
-        asyncSongbook?.result?.data?.current_song_entry?.id,
+        asyncSongbook?.result?.data?.current_song_entry?.id
       );
     }
     asyncSongbook.execute();
@@ -107,7 +107,7 @@ export default function HamburgerMenu({
     timerControls.refresh();
   };
   // handle what happens on key press
-  const handleKeyPress = (event: KeyboardEvent) => {
+  const handleKeyPress = async (event: KeyboardEvent) => {
     // if the add song drawer is open, ignore all typing
     if (addSongDrawerOutlet || isJumpSearchOpen || !isSongbookOwner) return;
 
@@ -121,7 +121,10 @@ export default function HamburgerMenu({
     } else if (event.code === "Delete") {
       performSongNavAction("delete");
     } else if (event.key === "!") {
-      setSongEntryFlagged(asyncSongbook?.result?.data?.current_song_entry?.id);
+      await setSongEntryFlagged(
+        asyncSongbook?.result?.data?.current_song_entry?.id
+      );
+      asyncSongbook.execute();
     } else if (event.code === "Space") {
       timerControls.playPauseToggle();
     } else if (event.code === "ArrowLeft" && event.shiftKey) {
@@ -255,11 +258,12 @@ export default function HamburgerMenu({
           <MenuItem
             color={"red.600"}
             icon={<Icon as={FaExclamationTriangle} />}
-            onClick={() =>
-              setSongEntryFlagged(
-                asyncSongbook?.result?.data?.current_song_entry?.id,
-              )
-            }
+            onClick={async () => {
+              await setSongEntryFlagged(
+                asyncSongbook?.result?.data?.current_song_entry?.id
+              );
+              asyncSongbook.execute();
+            }}
           >
             Flag Song
           </MenuItem>

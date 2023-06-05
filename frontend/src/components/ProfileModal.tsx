@@ -55,7 +55,7 @@ const ProfileModal = ({ asyncUser, isOpen, onClose }: ProfileModalProps) => {
           <Flex direction="column" alignItems="center">
             <Image
               referrerPolicy="no-referrer"
-              src={user?.social.picture}
+              src={user?.social_auth.picture}
               rounded="100%"
               height="75px"
               mb="1rem"
