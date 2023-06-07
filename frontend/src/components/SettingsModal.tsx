@@ -21,13 +21,13 @@ import {
   toggleUserChordsDisplay,
 } from "../services/songs";
 
-interface ProfileModalProps {
+interface SettingsModalProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const ProfileModal = ({ asyncUser, isOpen, onClose }: ProfileModalProps) => {
+const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
   const user = asyncUser.result && asyncUser.result.data;
   const joinedDate =
     user && user.date_joined
@@ -48,7 +48,7 @@ const ProfileModal = ({ asyncUser, isOpen, onClose }: ProfileModalProps) => {
       <ModalOverlay />
       <ModalContent>
         <ModalHeader textAlign="center">
-          <Text>Profile & Settings</Text>
+          <Text>Settings</Text>
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
@@ -139,4 +139,4 @@ const ProfileModal = ({ asyncUser, isOpen, onClose }: ProfileModalProps) => {
     <></>
   );
 };
-export default ProfileModal;
+export default SettingModal;

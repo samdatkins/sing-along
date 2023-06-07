@@ -38,7 +38,7 @@ import {
   setSongEntryFlagged,
 } from "../services/songs";
 import JumpSearch from "./JumpSearch";
-import ProfileModal from "./ProfileModal";
+import SettingModal from "./SettingsModal";
 
 interface HamburgerMenuProps {
   isMobileDevice: boolean;
@@ -98,7 +98,7 @@ export default function HamburgerMenu({
       await prevSongbookSong(sessionKey);
     } else {
       await deleteSongbookSong(
-        asyncSongbook?.result?.data?.current_song_entry?.id
+        asyncSongbook?.result?.data?.current_song_entry?.id,
       );
     }
     asyncSongbook.execute();
@@ -122,7 +122,7 @@ export default function HamburgerMenu({
       performSongNavAction("delete");
     } else if (event.key === "!") {
       await setSongEntryFlagged(
-        asyncSongbook?.result?.data?.current_song_entry?.id
+        asyncSongbook?.result?.data?.current_song_entry?.id,
       );
       asyncSongbook.execute();
     } else if (event.code === "Space") {
@@ -246,7 +246,7 @@ export default function HamburgerMenu({
             cursor="pointer"
             icon={<Icon as={FaUserAlt} />}
           >
-            Profile
+            Settings
           </MenuItem>
           {asyncSongbook?.result?.data?.is_noodle_mode && (
             <RouterLink to="list">
@@ -260,7 +260,7 @@ export default function HamburgerMenu({
             icon={<Icon as={FaExclamationTriangle} />}
             onClick={async () => {
               await setSongEntryFlagged(
-                asyncSongbook?.result?.data?.current_song_entry?.id
+                asyncSongbook?.result?.data?.current_song_entry?.id,
               );
               asyncSongbook.execute();
             }}
@@ -285,7 +285,7 @@ export default function HamburgerMenu({
           </Flex>
         </MenuList>
       </Menu>
-      <ProfileModal
+      <SettingModal
         asyncUser={asyncUser}
         isOpen={isProfileOpen}
         onClose={onProfileClose}

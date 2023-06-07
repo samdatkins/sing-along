@@ -2,7 +2,7 @@ import { Image, SkeletonCircle, useDisclosure } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
 import { User } from "../models";
-import ProfileModal from "./ProfileModal";
+import SettingModal from "./SettingsModal";
 
 interface UserProfileProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
@@ -28,7 +28,7 @@ export default function UserProfile({ asyncUser }: UserProfileProps) {
         <SkeletonCircle alignSelf="center" margin="1rem" size="32px" />
       )}
       {user && (
-        <ProfileModal onClose={onClose} isOpen={isOpen} asyncUser={asyncUser} />
+        <SettingModal onClose={onClose} isOpen={isOpen} asyncUser={asyncUser} />
       )}
     </>
   );

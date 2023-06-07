@@ -19,9 +19,9 @@ import { UseAsyncReturn, useAsync } from "react-async-hook";
 import { useNavigate } from "react-router-dom";
 import { User } from "../models";
 import { getAllSongbooks } from "../services/songs";
+import UserProfile from "./AvatarProfileLink";
 import CreateNewSongbook from "./CreateNewSongbook";
 import SongbookIndexTable from "./SongbookIndexTable";
-import UserProfile from "./AvatarProfileLink";
 
 interface WelcomePageProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
@@ -44,7 +44,7 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
 
   return (
     <>
-      <Flex position="fixed" top="0px" right="0px">
+      <Flex position="fixed" top="0" right="0">
         <UserProfile asyncUser={asyncUser} />
       </Flex>
       <Flex justifyContent="center">

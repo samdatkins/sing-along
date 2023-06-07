@@ -5,12 +5,14 @@ import {
   Flex,
   Heading,
   Link,
+  Portal,
   Skeleton,
   Text,
   useBoolean,
   useMediaQuery,
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { BsSuitHeart, BsSuitHeartFill } from "react-icons/bs";
 import {
   AppStateToTimerMap,
   ApplicationState,
@@ -63,6 +65,7 @@ export default function NavBar({
     AppStateToTimerMap[applicationState],
   );
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
+  const [isLiked, setIsLiked] = useBoolean(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   const isMobileDevice = isSmallerThan900;
 
@@ -120,10 +123,16 @@ export default function NavBar({
     timerControls.refresh();
   }, [countdownTimerInSeconds]);
 
+  const heartIconStyle = {
+    size: "34px",
+    color: "red",
+    opacity: "65%",
+  };
+
   return (
-    <Flex flexDir="row" w="100%" justifyContent="space-between">
+    <Flex flexDir="row" justifyContent="space-between">
       {/* LEFT COLUMN */}
-      <Flex w="33%" justifyContent="space-between">
+      <Flex justifyContent="space-between">
         <Flex paddingRight="1rem">
           <HamburgerMenu
             isMobileDevice={isMobileDevice}
@@ -165,7 +174,7 @@ export default function NavBar({
         )}
       </Flex>
       {/* MIDDLE COLUMN */}
-      <Flex w="34%" alignContent="center" justifyContent="center">
+      <Flex alignItems="space-between" justifyContent="space-between">
         <Flex direction="column">
           {!!asyncSongbook?.result && currentSongbook ? (
             <>
@@ -175,15 +184,15 @@ export default function NavBar({
                 fontSize="2xl"
                 align="center"
               >
+                {currentSongbook?.current_song_entry?.is_flagged && (
+                  <WarningTwoIcon />
+                )}{" "}
                 <Link
                   fontWeight="bold"
                   target="_blank"
                   rel="noopener noreferrer"
                   href={currentSongbook.current_song_entry?.song.url}
                 >
-                  {currentSongbook.current_song_entry.is_flagged && (
-                    <WarningTwoIcon />
-                  )}{" "}
                   "{currentSongbook.current_song_entry?.song.title}" by{" "}
                   {currentSongbook.current_song_entry?.song.artist}
                 </Link>{" "}
@@ -207,29 +216,47 @@ export default function NavBar({
         </Flex>
       </Flex>
       {/* RIGHT COLUMN */}
-      <Flex w="33%" justifyContent="space-between">
-        <Flex></Flex>
-        <Flex>
-          <Flex justifyContent="center">
-            {!isMobileDevice &&
-              !asyncSongbook?.result?.data?.is_noodle_mode &&
-              currentSongbook?.is_songbook_owner && (
-                <>
-                  {isTimerVisible ? (
-                    <Timer
-                      isLive={isLive}
-                      reference={timerRef}
-                      timerKey={timerKey}
-                      triggerOnTimerComplete={advanceToNextAppState}
-                      countdownTimeInSeconds={countdownTimerInSeconds}
-                    />
-                  ) : (
-                    <Button onClick={setIsTimerVisible.toggle}>Start</Button>
-                  )}
-                </>
-              )}
-          </Flex>
+      <Flex justifyContent="space-between">
+        <Flex justifyContent="center">
+          {!isMobileDevice &&
+            !asyncSongbook?.result?.data?.is_noodle_mode &&
+            currentSongbook?.is_songbook_owner && (
+              <>
+                {isTimerVisible ? (
+                  <Timer
+                    isLive={isLive}
+                    reference={timerRef}
+                    timerKey={timerKey}
+                    triggerOnTimerComplete={advanceToNextAppState}
+                    countdownTimeInSeconds={countdownTimerInSeconds}
+                  />
+                ) : (
+                  <Button onClick={setIsTimerVisible.toggle}>Start</Button>
+                )}
+              </>
+            )}
         </Flex>
+        {/* LIKE ICON */}
+        {asyncSongbook &&
+          asyncSongbook.result &&
+          !asyncSongbook?.result?.data?.is_songbook_owner && (
+            <Portal>
+              <Flex mr="10px" position="fixed" right="0" bottom="0">
+                {isLiked ? (
+                  <BsSuitHeartFill
+                    {...heartIconStyle}
+                    onClick={setIsLiked.toggle}
+                  />
+                ) : (
+                  <BsSuitHeart
+                    {...heartIconStyle}
+                    onClick={setIsLiked.toggle}
+                  />
+                )}
+              </Flex>
+            </Portal>
+          )}
+
         <Flex w="34%" justifyContent="end">
           <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
             <AddIcon />
