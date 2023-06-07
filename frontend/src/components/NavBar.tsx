@@ -132,7 +132,7 @@ export default function NavBar({
   return (
     <Flex flexDir="row" justifyContent="space-between">
       {/* LEFT COLUMN */}
-      <Flex justifyContent="space-between">
+      <Flex justifyContent="space-between" width={!isMobileDevice ? "33%" : ""}>
         <Flex paddingRight="1rem">
           <HamburgerMenu
             isMobileDevice={isMobileDevice}
@@ -162,7 +162,8 @@ export default function NavBar({
 
         {currentSongbook &&
         currentSongbook.is_songbook_owner &&
-        !currentSongbook.is_noodle_mode ? (
+        !currentSongbook.is_noodle_mode &&
+        !isMobileDevice ? (
           <Box>
             <Heading fontFamily="Ubuntu Mono">
               {" "}
@@ -172,9 +173,14 @@ export default function NavBar({
         ) : (
           <Flex></Flex>
         )}
+        <Flex> </Flex>
       </Flex>
       {/* MIDDLE COLUMN */}
-      <Flex alignItems="space-between" justifyContent="space-between">
+      <Flex
+        alignItems="space-between"
+        width={!isMobileDevice ? "34%" : ""}
+        justifyContent="space-between"
+      >
         <Flex direction="column">
           {!!asyncSongbook?.result && currentSongbook ? (
             <>
@@ -216,7 +222,7 @@ export default function NavBar({
         </Flex>
       </Flex>
       {/* RIGHT COLUMN */}
-      <Flex justifyContent="space-between">
+      <Flex width={!isMobileDevice ? "33%" : ""} justifyContent="space-between">
         <Flex justifyContent="center">
           {!isMobileDevice &&
             !asyncSongbook?.result?.data?.is_noodle_mode &&
