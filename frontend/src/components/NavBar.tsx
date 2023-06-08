@@ -25,7 +25,7 @@ import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
 import { Link as RouterLink, useOutlet } from "react-router-dom";
 import { countTabColumns } from "../helpers/tab";
-import { nextSongbookSong } from "../services/songs";
+import { likeSong, nextSongbookSong, unlikeSong } from "../services/songs";
 import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
 import Timer from "./Timer";
@@ -120,6 +120,15 @@ export default function NavBar({
   }, [applicationState]);
 
   useEffect(() => {
+    asyncSongbook &&
+    asyncSongbook.result &&
+    asyncSongbook.result.data &&
+    asyncSongbook?.result?.data?.is_current_song_liked
+      ? setIsLiked.on()
+      : setIsLiked.off();
+  }, [asyncSongbook, setIsLiked]);
+
+  useEffect(() => {
     timerControls.refresh();
   }, [countdownTimerInSeconds]);
 
@@ -127,6 +136,17 @@ export default function NavBar({
     size: "34px",
     color: "red",
     opacity: "65%",
+    filter: "drop-shadow(1px 1px 0 #666666",
+  };
+
+  const handleHeartClick = async () => {
+    if (!asyncSongbook || !asyncSongbook.result || !asyncSongbook.result.data)
+      return;
+    const newLikeState = !isLiked;
+    const songId = asyncSongbook.result.data.current_song_entry.song.id;
+    console.log(songId);
+    newLikeState ? await likeSong(songId) : await unlikeSong(songId);
+    asyncSongbook.execute();
   };
 
   return (
@@ -173,13 +193,12 @@ export default function NavBar({
         ) : (
           <Flex></Flex>
         )}
-        <Flex> </Flex>
       </Flex>
       {/* MIDDLE COLUMN */}
       <Flex
-        alignItems="space-between"
+        alignItems="center"
         width={!isMobileDevice ? "34%" : ""}
-        justifyContent="space-between"
+        justifyContent="center"
       >
         <Flex direction="column">
           {!!asyncSongbook?.result && currentSongbook ? (
@@ -223,6 +242,7 @@ export default function NavBar({
       </Flex>
       {/* RIGHT COLUMN */}
       <Flex width={!isMobileDevice ? "33%" : ""} justifyContent="space-between">
+        <Flex></Flex>
         <Flex justifyContent="center">
           {!isMobileDevice &&
             !asyncSongbook?.result?.data?.is_noodle_mode &&
@@ -242,34 +262,28 @@ export default function NavBar({
               </>
             )}
         </Flex>
-        {/* LIKE ICON */}
-        {asyncSongbook &&
-          asyncSongbook.result &&
-          !asyncSongbook?.result?.data?.is_songbook_owner && (
-            <Portal>
-              <Flex mr="10px" position="fixed" right="0" bottom="0">
-                {isLiked ? (
-                  <BsSuitHeartFill
-                    {...heartIconStyle}
-                    onClick={setIsLiked.toggle}
-                  />
-                ) : (
-                  <BsSuitHeart
-                    {...heartIconStyle}
-                    onClick={setIsLiked.toggle}
-                  />
-                )}
-              </Flex>
-            </Portal>
-          )}
-
-        <Flex w="34%" justifyContent="end">
-          <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
-            <AddIcon />
-          </Button>
-        </Flex>
+        <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
+          <AddIcon />
+        </Button>
         {addSongDrawerOutlet}
       </Flex>
+      {/* LIKE ICON */}
+      {asyncSongbook &&
+        asyncSongbook.result &&
+        !asyncSongbook?.result?.data?.is_songbook_owner && (
+          <Portal>
+            <Flex mr="10px" position="fixed" right="10px" bottom="10px">
+              {isLiked ? (
+                <BsSuitHeartFill
+                  {...heartIconStyle}
+                  onClick={handleHeartClick}
+                />
+              ) : (
+                <BsSuitHeart {...heartIconStyle} onClick={handleHeartClick} />
+              )}
+            </Flex>
+          </Portal>
+        )}
     </Flex>
   );
 }

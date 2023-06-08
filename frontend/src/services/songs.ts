@@ -179,7 +179,7 @@ export async function setSongEntryFlagged(id: number | undefined) {
 
 export async function likeSong(song_id: number) {
   try {
-    return await axios.put<User>(`/api/songs/${song_id}/like`);
+    return await axios.put(`/api/songs/${song_id}/like/`);
   } catch (error) {
     console.error(`Couldn't resolve the like: ${error}`);
     return false;
@@ -187,7 +187,7 @@ export async function likeSong(song_id: number) {
 }
 export async function unlikeSong(song_id: number) {
   try {
-    return await axios.delete<User>(`/api/songs/${song_id}/like`);
+    return await axios.delete(`/api/songs/${song_id}/like/`);
   } catch (error) {
     console.error(`Couldn't resolve the unlike: ${error}`);
     return false;

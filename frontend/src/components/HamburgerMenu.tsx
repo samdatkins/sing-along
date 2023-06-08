@@ -1,4 +1,4 @@
-import { HamburgerIcon } from "@chakra-ui/icons";
+import { HamburgerIcon, SettingsIcon } from "@chakra-ui/icons";
 import {
   Button,
   Flex,
@@ -24,7 +24,6 @@ import {
   FaPlay,
   FaTrash,
   FaUndoAlt,
-  FaUserAlt,
 } from "react-icons/fa";
 import { GrUnorderedList } from "react-icons/gr";
 import { MdOutlineMenuOpen } from "react-icons/md";
@@ -244,7 +243,7 @@ export default function HamburgerMenu({
               onProfileOpen();
             }}
             cursor="pointer"
-            icon={<Icon as={FaUserAlt} />}
+            icon={<Icon as={SettingsIcon} />}
           >
             Settings
           </MenuItem>
