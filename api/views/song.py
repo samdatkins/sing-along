@@ -49,3 +49,17 @@ class SongViewSet(viewsets.GenericViewSet):
             status=status.HTTP_200_OK,
             data=SongSerializer(song_matches, many=True).data,
         )
+
+    @action(methods=["put", "delete"], detail=True, url_path="like", url_name="like")
+    def like(self, request, pk):
+        user = request.user
+        instance = self.get_object()
+
+        if request.method == "PUT":
+            instance.likes.add(user)
+            return Response(status=status.HTTP_201_CREATED)
+        elif request.method == "DELETE":
+            instance.likes.remove(user)
+            return Response(status=status.HTTP_202_ACCEPTED)
+
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
