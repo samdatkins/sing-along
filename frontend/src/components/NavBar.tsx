@@ -8,6 +8,7 @@ import {
   Skeleton,
   Text,
   useBoolean,
+  useDisclosure,
   useMediaQuery,
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -26,6 +27,8 @@ import { countTabColumns } from "../helpers/tab";
 import { nextSongbookSong } from "../services/songs";
 import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
+import MemberAvatarGroup from "./MemberAvatarGroup";
+import StatsModal from "./StatsModal";
 import Timer from "./Timer";
 
 interface NavBarProps {
@@ -67,6 +70,12 @@ export default function NavBar({
   const isMobileDevice = isSmallerThan900;
 
   const currentSongbook = asyncSongbook.result?.data;
+
+  const {
+    isOpen: isStatsOpen,
+    onOpen: onStatsOpen,
+    onClose: onStatsClose,
+  } = useDisclosure();
 
   const totalColumns = useMemo(
     () =>
@@ -230,11 +239,30 @@ export default function NavBar({
               )}
           </Flex>
         </Flex>
-        <Flex w="34%" justifyContent="end">
-          <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
-            <AddIcon />
-          </Button>
-        </Flex>
+        {currentSongbook?.is_songbook_owner &&
+        !isMobileDevice &&
+        !asyncSongbook?.result?.data?.is_noodle_mode ? (
+          currentSongbook &&
+          currentSongbook.session_key && (
+            <>
+              <Flex onClick={onStatsOpen}>
+                <MemberAvatarGroup />
+              </Flex>
+              <StatsModal
+                isOpen={isStatsOpen}
+                onClose={onStatsClose}
+                sessionKey={currentSongbook.session_key}
+                songbookTitle={currentSongbook.title}
+              />
+            </>
+          )
+        ) : (
+          <Flex w="34%" justifyContent="end">
+            <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
+              <AddIcon />
+            </Button>
+          </Flex>
+        )}
         {addSongDrawerOutlet}
       </Flex>
     </Flex>
