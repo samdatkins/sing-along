@@ -4,6 +4,7 @@ import {
   Song,
   Songbook,
   SongbookDetails,
+  SongbookListItem,
   SongEntry,
   User,
 } from "../models";
@@ -50,7 +51,9 @@ export async function getSongbookDetails(sessionKey: string | undefined) {
 }
 
 export async function getAllSongbooks() {
-  return await axios.get<DjangoPaginatedResponse<Songbook>>(`/api/songbooks/`);
+  return await axios.get<DjangoPaginatedResponse<SongbookListItem>>(
+    `/api/songbooks/`,
+  );
 }
 
 export async function nextSongbookSong(sessionKey: string | undefined) {
@@ -171,5 +174,22 @@ export async function setSongEntryFlagged(id: number | undefined) {
     });
   } catch (error) {
     console.error(`Couldn't flag song entry: ${error}`);
+  }
+}
+
+export async function likeSong(song_id: number) {
+  try {
+    return await axios.put<User>(`/api/songs/${song_id}/like`);
+  } catch (error) {
+    console.error(`Couldn't resolve the like: ${error}`);
+    return false;
+  }
+}
+export async function unlikeSong(song_id: number) {
+  try {
+    return await axios.delete<User>(`/api/songs/${song_id}/like`);
+  } catch (error) {
+    console.error(`Couldn't resolve the unlike: ${error}`);
+    return false;
   }
 }

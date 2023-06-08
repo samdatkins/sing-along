@@ -33,8 +33,9 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
   const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
   const songbooks = asyncSongbooks.result?.data.results;
   const activePowerHours = songbooks?.filter((songbook) => {
+    debugger;
     const currentTime = new Date(Date.now()).getTime();
-    const songbookTime = new Date(songbook["current_song_timestamp"]).getTime();
+    const songbookTime = new Date(songbook.created_at).getTime();
     return (
       songbook.is_noodle_mode === false &&
       (currentTime - songbookTime) / (1000 * 60 * 60) < 8

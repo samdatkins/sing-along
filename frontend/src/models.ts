@@ -25,7 +25,9 @@ export type Songbook = {
   total_songs: number;
   current_song_position: number;
   current_song_entry: SongEntry;
+  current_song_timestamp: string;
   is_songbook_owner: boolean;
+  is_current_song_liked: boolean;
 };
 
 export type SongbookDetails = {
@@ -36,6 +38,16 @@ export type SongbookDetails = {
   is_noodle_mode: boolean;
   song_entries: SongEntry[];
 };
+
+export type SongbookListItem = {
+  session_key: string;
+  max_active_songs?: number;
+  title: string;
+  is_noodle_mode: boolean;
+  current_song_timestamp: string;
+  created_at: string;
+};
+
 export enum ApplicationState {
   ShowSong,
   ActionPrompt,

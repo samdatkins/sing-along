@@ -73,6 +73,7 @@ class SongbookListSerializer(serializers.ModelSerializer):
             "title",
             "is_noodle_mode",
             "current_song_timestamp",
+            "created_at",
         ]
 
         extra_kwargs = {"session_key": {"read_only": True}}
