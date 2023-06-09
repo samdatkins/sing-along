@@ -26,7 +26,7 @@ import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
 import { Link as RouterLink, useOutlet } from "react-router-dom";
 import { countTabColumns } from "../helpers/tab";
-import { likeSong, nextSongbookSong, unlikeSong } from "../services/songs";
+import { nextSongbookSong, setSongLikeStatus } from "../services/songs";
 import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
 import MemberAvatarGroup from "./MemberAvatarGroup";
@@ -65,7 +65,7 @@ export default function NavBar({
   // state for length of countdown timer in seconds
 
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
-    AppStateToTimerMap[applicationState],
+    AppStateToTimerMap[applicationState]
   );
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
   const [isLiked, setIsLiked] = useBoolean(false);
@@ -84,9 +84,9 @@ export default function NavBar({
     () =>
       countTabColumns(
         asyncSongbook.result?.data?.current_song_entry?.song?.content,
-        LINES_PER_COLUMN,
+        LINES_PER_COLUMN
       ),
-    [asyncSongbook.result?.data?.current_song_entry?.song?.content],
+    [asyncSongbook.result?.data?.current_song_entry?.song?.content]
   );
 
   const timerControls = {
@@ -126,13 +126,10 @@ export default function NavBar({
   }, [applicationState]);
 
   useEffect(() => {
-    asyncSongbook &&
-    asyncSongbook.result &&
-    asyncSongbook.result.data &&
     asyncSongbook?.result?.data?.is_current_song_liked
       ? setIsLiked.on()
       : setIsLiked.off();
-  }, [asyncSongbook, setIsLiked]);
+  }, [asyncSongbook?.result?.data?.is_current_song_liked, setIsLiked]);
 
   useEffect(() => {
     timerControls.refresh();
@@ -156,15 +153,17 @@ export default function NavBar({
     color: "red",
     opacity: "65%",
     filter: "drop-shadow(1px 1px 0 #666666",
+    cursor: "pointer",
   };
 
   const handleHeartClick = async () => {
-    if (!asyncSongbook || !asyncSongbook.result || !asyncSongbook.result.data)
+    if (!asyncSongbook?.result?.data) {
       return;
+    }
+    setIsLiked.toggle();
     const newLikeState = !isLiked;
     const songId = asyncSongbook.result.data.current_song_entry.song.id;
-    console.log(songId);
-    newLikeState ? await likeSong(songId) : await unlikeSong(songId);
+    setSongLikeStatus(songId, newLikeState);
     asyncSongbook.execute();
   };
 
@@ -199,9 +198,8 @@ export default function NavBar({
           )}
         </Box>
 
-        {currentSongbook &&
-        currentSongbook.is_songbook_owner &&
-        !currentSongbook.is_noodle_mode &&
+        {currentSongbook?.is_songbook_owner &&
+        !currentSongbook?.is_noodle_mode &&
         !isMobileDevice ? (
           <Box>
             <Heading fontFamily="Ubuntu Mono">
@@ -313,22 +311,17 @@ export default function NavBar({
         {addSongDrawerOutlet}
       </Flex>
       {/* LIKE ICON */}
-      {asyncSongbook &&
-        asyncSongbook.result &&
-        !asyncSongbook?.result?.data?.is_songbook_owner && (
-          <Portal>
-            <Flex mr="10px" position="fixed" right="10px" bottom="10px">
-              {isLiked ? (
-                <BsSuitHeartFill
-                  {...heartIconStyle}
-                  onClick={handleHeartClick}
-                />
-              ) : (
-                <BsSuitHeart {...heartIconStyle} onClick={handleHeartClick} />
-              )}
-            </Flex>
-          </Portal>
-        )}
+      {!asyncSongbook?.result?.data?.is_songbook_owner && (
+        <Portal>
+          <Flex mr="10px" position="fixed" right="10px" bottom="10px">
+            {isLiked ? (
+              <BsSuitHeartFill {...heartIconStyle} onClick={handleHeartClick} />
+            ) : (
+              <BsSuitHeart {...heartIconStyle} onClick={handleHeartClick} />
+            )}
+          </Flex>
+        </Portal>
+      )}
     </Flex>
   );
 }

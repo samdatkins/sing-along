@@ -26,7 +26,7 @@ export async function toggleUserChordsDisplay(isShowingChords: boolean) {
     });
   } catch (error) {
     console.error(
-      `Couldn't toggle user's chords display preferences: ${error}`,
+      `Couldn't toggle user's chords display preferences: ${error}`
     );
   }
 }
@@ -47,13 +47,13 @@ export async function getCurrentSong(sessionKey: string | undefined) {
 
 export async function getSongbookDetails(sessionKey: string | undefined) {
   return await axios.get<SongbookDetails>(
-    `/api/songbooks/${sessionKey}/details/`,
+    `/api/songbooks/${sessionKey}/details/`
   );
 }
 
 export async function getAllSongbooks() {
   return await axios.get<DjangoPaginatedResponse<SongbookListItem>>(
-    `/api/songbooks/`,
+    `/api/songbooks/`
   );
 }
 
@@ -72,7 +72,7 @@ export async function nextSongbookSong(sessionKey: string | undefined) {
 export async function createNewSongbook(
   maxActiveSongs: string | undefined,
   songbookTitle: string | undefined,
-  isNoodleMode: boolean | undefined,
+  isNoodleMode: boolean | undefined
 ) {
   try {
     return await axios.post<Songbook>(`/api/songbooks/`, {
@@ -89,7 +89,7 @@ export async function createNewSongbook(
 
 export async function setSongbookSong(
   sessionKey: string | undefined,
-  songCreatedTime: string | undefined,
+  songCreatedTime: string | undefined
 ) {
   if (!sessionKey || !songCreatedTime) return;
 
@@ -148,7 +148,7 @@ export async function searchForSong(q: string) {
 
 export async function addSongToSongbook(
   song?: Song | undefined,
-  songbookId?: number,
+  songbookId?: number
 ) {
   try {
     return await axios.post<SongEntry>(`/api/song_entries/`, {
@@ -178,20 +178,15 @@ export async function setSongEntryFlagged(id: number | undefined) {
   }
 }
 
-export async function likeSong(song_id: number) {
+export async function setSongLikeStatus(song_id: number, isLiked: boolean) {
   try {
-    return await axios.put(`/api/songs/${song_id}/like/`);
+    if (isLiked) {
+      return await axios.put(`/api/songs/${song_id}/like/`);
+    } else {
+      return await axios.delete(`/api/songs/${song_id}/like/`);
+    }
   } catch (error) {
-    console.error(`Couldn't resolve the like: ${error}`);
-    return false;
-  }
-}
-
-export async function unlikeSong(song_id: number) {
-  try {
-    return await axios.delete(`/api/songs/${song_id}/like/`);
-  } catch (error) {
-    console.error(`Couldn't resolve the unlike: ${error}`);
+    console.error(`Couldn't update like status: ${error}`);
     return false;
   }
 }

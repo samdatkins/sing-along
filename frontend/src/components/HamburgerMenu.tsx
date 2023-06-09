@@ -97,7 +97,7 @@ export default function HamburgerMenu({
       await prevSongbookSong(sessionKey);
     } else {
       await deleteSongbookSong(
-        asyncSongbook?.result?.data?.current_song_entry?.id,
+        asyncSongbook?.result?.data?.current_song_entry?.id
       );
     }
     asyncSongbook.execute();
@@ -121,7 +121,7 @@ export default function HamburgerMenu({
       performSongNavAction("delete");
     } else if (event.key === "!") {
       await setSongEntryFlagged(
-        asyncSongbook?.result?.data?.current_song_entry?.id,
+        asyncSongbook?.result?.data?.current_song_entry?.id
       );
       asyncSongbook.execute();
     } else if (event.code === "Space") {
@@ -259,7 +259,7 @@ export default function HamburgerMenu({
             icon={<Icon as={FaExclamationTriangle} />}
             onClick={async () => {
               await setSongEntryFlagged(
-                asyncSongbook?.result?.data?.current_song_entry?.id,
+                asyncSongbook?.result?.data?.current_song_entry?.id
               );
               asyncSongbook.execute();
             }}
@@ -267,12 +267,14 @@ export default function HamburgerMenu({
             Flag Song
           </MenuItem>
 
-          <MenuItem
-            icon={<Icon as={MdOutlineMenuOpen} boxSize={4} />}
-            onClick={onOpen}
-          >
-            Jump To...
-          </MenuItem>
+          {isSongbookOwner && (
+            <MenuItem
+              icon={<Icon as={MdOutlineMenuOpen} boxSize={4} />}
+              onClick={onOpen}
+            >
+              Jump To...
+            </MenuItem>
+          )}
           <Flex direction="column" justifyContent="center" alignItems="center">
             <Flex
               flexDirection="row"
