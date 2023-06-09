@@ -78,7 +78,7 @@ const MemberAvatarGroup = () => {
           },
         ],
       },
-      songs_requested: 99,
+      songs_requested: 12,
     },
     {
       user: {
@@ -91,7 +91,7 @@ const MemberAvatarGroup = () => {
           },
         ],
       },
-      songs_requested: 99,
+      songs_requested: 5,
     },
     {
       user: {
@@ -104,7 +104,7 @@ const MemberAvatarGroup = () => {
           },
         ],
       },
-      songs_requested: 99,
+      songs_requested: 7,
     },
     {
       user: {
@@ -117,13 +117,13 @@ const MemberAvatarGroup = () => {
           },
         ],
       },
-      songs_requested: 99,
+      songs_requested: 19,
     },
   ];
 
   return (
     <Flex>
-      <AvatarGroup size="md" max={6}>
+      <AvatarGroup max={6}>
         {membersList &&
           membersList.length &&
           membersList.map((member) => {

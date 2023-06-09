@@ -1,6 +1,11 @@
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Avatar,
-  Card,
+  Box,
   Flex,
   Grid,
   GridItem,
@@ -11,6 +16,8 @@ import {
   ModalContent,
   ModalFooter,
   ModalOverlay,
+  Progress,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import QRCode from "react-qr-code";
 
@@ -109,9 +116,8 @@ const StatsModal = ({
           },
         ],
       },
-      songs_requested: 99,
+      songs_requested: 12,
     },
-
     {
       user: {
         id: 33,
@@ -123,7 +129,7 @@ const StatsModal = ({
           },
         ],
       },
-      songs_requested: 99,
+      songs_requested: 5,
     },
     {
       user: {
@@ -132,11 +138,11 @@ const StatsModal = ({
         last_name: "Malkmus",
         social_auth: [
           {
-            picture: "/malkmus.jpg",
+            picture: "",
           },
         ],
       },
-      songs_requested: 99,
+      songs_requested: 7,
     },
     {
       user: {
@@ -149,13 +155,18 @@ const StatsModal = ({
           },
         ],
       },
-      songs_requested: 99,
+      songs_requested: 19,
     },
   ];
 
+  const avatarBackgroundStyle = {
+    color: useColorModeValue("white", "black"),
+    bg: useColorModeValue("teal.500", "cyan.300"),
+  };
+
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} size="5xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="6xl">
         <ModalOverlay />
         <ModalContent>
           <ModalCloseButton />
@@ -164,59 +175,138 @@ const StatsModal = ({
               {songbookTitle}
             </Heading>
             <Flex direction="column" alignItems="center">
-              <Flex
-                bgColor="white"
-                width="166px"
-                justifyContent="center"
-                border="8px solid white"
-                margin="1rem"
-              >
-                <QRCode size={150} value={addSongUrl} />
+              <Flex direction="row" alignItems="center">
+                <Heading
+                  size="4xl"
+                  margin="1rem"
+                  mr="3rem"
+                  fontFamily="Ubuntu Mono"
+                  textAlign="center"
+                >
+                  {sessionKey}
+                </Heading>
+                <Flex
+                  bgColor="white"
+                  width="166px"
+                  justifyContent="center"
+                  border="8px solid white"
+                  margin="1rem"
+                  mb="3rem"
+                >
+                  <QRCode size={150} value={addSongUrl} />
+                </Flex>
               </Flex>
-              <Heading
-                size="2xl"
-                margin="1rem"
-                fontFamily="Ubuntu Mono"
-                textAlign="center"
-              >
-                {sessionKey}
-              </Heading>
-              <Grid templateColumns="repeat(3, 1fr)" margin="1rem">
-                {songbookStats &&
-                  songbookStats.length &&
-                  songbookStats.map((stat) => {
-                    return (
-                      <GridItem key={stat.user.id}>
-                        <Card
-                          margin="5px"
-                          padding="10px"
-                          width="95%"
-                          colorScheme="blue"
-                          variant="filled"
+            </Flex>
+
+            <Accordion defaultIndex={[0]} allowMultiple>
+              <AccordionItem>
+                <h2>
+                  <AccordionButton>
+                    <Box as="span" flex="1" textAlign="left">
+                      <Heading size="lg">Songbook Members</Heading>
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  <Grid templateColumns="repeat(5, 2fr)" gap={6} margin="1rem">
+                    {songbookStats &&
+                      songbookStats.length &&
+                      songbookStats.map((stat) => {
+                        return (
+                          <GridItem key={stat.user.id}>
+                            <Flex
+                              margin="5px"
+                              padding="10px"
+                              width="95%"
+                              direction="row"
+                              justifyContent="baseline"
+                              alignItems="center"
+                            >
+                              <Avatar
+                                ml="5px"
+                                mr="10px"
+                                {...avatarBackgroundStyle}
+                                name={`${
+                                  stat.user.first_name
+                                } ${stat.user.last_name.substring(0, 1)}`}
+                                src={stat.user.social_auth[0].picture}
+                              />{" "}
+                              <Heading
+                                size="sm"
+                                verticalAlign="center"
+                                ml="5px"
+                              >
+                                {stat.user.first_name}{" "}
+                                {stat.user.last_name.substring(0, 1)}.
+                              </Heading>
+                            </Flex>
+                          </GridItem>
+                        );
+                      })}
+                  </Grid>
+                </AccordionPanel>
+              </AccordionItem>
+
+              <AccordionItem>
+                <h2>
+                  <AccordionButton>
+                    <Box as="span" flex="1" textAlign="left">
+                      <Heading size="lg">Requests Leaderboard</Heading>
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  {songbookStats &&
+                    songbookStats.length &&
+                    songbookStats.map((stat) => {
+                      return stat.songs_requested > 0 ? (
+                        <Flex
+                          direction="row"
+                          justifyContent="center"
+                          alignItems="center"
+                          key={stat.user.id}
                         >
-                          <Flex
-                            direction="row"
-                            justifyContent="baseline"
-                            alignItems="center"
-                          >
+                          <Flex width="20%" alignItems="center">
                             <Avatar
                               ml="5px"
                               mr="10px"
+                              {...avatarBackgroundStyle}
+                              name={`${
+                                stat.user.first_name
+                              } ${stat.user.last_name.substring(0, 1)}`}
                               src={stat.user.social_auth[0].picture}
                             />{" "}
-                            <Heading size="sm" verticalAlign="center">
-                              {stat.user.first_name} requested{" "}
-                              {stat.songs_requested} songs!
+                            <Heading size="sm" verticalAlign="center" ml="5px">
+                              {stat.user.first_name}{" "}
+                              {stat.user.last_name.substring(0, 1)}.
                             </Heading>
                           </Flex>
-                        </Card>
-                      </GridItem>
-                    );
-                  })}
-              </Grid>
-            </Flex>
+                          <Flex width="40%">
+                            <Progress
+                              ml="1rem"
+                              mr="1rem"
+                              width="100%"
+                              value={stat.songs_requested}
+                            />
+                            <Heading
+                              size="sm"
+                              width="10%"
+                              verticalAlign="center"
+                            >
+                              {stat.songs_requested}
+                            </Heading>
+                          </Flex>
+                        </Flex>
+                      ) : (
+                        <></>
+                      );
+                    })}
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
           </ModalBody>
-
           <ModalFooter></ModalFooter>
         </ModalContent>
       </Modal>
