@@ -7,6 +7,7 @@ import {
   Avatar,
   Box,
   Flex,
+  FormLabel,
   Grid,
   GridItem,
   Heading,
@@ -17,9 +18,10 @@ import {
   ModalFooter,
   ModalOverlay,
   Progress,
+  Switch,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAsync } from "react-async-hook";
 import QRCode from "react-qr-code";
 import { getSongbookStats } from "../services/songs";
@@ -39,20 +41,18 @@ const StatsModal = ({
   songbookTitle,
   totalSongs,
 }: StatsModalProps) => {
+  const [defaultTab, setDefaultTab] = useState(0);
+
   const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
   const asyncSongbookStats = useAsync(getSongbookStats, [sessionKey], {
     setLoading: (state) => ({ ...state, loading: true }),
   });
   const songbookStats = asyncSongbookStats?.result?.data;
-
-  const [topRequestScore, setTopRequestScore] = useState<number>(60);
-
-  useEffect(() => {
-    songbookStats &&
-      songbookStats.length &&
-      setTopRequestScore(songbookStats[0].songs_requested);
-  }, [songbookStats]);
+  const topRequestScore =
+    songbookStats && songbookStats.length
+      ? songbookStats[0].songs_requested
+      : 1;
 
   const avatarBackgroundStyle = {
     color: useColorModeValue("white", "black"),
@@ -86,7 +86,6 @@ const StatsModal = ({
                   justifyContent="center"
                   border="8px solid white"
                   margin="1rem"
-                  mb="3rem"
                 >
                   <QRCode size={150} value={addSongUrl} />
                 </Flex>
@@ -101,8 +100,23 @@ const StatsModal = ({
                 </Heading>
               </Flex>
             </Flex>
-
-            <Accordion defaultIndex={[0]} allowMultiple>
+            <Flex
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              margin="1rem"
+            >
+              <FormLabel mr="1rem">
+                {defaultTab ? `Hide Stats` : `Show Stats`}
+              </FormLabel>
+              <Switch
+                isChecked={defaultTab > 0}
+                onChange={() => {
+                  defaultTab ? setDefaultTab(0) : setDefaultTab(1);
+                }}
+              />
+            </Flex>
+            <Accordion index={[defaultTab]} allowMultiple>
               <AccordionItem>
                 <h2>
                   <AccordionButton>
