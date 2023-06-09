@@ -194,12 +194,12 @@ const StatsModal = ({
                           >
                             {stat.songs_requested}
                           </Heading>
-                          <Flex width={totalSongs * 8} justifyContent="center">
+                          <Flex width="85%" justifyContent="center">
                             <Progress
                               ml="1rem"
                               mr="1rem"
-                              width={totalSongs * 8}
-                              value={stat.songs_requested}
+                              width="100%"
+                              value={(stat.songs_requested / totalSongs) * 100}
                             />
                           </Flex>
                           <Heading

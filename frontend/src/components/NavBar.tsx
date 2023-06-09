@@ -246,7 +246,7 @@ export default function NavBar({
           currentSongbook.session_key && (
             <>
               <Flex onClick={onStatsOpen}>
-                <MemberAvatarGroup />
+                <MemberAvatarGroup sessionKey={currentSongbook.session_key} />
               </Flex>
               <StatsModal
                 isOpen={isStatsOpen}
