@@ -176,7 +176,5 @@ export async function setSongEntryFlagged(id: number | undefined) {
 }
 
 export async function getSongbookStats(sessionKey: string) {
-  return await axios.get<SongbookStats>(
-    `/api/songbooks/${sessionKey}/stats/`,
-  );
+  return await axios.get<SongbookStats>(`/api/songbooks/${sessionKey}/stats/`);
 }

@@ -79,14 +79,12 @@ export type SongbookStats = {
     id: number;
     first_name: string;
     last_name: string;
-    social_auth: [
-      {
-        picture: string;
-      },
-    ];
+    social_auth: {
+      picture: string;
+    }[];
   };
   songs_requested: number;
-};
+}[];
 
 export type ChakraAlertStatus =
   | "info"

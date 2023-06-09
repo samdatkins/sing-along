@@ -19,7 +19,9 @@ import {
   Progress,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { useAsync } from "react-async-hook";
 import QRCode from "react-qr-code";
+import { getSongbookStats } from "../services/songs";
 
 interface StatsModalProps {
   isOpen: boolean;
@@ -38,129 +40,10 @@ const StatsModal = ({
 }: StatsModalProps) => {
   const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
-  // const songbookStats = useAsync(getSongbookStats(sessionKey), [], {
-  //   setLoading: (state) => ({ ...state, loading: true }),
-  // });
-  const songbookStats = [
-    {
-      user: {
-        id: 2,
-        first_name: "David",
-        last_name: "Bowie",
-        social_auth: [
-          {
-            picture: "/bowie.jpg",
-          },
-        ],
-      },
-      songs_requested: 38,
-    },
-    {
-      user: {
-        id: 3,
-        first_name: "Annie",
-        last_name: "Lennox",
-        social_auth: [
-          {
-            picture: "/lennox.jpg",
-          },
-        ],
-      },
-      songs_requested: 14,
-    },
-    {
-      user: {
-        id: 1,
-        first_name: "Prince",
-        last_name: "Formerly",
-        social_auth: [
-          {
-            picture: "/prince.jpg",
-          },
-        ],
-      },
-      songs_requested: 27,
-    },
-    {
-      user: {
-        id: 12,
-        first_name: "Cyndi",
-        last_name: "Lauper",
-        social_auth: [
-          {
-            picture: "/lauper.jpg",
-          },
-        ],
-      },
-      songs_requested: 0,
-    },
-    {
-      user: {
-        id: 33,
-        first_name: "Rivers",
-        last_name: "Cuomo",
-        social_auth: [
-          {
-            picture: "/cuomo.jpg",
-          },
-        ],
-      },
-      songs_requested: 6,
-    },
-    {
-      user: {
-        id: 66,
-        first_name: "Billy",
-        last_name: "Corgan",
-        social_auth: [
-          {
-            picture: "/corgan.jpg",
-          },
-        ],
-      },
-      songs_requested: 12,
-    },
-    {
-      user: {
-        id: 34,
-        first_name: "Angel",
-        last_name: "Olsen",
-        social_auth: [
-          {
-            picture: "/olsen.jpg",
-          },
-        ],
-      },
-      songs_requested: 5,
-    },
-    {
-      user: {
-        id: 44,
-        first_name: "Stephen",
-        last_name: "Malkmus",
-        social_auth: [
-          {
-            picture: "",
-          },
-        ],
-      },
-      songs_requested: 7,
-    },
-    {
-      user: {
-        id: 55,
-        first_name: "Gwen",
-        last_name: "Stefani",
-        social_auth: [
-          {
-            picture: "/stefani.jpg",
-          },
-        ],
-      },
-      songs_requested: 19,
-    },
-  ];
-
+  const asyncSongbookStats = useAsync(getSongbookStats, [sessionKey], {
+    setLoading: (state) => ({ ...state, loading: true }),
+  });
+  const songbookStats = asyncSongbookStats?.result?.data;
   const avatarBackgroundStyle = {
     color: useColorModeValue("white", "black"),
     bg: useColorModeValue("teal.500", "cyan.300"),
@@ -223,9 +106,9 @@ const StatsModal = ({
                   <Grid templateColumns="repeat(5, 1fr)" gap={1}>
                     {songbookStats &&
                       songbookStats.length &&
-                      songbookStats.map((userStats) => {
+                      songbookStats.map((stat) => {
                         return (
-                          <GridItem key={userStats.user.id}>
+                          <GridItem key={stat.user.id}>
                             <Flex
                               margin="5px"
                               padding="10px"
@@ -237,19 +120,20 @@ const StatsModal = ({
                               <Avatar
                                 ml="5px"
                                 mr="10px"
+                                referrerPolicy="no-referrer"
                                 {...avatarBackgroundStyle}
                                 name={`${
-                                  userStats.user.first_name
-                                } ${userStats.user.last_name.substring(0, 1)}`}
-                                src={userStats.user.social_auth[0].picture}
+                                  stat.user.first_name
+                                } ${stat.user.last_name.substring(0, 1)}`}
+                                src={stat.user.social_auth[0].picture}
                               />{" "}
                               <Heading
                                 size="sm"
                                 verticalAlign="center"
                                 ml="5px"
                               >
-                                {userStats.user.first_name}{" "}
-                                {userStats.user.last_name.substring(0, 1)}.
+                                {stat.user.first_name}{" "}
+                                {stat.user.last_name.substring(0, 1)}.
                               </Heading>
                             </Flex>
                           </GridItem>
@@ -289,6 +173,7 @@ const StatsModal = ({
                             <Avatar
                               ml="5px"
                               mr="10px"
+                              referrerPolicy="no-referrer"
                               {...avatarBackgroundStyle}
                               name={`${
                                 stat.user.first_name
