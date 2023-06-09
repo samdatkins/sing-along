@@ -26,6 +26,7 @@ interface StatsModalProps {
   onClose: () => void;
   sessionKey: string;
   songbookTitle: string;
+  totalSongs: number;
 }
 
 const StatsModal = ({
@@ -33,6 +34,7 @@ const StatsModal = ({
   onClose,
   sessionKey,
   songbookTitle,
+  totalSongs,
 }: StatsModalProps) => {
   const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
@@ -120,7 +122,7 @@ const StatsModal = ({
     },
     {
       user: {
-        id: 33,
+        id: 34,
         first_name: "Angel",
         last_name: "Olsen",
         social_auth: [
@@ -195,6 +197,15 @@ const StatsModal = ({
                 >
                   <QRCode size={150} value={addSongUrl} />
                 </Flex>
+                <Heading
+                  size="xl"
+                  margin="1rem"
+                  ml="3rem"
+                  fontFamily="Ubuntu Mono"
+                  textAlign="center"
+                >
+                  {totalSongs} {totalSongs === 1 ? `song` : `songs`}
+                </Heading>
               </Flex>
             </Flex>
 
@@ -209,12 +220,12 @@ const StatsModal = ({
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
-                  <Grid templateColumns="repeat(5, 2fr)" gap={6} margin="1rem">
+                  <Grid templateColumns="repeat(5, 1fr)" gap={1}>
                     {songbookStats &&
                       songbookStats.length &&
-                      songbookStats.map((stat) => {
+                      songbookStats.map((userStats) => {
                         return (
-                          <GridItem key={stat.user.id}>
+                          <GridItem key={userStats.user.id}>
                             <Flex
                               margin="5px"
                               padding="10px"
@@ -228,17 +239,17 @@ const StatsModal = ({
                                 mr="10px"
                                 {...avatarBackgroundStyle}
                                 name={`${
-                                  stat.user.first_name
-                                } ${stat.user.last_name.substring(0, 1)}`}
-                                src={stat.user.social_auth[0].picture}
+                                  userStats.user.first_name
+                                } ${userStats.user.last_name.substring(0, 1)}`}
+                                src={userStats.user.social_auth[0].picture}
                               />{" "}
                               <Heading
                                 size="sm"
                                 verticalAlign="center"
                                 ml="5px"
                               >
-                                {stat.user.first_name}{" "}
-                                {stat.user.last_name.substring(0, 1)}.
+                                {userStats.user.first_name}{" "}
+                                {userStats.user.last_name.substring(0, 1)}.
                               </Heading>
                             </Flex>
                           </GridItem>
@@ -257,18 +268,24 @@ const StatsModal = ({
                     <AccordionIcon />
                   </AccordionButton>
                 </h2>
-                <AccordionPanel pb={4}>
+                <AccordionPanel pb={4} justifyContent="center">
                   {songbookStats &&
                     songbookStats.length &&
-                    songbookStats.map((stat) => {
+                    songbookStats.map((stat, idx) => {
                       return stat.songs_requested > 0 ? (
                         <Flex
                           direction="row"
                           justifyContent="center"
                           alignItems="center"
-                          key={stat.user.id}
+                          margin="1rem"
+                          width="100%"
+                          key={idx}
                         >
-                          <Flex width="20%" alignItems="center">
+                          <Flex
+                            width="15%"
+                            justifyContent="baseline"
+                            alignItems="center"
+                          >
                             <Avatar
                               ml="5px"
                               mr="10px"
@@ -283,24 +300,38 @@ const StatsModal = ({
                               {stat.user.last_name.substring(0, 1)}.
                             </Heading>
                           </Flex>
-                          <Flex width="40%">
+                          <Heading
+                            size="sm"
+                            width="10%"
+                            verticalAlign="center"
+                            textAlign="center"
+                            fontFamily="Ubuntu Mono"
+                          >
+                            {stat.songs_requested}
+                          </Heading>
+                          <Flex width={totalSongs * 8} justifyContent="center">
                             <Progress
                               ml="1rem"
                               mr="1rem"
-                              width="100%"
+                              width={totalSongs * 8}
                               value={stat.songs_requested}
                             />
-                            <Heading
-                              size="sm"
-                              width="10%"
-                              verticalAlign="center"
-                            >
-                              {stat.songs_requested}
-                            </Heading>
                           </Flex>
+                          <Heading
+                            size="sm"
+                            width="10%"
+                            verticalAlign="center"
+                            textAlign="center"
+                            fontFamily="Ubuntu Mono"
+                          >
+                            {Math.round(
+                              (stat.songs_requested / totalSongs) * 100,
+                            )}
+                            %
+                          </Heading>
                         </Flex>
                       ) : (
-                        <></>
+                        <span key={idx}></span>
                       );
                     })}
                 </AccordionPanel>

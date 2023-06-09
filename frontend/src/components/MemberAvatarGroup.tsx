@@ -82,7 +82,7 @@ const MemberAvatarGroup = () => {
     },
     {
       user: {
-        id: 33,
+        id: 34,
         first_name: "Angel",
         last_name: "Olsen",
         social_auth: [
@@ -131,6 +131,7 @@ const MemberAvatarGroup = () => {
               <Avatar
                 name={member.user.first_name}
                 src={member.user.social_auth[0].picture}
+                key={member.user.id}
               />
             );
           })}

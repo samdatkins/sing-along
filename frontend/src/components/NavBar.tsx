@@ -253,6 +253,7 @@ export default function NavBar({
                 onClose={onStatsClose}
                 sessionKey={currentSongbook.session_key}
                 songbookTitle={currentSongbook.title}
+                totalSongs={currentSongbook.total_songs}
               />
             </>
           )
