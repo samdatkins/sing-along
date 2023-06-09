@@ -186,6 +186,7 @@ export async function likeSong(song_id: number) {
     return false;
   }
 }
+
 export async function unlikeSong(song_id: number) {
   try {
     return await axios.delete(`/api/songs/${song_id}/like/`);
@@ -193,6 +194,8 @@ export async function unlikeSong(song_id: number) {
     console.error(`Couldn't resolve the unlike: ${error}`);
     return false;
   }
+}
+
 export async function getSongbookStats(sessionKey: string) {
   return await axios.get<SongbookStats>(`/api/songbooks/${sessionKey}/stats/`);
 }
