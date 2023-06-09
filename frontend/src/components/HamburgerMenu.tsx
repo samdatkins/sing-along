@@ -273,14 +273,17 @@ export default function HamburgerMenu({
           >
             Jump To...
           </MenuItem>
-
-          <Flex
-            bgColor="white"
-            justifyContent="center"
-            border="8px solid white"
-            width="auto"
-          >
-            <QRCode size={150} value={addSongUrl} />
+          <Flex direction="column" justifyContent="center" alignItems="center">
+            <Flex
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
+              bgColor="white"
+              width="166px"
+              border="8px solid white"
+            >
+              <QRCode size={150} value={addSongUrl} />
+            </Flex>
           </Flex>
         </MenuList>
       </Menu>
