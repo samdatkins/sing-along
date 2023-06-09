@@ -19,6 +19,7 @@ import {
   Progress,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { useAsync } from "react-async-hook";
 import QRCode from "react-qr-code";
 import { getSongbookStats } from "../services/songs";
@@ -44,6 +45,15 @@ const StatsModal = ({
     setLoading: (state) => ({ ...state, loading: true }),
   });
   const songbookStats = asyncSongbookStats?.result?.data;
+
+  const [topRequestScore, setTopRequestScore] = useState<number>(60);
+
+  useEffect(() => {
+    songbookStats &&
+      songbookStats.length &&
+      setTopRequestScore(songbookStats[0].songs_requested);
+  }, [songbookStats]);
+
   const avatarBackgroundStyle = {
     color: useColorModeValue("white", "black"),
     bg: useColorModeValue("teal.500", "cyan.300"),
@@ -187,33 +197,24 @@ const StatsModal = ({
                           </Flex>
                           <Heading
                             size="sm"
-                            width="10%"
+                            width="20%"
                             verticalAlign="center"
                             textAlign="center"
                             fontFamily="Ubuntu Mono"
                           >
-                            {stat.songs_requested}
+                            {stat.songs_requested} songs
                           </Heading>
                           <Flex width="85%" justifyContent="center">
                             <Progress
                               ml="1rem"
                               mr="1rem"
                               width="100%"
-                              value={(stat.songs_requested / totalSongs) * 100}
+                              colorScheme="blue"
+                              value={
+                                (stat.songs_requested / topRequestScore) * 100
+                              }
                             />
                           </Flex>
-                          <Heading
-                            size="sm"
-                            width="10%"
-                            verticalAlign="center"
-                            textAlign="center"
-                            fontFamily="Ubuntu Mono"
-                          >
-                            {Math.round(
-                              (stat.songs_requested / totalSongs) * 100,
-                            )}
-                            %
-                          </Heading>
                         </Flex>
                       ) : (
                         <span key={idx}></span>
