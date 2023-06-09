@@ -4,6 +4,7 @@ import {
   Song,
   Songbook,
   SongbookDetails,
+  SongbookStats,
   SongEntry,
   User,
 } from "../models";
@@ -172,4 +173,8 @@ export async function setSongEntryFlagged(id: number | undefined) {
   } catch (error) {
     console.error(`Couldn't flag song entry: ${error}`);
   }
+}
+
+export async function getSongbookStats(sessionKey: string) {
+  return await axios.get<SongbookStats>(`/api/songbooks/${sessionKey}/stats/`);
 }

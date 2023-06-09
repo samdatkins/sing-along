@@ -146,6 +146,7 @@ class SongbookViewSet(
             .annotate(count=Count("id", distinct=True))
             .filter(~Q(requested_by=None))
             .values_list("requested_by", "count")
+            .order_by("-count")
         )
 
         user_ids = [user_id for user_id, _ in user_ids_with_counts]

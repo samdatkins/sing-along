@@ -8,6 +8,7 @@ import {
   Skeleton,
   Text,
   useBoolean,
+  useDisclosure,
   useMediaQuery,
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -26,6 +27,8 @@ import { countTabColumns } from "../helpers/tab";
 import { nextSongbookSong } from "../services/songs";
 import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
+import MemberAvatarGroup from "./MemberAvatarGroup";
+import StatsModal from "./StatsModal";
 import Timer from "./Timer";
 
 interface NavBarProps {
@@ -68,16 +71,19 @@ export default function NavBar({
 
   const currentSongbook = asyncSongbook.result?.data;
 
+  const {
+    isOpen: isStatsOpen,
+    onOpen: onStatsOpen,
+    onClose: onStatsClose,
+  } = useDisclosure();
+
   const totalColumns = useMemo(
     () =>
       countTabColumns(
         asyncSongbook.result?.data?.current_song_entry?.song?.content,
         LINES_PER_COLUMN,
       ),
-    [
-      asyncSongbook.result?.data?.current_song_entry?.song?.content,
-      LINES_PER_COLUMN,
-    ],
+    [asyncSongbook.result?.data?.current_song_entry?.song?.content],
   );
 
   const timerControls = {
@@ -119,6 +125,19 @@ export default function NavBar({
   useEffect(() => {
     timerControls.refresh();
   }, [countdownTimerInSeconds]);
+
+  useEffect(() => {
+    if (
+      asyncSongbook?.result?.data.total_songs === 0 &&
+      currentSongbook?.is_songbook_owner
+    ) {
+      onStatsOpen();
+    }
+  }, [
+    asyncSongbook.result?.data.total_songs,
+    onStatsOpen,
+    currentSongbook?.is_songbook_owner,
+  ]);
 
   return (
     <Flex flexDir="row" w="100%" justifyContent="space-between">
@@ -181,7 +200,7 @@ export default function NavBar({
                   rel="noopener noreferrer"
                   href={currentSongbook.current_song_entry?.song.url}
                 >
-                  {currentSongbook.current_song_entry.is_flagged && (
+                  {currentSongbook?.current_song_entry?.is_flagged && (
                     <WarningTwoIcon />
                   )}{" "}
                   "{currentSongbook.current_song_entry?.song.title}" by{" "}
@@ -230,11 +249,30 @@ export default function NavBar({
               )}
           </Flex>
         </Flex>
-        <Flex w="34%" justifyContent="end">
-          <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
-            <AddIcon />
-          </Button>
-        </Flex>
+        {currentSongbook?.is_songbook_owner &&
+        !isMobileDevice &&
+        !asyncSongbook?.result?.data?.is_noodle_mode ? (
+          currentSongbook?.session_key && (
+            <>
+              <Flex onClick={onStatsOpen}>
+                <MemberAvatarGroup sessionKey={currentSongbook.session_key} />
+              </Flex>
+              <StatsModal
+                isOpen={isStatsOpen}
+                onClose={onStatsClose}
+                sessionKey={currentSongbook.session_key}
+                songbookTitle={currentSongbook.title}
+                totalSongs={currentSongbook.total_songs}
+              />
+            </>
+          )
+        ) : (
+          <Flex w="34%" justifyContent="end">
+            <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
+              <AddIcon />
+            </Button>
+          </Flex>
+        )}
         {addSongDrawerOutlet}
       </Flex>
     </Flex>

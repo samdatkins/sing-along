@@ -98,7 +98,7 @@ export default function HamburgerMenu({
       await prevSongbookSong(sessionKey);
     } else {
       await deleteSongbookSong(
-        asyncSongbook?.result?.data?.current_song_entry?.id
+        asyncSongbook?.result?.data?.current_song_entry?.id,
       );
     }
     asyncSongbook.execute();
@@ -122,7 +122,7 @@ export default function HamburgerMenu({
       performSongNavAction("delete");
     } else if (event.key === "!") {
       await setSongEntryFlagged(
-        asyncSongbook?.result?.data?.current_song_entry?.id
+        asyncSongbook?.result?.data?.current_song_entry?.id,
       );
       asyncSongbook.execute();
     } else if (event.code === "Space") {
@@ -260,7 +260,7 @@ export default function HamburgerMenu({
             icon={<Icon as={FaExclamationTriangle} />}
             onClick={async () => {
               await setSongEntryFlagged(
-                asyncSongbook?.result?.data?.current_song_entry?.id
+                asyncSongbook?.result?.data?.current_song_entry?.id,
               );
               asyncSongbook.execute();
             }}
@@ -274,14 +274,17 @@ export default function HamburgerMenu({
           >
             Jump To...
           </MenuItem>
-
-          <Flex
-            bgColor="white"
-            justifyContent="center"
-            border="8px solid white"
-            width="auto"
-          >
-            <QRCode size={150} value={addSongUrl} />
+          <Flex direction="column" justifyContent="center" alignItems="center">
+            <Flex
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
+              bgColor="white"
+              width="166px"
+              border="8px solid white"
+            >
+              <QRCode size={150} value={addSongUrl} />
+            </Flex>
           </Flex>
         </MenuList>
       </Menu>
