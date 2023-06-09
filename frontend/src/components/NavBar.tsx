@@ -77,26 +77,13 @@ export default function NavBar({
     onClose: onStatsClose,
   } = useDisclosure();
 
-  useEffect(() => {
-    if (
-      asyncSongbook &&
-      asyncSongbook.result &&
-      !asyncSongbook.result?.data.total_songs
-    ) {
-      onStatsOpen();
-    }
-  }, [asyncSongbook.result?.data.total_songs]);
-
   const totalColumns = useMemo(
     () =>
       countTabColumns(
         asyncSongbook.result?.data?.current_song_entry?.song?.content,
         LINES_PER_COLUMN,
       ),
-    [
-      asyncSongbook.result?.data?.current_song_entry?.song?.content,
-      LINES_PER_COLUMN,
-    ],
+    [asyncSongbook.result?.data?.current_song_entry?.song?.content],
   );
 
   const timerControls = {
@@ -138,6 +125,19 @@ export default function NavBar({
   useEffect(() => {
     timerControls.refresh();
   }, [countdownTimerInSeconds]);
+
+  useEffect(() => {
+    if (
+      asyncSongbook?.result?.data.total_songs === 0 &&
+      currentSongbook?.is_songbook_owner
+    ) {
+      onStatsOpen();
+    }
+  }, [
+    asyncSongbook.result?.data.total_songs,
+    onStatsOpen,
+    currentSongbook?.is_songbook_owner,
+  ]);
 
   return (
     <Flex flexDir="row" w="100%" justifyContent="space-between">
@@ -200,11 +200,9 @@ export default function NavBar({
                   rel="noopener noreferrer"
                   href={currentSongbook.current_song_entry?.song.url}
                 >
-                  {currentSongbook &&
-                    currentSongbook.current_song_entry &&
-                    currentSongbook.current_song_entry.is_flagged && (
-                      <WarningTwoIcon />
-                    )}{" "}
+                  {currentSongbook?.current_song_entry?.is_flagged && (
+                    <WarningTwoIcon />
+                  )}{" "}
                   "{currentSongbook.current_song_entry?.song.title}" by{" "}
                   {currentSongbook.current_song_entry?.song.artist}
                 </Link>{" "}
@@ -254,8 +252,7 @@ export default function NavBar({
         {currentSongbook?.is_songbook_owner &&
         !isMobileDevice &&
         !asyncSongbook?.result?.data?.is_noodle_mode ? (
-          currentSongbook &&
-          currentSongbook.session_key && (
+          currentSongbook?.session_key && (
             <>
               <Flex onClick={onStatsOpen}>
                 <MemberAvatarGroup sessionKey={currentSongbook.session_key} />

@@ -127,9 +127,8 @@ const StatsModal = ({
                 </h2>
                 <AccordionPanel pb={4}>
                   <Grid templateColumns="repeat(5, 1fr)" gap={1}>
-                    {songbookStats &&
-                      songbookStats.length > 0 &&
-                      songbookStats.map((stat) => {
+                    {(songbookStats?.length || 0) > 0 &&
+                      songbookStats?.map((stat) => {
                         return (
                           <GridItem key={stat.user.id}>
                             <Flex
@@ -180,9 +179,8 @@ const StatsModal = ({
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4} justifyContent="center">
-                  {songbookStats &&
-                    songbookStats.length > 0 &&
-                    songbookStats.map((stat, idx) => {
+                  {(songbookStats?.length || 0) > 0 &&
+                    songbookStats?.map((stat, idx) => {
                       return stat.songs_requested > 0 ? (
                         <Flex
                           direction="row"

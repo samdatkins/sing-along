@@ -64,7 +64,7 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     }
   }, SONGBOOK_POLL_INTERVAL);
 
-  return asyncSongbook && asyncSongbook?.result?.data.total_songs ? (
+  return asyncSongbook?.result?.data.total_songs ? (
     <>
       <SongbookContext.Provider value={asyncSongbook?.result?.data}>
         <Flex padding="1rem" paddingTop=".5rem" flexDir="column" height="100%">

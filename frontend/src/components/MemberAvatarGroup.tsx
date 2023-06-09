@@ -21,8 +21,7 @@ const MemberAvatarGroup = ({ sessionKey }: MemberAvatarGroupProps) => {
   return (
     <Flex>
       <AvatarGroup max={6}>
-        {membersList &&
-          membersList.length &&
+        {membersList?.length &&
           membersList.map((member) => {
             return (
               <Avatar
