@@ -77,6 +77,16 @@ export default function NavBar({
     onClose: onStatsClose,
   } = useDisclosure();
 
+  useEffect(() => {
+    if (
+      asyncSongbook &&
+      asyncSongbook.result &&
+      !asyncSongbook.result?.data.total_songs
+    ) {
+      onStatsOpen();
+    }
+  }, [asyncSongbook.result?.data.total_songs]);
+
   const totalColumns = useMemo(
     () =>
       countTabColumns(
@@ -190,9 +200,11 @@ export default function NavBar({
                   rel="noopener noreferrer"
                   href={currentSongbook.current_song_entry?.song.url}
                 >
-                  {currentSongbook.current_song_entry.is_flagged && (
-                    <WarningTwoIcon />
-                  )}{" "}
+                  {currentSongbook &&
+                    currentSongbook.current_song_entry &&
+                    currentSongbook.current_song_entry.is_flagged && (
+                      <WarningTwoIcon />
+                    )}{" "}
                   "{currentSongbook.current_song_entry?.song.title}" by{" "}
                   {currentSongbook.current_song_entry?.song.artist}
                 </Link>{" "}

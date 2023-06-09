@@ -100,14 +100,9 @@ const StatsModal = ({
                 </Heading>
               </Flex>
             </Flex>
-            <Flex
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-              margin="1rem"
-            >
+            <Flex direction="row" justifyContent="center" margin="1rem">
               <FormLabel mr="1rem">
-                {defaultTab ? `Hide Stats` : `Show Stats`}
+                {defaultTab ? `Hide Leaderboard:` : `View Leaderboard:`}
               </FormLabel>
               <Switch
                 isChecked={defaultTab > 0}
@@ -119,7 +114,11 @@ const StatsModal = ({
             <Accordion index={[defaultTab]} allowMultiple>
               <AccordionItem>
                 <h2>
-                  <AccordionButton>
+                  <AccordionButton
+                    onClick={() => {
+                      setDefaultTab(0);
+                    }}
+                  >
                     <Box as="span" flex="1" textAlign="left">
                       <Heading size="lg">Songbook Members</Heading>
                     </Box>
@@ -129,7 +128,7 @@ const StatsModal = ({
                 <AccordionPanel pb={4}>
                   <Grid templateColumns="repeat(5, 1fr)" gap={1}>
                     {songbookStats &&
-                      songbookStats.length &&
+                      songbookStats.length > 0 &&
                       songbookStats.map((stat) => {
                         return (
                           <GridItem key={stat.user.id}>
@@ -169,7 +168,11 @@ const StatsModal = ({
 
               <AccordionItem>
                 <h2>
-                  <AccordionButton>
+                  <AccordionButton
+                    onClick={() => {
+                      setDefaultTab(1);
+                    }}
+                  >
                     <Box as="span" flex="1" textAlign="left">
                       <Heading size="lg">Requests Leaderboard</Heading>
                     </Box>
@@ -178,7 +181,7 @@ const StatsModal = ({
                 </h2>
                 <AccordionPanel pb={4} justifyContent="center">
                   {songbookStats &&
-                    songbookStats.length &&
+                    songbookStats.length > 0 &&
                     songbookStats.map((stat, idx) => {
                       return stat.songs_requested > 0 ? (
                         <Flex

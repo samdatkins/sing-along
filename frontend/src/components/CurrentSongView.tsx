@@ -64,7 +64,7 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     }
   }, SONGBOOK_POLL_INTERVAL);
 
-  return (
+  return asyncSongbook && asyncSongbook?.result?.data.total_songs ? (
     <>
       <SongbookContext.Provider value={asyncSongbook?.result?.data}>
         <Flex padding="1rem" paddingTop=".5rem" flexDir="column" height="100%">
@@ -88,6 +88,21 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
         </Flex>
       </SongbookContext.Provider>
     </>
+  ) : (
+    <SongbookContext.Provider value={asyncSongbook?.result?.data}>
+      <Flex padding="1rem" paddingTop=".5rem" flexDir="column" height="100%">
+        <NavBar
+          asyncSongbook={asyncSongbook}
+          advanceToNextAppState={advanceToNextAppState}
+          resetAppState={resetAppState}
+          applicationState={applicationState}
+          firstColDispIndex={firstColDispIndex}
+          setFirstColDispIndex={setFirstColDispIndex}
+          columnsToDisplay={columnsToDisplay}
+          asyncUser={asyncUser}
+        />
+      </Flex>
+    </SongbookContext.Provider>
   );
 }
 
