@@ -29,7 +29,7 @@ import { GrUnorderedList } from "react-icons/gr";
 import { MdOutlineMenuOpen } from "react-icons/md";
 import QRCode from "react-qr-code";
 import { Link as RouterLink, useParams } from "react-router-dom";
-import { Songbook, User } from "../models";
+import { ApplicationState, Songbook, User } from "../models";
 import {
   deleteSongbookSong,
   nextSongbookSong,
@@ -58,6 +58,7 @@ interface HamburgerMenuProps {
   totalColumns: number;
   columnsToDisplay: number;
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
+  applicationState: ApplicationState;
 }
 export default function HamburgerMenu({
   isMobileDevice,
@@ -72,6 +73,7 @@ export default function HamburgerMenu({
   totalColumns,
   columnsToDisplay,
   asyncUser,
+  applicationState,
 }: HamburgerMenuProps) {
   const { toggleColorMode } = useColorMode();
   const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
@@ -131,16 +133,19 @@ export default function HamburgerMenu({
     } else if (event.code === "ArrowRight" && event.shiftKey) {
       performSongNavAction("next");
     } else if (event.code === "ArrowLeft") {
-      if (firstColDispIndex - 1 >= 0) {
+      if (firstColDispIndex - 2 >= 0) {
+        setFirstColDispIndex(firstColDispIndex - 2);
+      } else if (firstColDispIndex - 1 >= 0) {
         setFirstColDispIndex(firstColDispIndex - 1);
       }
     } else if (event.code === "ArrowRight") {
-      if (firstColDispIndex + columnsToDisplay + 1 <= totalColumns) {
-        setFirstColDispIndex(firstColDispIndex + 1);
+      if (firstColDispIndex + columnsToDisplay + 2 <= totalColumns + 1) {
+        setFirstColDispIndex(firstColDispIndex + 2);
       }
     } else if (event.code === "KeyR") {
-      resetAppState();
-      timerControls.refresh();
+      if (applicationState === ApplicationState.ShowSong) {
+        timerControls.refresh();
+      }
     } else if (event.code === "KeyF") {
       alert(`This cancels the tab view truncation AND pauses the timer.`);
     } else if (event.code === "Slash") {

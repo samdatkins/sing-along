@@ -114,7 +114,7 @@ export default function NavBar({
 
       const newCountdownTime = AppStateToTimerMap[applicationState];
       setCountdownTimerInSeconds(newCountdownTime);
-      if (applicationState === ApplicationState.PrepForNextSong) {
+      if (applicationState === ApplicationState.PrepForSong) {
         const sessionKey = asyncSongbook?.result?.data?.session_key;
         asyncSongbook.reset();
         await nextSongbookSong(sessionKey);
@@ -185,6 +185,7 @@ export default function NavBar({
             totalColumns={totalColumns}
             columnsToDisplay={columnsToDisplay}
             asyncUser={asyncUser}
+            applicationState={applicationState}
           />
         </Flex>
         <Box pt=".5rem">

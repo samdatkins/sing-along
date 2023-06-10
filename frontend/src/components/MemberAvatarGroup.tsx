@@ -1,5 +1,5 @@
 import { Avatar, AvatarGroup, Flex, useColorModeValue } from "@chakra-ui/react";
-import { Member, PublicUser } from "../models";
+import { Member } from "../models";
 
 interface MemberAvatarGroupProps {
   membersList: Member[];

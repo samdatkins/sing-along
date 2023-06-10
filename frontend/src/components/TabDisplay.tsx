@@ -1,4 +1,4 @@
-import { Flex, Text, useColorModeValue } from "@chakra-ui/react";
+import { Flex, Text, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { UseAsyncReturn } from "react-async-hook";
@@ -64,14 +64,19 @@ export default function TabDisplay({
 
   const formattedTabArray = formatTab(tab, toneSteps);
   const tabColumns = splitTabIntoColumns(formattedTabArray, LINES_PER_COLUMN);
+  const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
+  const isMobileDevice = isSmallerThan900;
 
   return (
     <>
       {tabColumns &&
-        (!showChords ? (
-          <TabWithoutChords tabToDisplay={formattedTabArray} />
+        (isMobileDevice ? (
+          <MobileChords
+            tabToDisplay={formattedTabArray}
+            showChords={showChords}
+          />
         ) : (
-          <TabWithChords
+          <DesktopChords
             isLoading={!!tab}
             tabToDisplay={tabColumns}
             toneSteps={toneSteps}
@@ -84,7 +89,7 @@ export default function TabDisplay({
   );
 }
 
-type TabWithChordsProps = {
+type DesktopChordsProps = {
   isLoading: boolean;
   tabToDisplay: string[][];
   toneSteps: number;
@@ -93,14 +98,14 @@ type TabWithChordsProps = {
   columnsToDisplay: number;
 };
 
-function TabWithChords({
+function DesktopChords({
   tabToDisplay,
   toneSteps,
   usesSharps,
   firstColDispIndex,
   columnsToDisplay,
   isLoading,
-}: TabWithChordsProps) {
+}: DesktopChordsProps) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
   const totalPercentageWidthOfScreen =
     100 * (tabToDisplay?.length / columnsToDisplay);
@@ -114,43 +119,58 @@ function TabWithChords({
       transition={isLoading ? "left 0.4s ease" : ""}
     >
       {tabToDisplay &&
-        tabToDisplay
-          // .slice(firstColDispIndex, firstColDispIndex + columnsToDisplay)
-          .map((column, idx) => (
-            <Text
-              key={idx}
-              as="pre"
-              style={{ fontSize: "1rem", fontFamily: "Ubuntu Mono" }}
-              w={`${100 / columnsToDisplay}%`}
-              pl="1rem"
-            >
-              {column.map((tabLine) => {
-                if (tabLine.includes("[ch]")) {
-                  return (
-                    <Text color={chordColor} key={window.crypto.randomUUID()}>
-                      {transposer(tabLine, toneSteps, usesSharps)}
-                    </Text>
-                  );
-                } else {
-                  return (
-                    <Text key={window.crypto.randomUUID()}>
-                      {tabLine.length > 0 ? tabLine : " "}
-                    </Text>
-                  );
-                }
-              })}
-            </Text>
-          ))}
+        tabToDisplay.map((column, idx) => (
+          <Text
+            key={idx}
+            as="pre"
+            style={{ fontSize: "1.2rem", fontFamily: "Ubuntu Mono" }}
+            w={`${100 / columnsToDisplay}%`}
+            pl="1rem"
+            overflow="hidden"
+          >
+            {column.map((tabLine) => {
+              if (tabLine.includes("[ch]")) {
+                return (
+                  <Text color={chordColor} key={window.crypto.randomUUID()}>
+                    {transposer(tabLine, toneSteps, usesSharps)}
+                  </Text>
+                );
+              } else {
+                return (
+                  <Text key={window.crypto.randomUUID()}>
+                    {tabLine.length > 0 ? tabLine : " "}
+                  </Text>
+                );
+              }
+            })}
+          </Text>
+        ))}
     </Flex>
   );
 }
 
-function TabWithoutChords({ tabToDisplay }: { tabToDisplay: string[] }) {
+function MobileChords({
+  tabToDisplay,
+  showChords,
+}: {
+  tabToDisplay: string[];
+  showChords: boolean;
+}) {
+  const chordColor = useColorModeValue("teal.500", "cyan.300");
+  const fontStyles = showChords
+    ? { fontSize: "1rem", fontFamily: "Ubuntu Mono" }
+    : { fontSize: "1rem", fontFamily: "Helvetica" };
   return (
-    <pre style={{ fontSize: "1rem", fontFamily: "Helvetica" }}>
+    <pre style={fontStyles}>
       {tabToDisplay &&
         tabToDisplay.map((tabLine: string) => {
-          if (!tabLine.includes("[ch]")) {
+          if (tabLine.includes("[ch]") && showChords) {
+            return (
+              <Text color={chordColor} key={window.crypto.randomUUID()}>
+                {transposer(tabLine, 0, true)}
+              </Text>
+            );
+          } else {
             return (
               <Text key={window.crypto.randomUUID()}>
                 {tabLine.length > 0 ? tabLine : " "}

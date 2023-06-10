@@ -34,7 +34,7 @@ export default function JumpSearch({
   const asyncSongbookDetails = useAsync(getSongbookDetails, [sessionKey]);
 
   const [searchText, setSearchText] = useState("");
-  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useBoolean(false);
 
   const updateSelectedIndexWithValidValue = (index: number) => {
@@ -98,7 +98,7 @@ export default function JumpSearch({
                   placeholder="Lynyrd Skynyrd - Free Bird"
                   value={searchText}
                   onChange={(e) => {
-                    setSelectedIndex(-1);
+                    setSelectedIndex(0);
                     setSearchText(e.target.value);
                   }}
                   disabled={isSubmitting}
