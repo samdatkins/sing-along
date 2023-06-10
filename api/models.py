@@ -139,7 +139,6 @@ class Song(SafeDeleteModel, CreatedUpdated):
     likes = models.ManyToManyField(get_user_model())
 
 
-
 class SongEntry(SafeDeleteModel, CreatedUpdated):
     class Meta:
         constraints = [
@@ -194,6 +193,6 @@ class Membership(SafeDeleteModel, CreatedUpdated):
 
 class UserProfile(SafeDeleteModel, CreatedUpdated):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
-    is_showing_chords = models.BooleanField(blank=True, null=False, default=True)
-    columns_to_display = models.IntegerField(blank=True, null=False, default=1)
+    is_showing_chords = models.BooleanField(blank=True, null=False, default=False)
+    columns_to_display = models.IntegerField(blank=True, null=False, default=2)
     is_day_mode = models.BooleanField(blank=True, null=False, default=True)

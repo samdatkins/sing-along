@@ -28,10 +28,10 @@ function TabContainer({
       {applicationState === ApplicationState.ActionPrompt && (
         <ActionPrompt text="DANCE" animate={true} />
       )}
-      {applicationState === ApplicationState.PrepForNextSong && (
+      {applicationState === ApplicationState.PrepForSong && (
         <ActionPrompt text="¡GET READY!" animate={false} />
       )}
-      <Box p="1rem" width="100%" height="100%" overflow="hidden">
+      <Box p="1rem 1rem 0 1rem" width="100%" height="100%" overflow="hidden">
         <SkeletonText
           noOfLines={80}
           isLoaded={!!asyncSongbook?.result}

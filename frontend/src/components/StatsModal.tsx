@@ -24,7 +24,7 @@ import {
 import { useState } from "react";
 import { useAsync } from "react-async-hook";
 import QRCode from "react-qr-code";
-import { Member, PublicUser } from "../models";
+import { Member } from "../models";
 import { getSongbookStats } from "../services/songs";
 
 interface StatsModalProps {

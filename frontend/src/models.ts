@@ -56,13 +56,13 @@ export type SongbookListItem = {
 export enum ApplicationState {
   ShowSong,
   ActionPrompt,
-  PrepForNextSong,
+  PrepForSong,
 }
 
 export const AppStateToTimerMap = {
   [ApplicationState.ShowSong]: 60,
   [ApplicationState.ActionPrompt]: 7,
-  [ApplicationState.PrepForNextSong]: 8,
+  [ApplicationState.PrepForSong]: 8,
 };
 
 export type DjangoPaginatedResponse<T> = {
@@ -113,4 +113,4 @@ export type ChakraAlertStatus =
   | "loading"
   | undefined;
 
-export const LINES_PER_COLUMN = 40;
+export const LINES_PER_COLUMN = 34;

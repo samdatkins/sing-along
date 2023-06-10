@@ -24,7 +24,6 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     ApplicationState.ShowSong
   );
   const [firstColDispIndex, setFirstColDispIndex] = useState(0);
-  // const setColRef = useRef(setFirstColDispIndex);
   const columnsToDisplay = user ? user.userprofile.columns_to_display : 1;
 
   const advanceToNextAppState = () => {
@@ -34,9 +33,9 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
         break;
       case ApplicationState.ActionPrompt:
         setFirstColDispIndex(0);
-        setApplicationState(ApplicationState.PrepForNextSong);
+        setApplicationState(ApplicationState.PrepForSong);
         break;
-      case ApplicationState.PrepForNextSong:
+      case ApplicationState.PrepForSong:
         setApplicationState(ApplicationState.ShowSong);
         break;
     }
@@ -53,7 +52,7 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     if (asyncSongbook?.result?.data?.is_noodle_mode) {
       setApplicationState(ApplicationState.ShowSong);
     } else {
-      setApplicationState(ApplicationState.PrepForNextSong);
+      setApplicationState(ApplicationState.PrepForSong);
     }
   };
 
