@@ -1,23 +1,15 @@
 import { Avatar, AvatarGroup, Flex, useColorModeValue } from "@chakra-ui/react";
-import { useAsync } from "react-async-hook";
-import { getSongbookStats } from "../services/songs";
+import { Member, PublicUser } from "../models";
 
 interface MemberAvatarGroupProps {
-  sessionKey: string;
+  membersList: Member[];
 }
 
-const MemberAvatarGroup = ({ sessionKey }: MemberAvatarGroupProps) => {
-  //change this fetch when member list is being served on asyncSongbook
-  const asyncSongbookStats = useAsync(getSongbookStats, [sessionKey], {
-    setLoading: (state) => ({ ...state, loading: true }),
-  });
-  const membersList = asyncSongbookStats?.result?.data;
-
+const MemberAvatarGroup = ({ membersList }: MemberAvatarGroupProps) => {
   const avatarBackgroundStyle = {
     color: useColorModeValue("white", "black"),
     bg: useColorModeValue("teal.500", "cyan.300"),
   };
-
   return (
     <Flex>
       <AvatarGroup max={6}>
@@ -28,7 +20,7 @@ const MemberAvatarGroup = ({ sessionKey }: MemberAvatarGroupProps) => {
                 {...avatarBackgroundStyle}
                 name={`${member.user.first_name} ${member.user.last_initial}`}
                 referrerPolicy="no-referrer"
-                src={member.user.social_auth[0].picture}
+                src={member.user.social_auth?.[0]?.picture}
                 key={member.user.id}
               />
             );

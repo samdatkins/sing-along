@@ -17,7 +17,7 @@ export default function UserProfile({ asyncUser }: UserProfileProps) {
       {user ? (
         <Image
           referrerPolicy="no-referrer"
-          src={user?.social_auth.picture}
+          src={user?.social_auth?.[0]?.picture}
           rounded="100%"
           margin="1rem"
           height="32px"

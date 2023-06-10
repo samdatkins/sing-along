@@ -28,6 +28,11 @@ export type Songbook = {
   current_song_timestamp: string;
   is_songbook_owner: boolean;
   is_current_song_liked: boolean;
+  membership_set: Member[];
+};
+
+export type Member = {
+  user: PublicUser;
 };
 
 export type SongbookDetails = {
@@ -80,7 +85,7 @@ export type User = {
   email: string;
   social_auth: {
     picture: string;
-  };
+  }[];
   last_login: string;
   date_joined: string;
   userprofile: UserProfile;

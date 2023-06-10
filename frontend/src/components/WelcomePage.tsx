@@ -33,7 +33,6 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
   const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
   const songbooks = asyncSongbooks.result?.data.results;
   const activePowerHours = songbooks?.filter((songbook) => {
-    debugger;
     const currentTime = new Date(Date.now()).getTime();
     const songbookTime = new Date(songbook.created_at).getTime();
     return (
@@ -51,7 +50,7 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
       <Flex justifyContent="center">
         <Flex alignItems="center" direction="column">
           <Text
-            fontSize="3rem"
+            fontSize="2rem"
             fontFamily="Ubuntu Mono"
             color="blue.600"
             pt="2rem"

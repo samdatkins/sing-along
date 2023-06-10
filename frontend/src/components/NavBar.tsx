@@ -286,7 +286,9 @@ export default function NavBar({
           currentSongbook?.session_key && (
             <>
               <Flex onClick={onStatsOpen}>
-                <MemberAvatarGroup sessionKey={currentSongbook.session_key} />
+                <MemberAvatarGroup
+                  membersList={currentSongbook.membership_set}
+                />
               </Flex>
               <StatsModal
                 isOpen={isStatsOpen}
@@ -294,6 +296,7 @@ export default function NavBar({
                 sessionKey={currentSongbook.session_key}
                 songbookTitle={currentSongbook.title}
                 totalSongs={currentSongbook.total_songs}
+                membersList={currentSongbook.membership_set}
               />
             </>
           )
@@ -307,7 +310,7 @@ export default function NavBar({
         {addSongDrawerOutlet}
       </Flex>
       {/* LIKE ICON */}
-      {!asyncSongbook?.result?.data?.is_songbook_owner && (
+      {(!asyncSongbook?.result?.data?.is_songbook_owner || isMobileDevice) && (
         <Portal>
           <Flex
             position="fixed"
