@@ -136,6 +136,8 @@ class Song(SafeDeleteModel, CreatedUpdated):
     rating = models.DecimalField(max_digits=8, decimal_places=6, null=True, blank=True)
     votes = models.IntegerField(null=True, blank=True)
     capo = models.IntegerField(null=True, blank=True)
+    likes = models.ManyToManyField(get_user_model())
+
 
 
 class SongEntry(SafeDeleteModel, CreatedUpdated):

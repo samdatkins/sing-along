@@ -162,7 +162,7 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(7):
             response = self.client.get(
                 reverse(
                     "songbook-detail",
@@ -349,7 +349,7 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(7):
             response = self.client.get(
                 reverse(
                     "songbook-details",
@@ -403,7 +403,7 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(7):
             response = self.client.get(
                 reverse(
                     "songbook-detail",

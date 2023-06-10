@@ -5,6 +5,7 @@ import {
   Flex,
   Heading,
   Link,
+  Portal,
   Skeleton,
   Text,
   useBoolean,
@@ -12,6 +13,7 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { BsSuitHeart, BsSuitHeartFill } from "react-icons/bs";
 import {
   AppStateToTimerMap,
   ApplicationState,
@@ -24,7 +26,7 @@ import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
 import { Link as RouterLink, useOutlet } from "react-router-dom";
 import { countTabColumns } from "../helpers/tab";
-import { nextSongbookSong } from "../services/songs";
+import { nextSongbookSong, setSongLikeStatus } from "../services/songs";
 import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
 import MemberAvatarGroup from "./MemberAvatarGroup";
@@ -63,9 +65,10 @@ export default function NavBar({
   // state for length of countdown timer in seconds
 
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
-    AppStateToTimerMap[applicationState],
+    AppStateToTimerMap[applicationState]
   );
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
+  const [isLiked, setIsLiked] = useBoolean(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   const isMobileDevice = isSmallerThan900;
 
@@ -81,9 +84,9 @@ export default function NavBar({
     () =>
       countTabColumns(
         asyncSongbook.result?.data?.current_song_entry?.song?.content,
-        LINES_PER_COLUMN,
+        LINES_PER_COLUMN
       ),
-    [asyncSongbook.result?.data?.current_song_entry?.song?.content],
+    [asyncSongbook.result?.data?.current_song_entry?.song?.content]
   );
 
   const timerControls = {
@@ -123,6 +126,12 @@ export default function NavBar({
   }, [applicationState]);
 
   useEffect(() => {
+    asyncSongbook?.result?.data?.is_current_song_liked
+      ? setIsLiked.on()
+      : setIsLiked.off();
+  }, [asyncSongbook?.result?.data?.is_current_song_liked, setIsLiked]);
+
+  useEffect(() => {
     timerControls.refresh();
   }, [countdownTimerInSeconds]);
 
@@ -139,10 +148,29 @@ export default function NavBar({
     currentSongbook?.is_songbook_owner,
   ]);
 
+  const heartIconStyle = {
+    size: "34px",
+    color: "red",
+    opacity: "65%",
+    filter: "drop-shadow(1px 1px 0 #666666",
+    cursor: "pointer",
+  };
+
+  const handleHeartClick = async () => {
+    if (!asyncSongbook?.result?.data) {
+      return;
+    }
+    setIsLiked.toggle();
+    const newLikeState = !isLiked;
+    const songId = asyncSongbook.result.data.current_song_entry.song.id;
+    setSongLikeStatus(songId, newLikeState);
+    asyncSongbook.execute();
+  };
+
   return (
-    <Flex flexDir="row" w="100%" justifyContent="space-between">
+    <Flex flexDir="row" justifyContent="space-between">
       {/* LEFT COLUMN */}
-      <Flex w="33%" justifyContent="space-between">
+      <Flex justifyContent="space-between" width={!isMobileDevice ? "33%" : ""}>
         <Flex paddingRight="1rem">
           <HamburgerMenu
             isMobileDevice={isMobileDevice}
@@ -170,12 +198,11 @@ export default function NavBar({
           )}
         </Box>
 
-        {currentSongbook &&
-        currentSongbook.is_songbook_owner &&
-        !currentSongbook.is_noodle_mode ? (
+        {currentSongbook?.is_songbook_owner &&
+        !currentSongbook?.is_noodle_mode &&
+        !isMobileDevice ? (
           <Box>
             <Heading fontFamily="Ubuntu Mono">
-              {" "}
               {currentSongbook.session_key}
             </Heading>
           </Box>
@@ -184,7 +211,11 @@ export default function NavBar({
         )}
       </Flex>
       {/* MIDDLE COLUMN */}
-      <Flex w="34%" alignContent="center" justifyContent="center">
+      <Flex
+        alignItems="center"
+        width={!isMobileDevice ? "34%" : ""}
+        justifyContent="center"
+      >
         <Flex direction="column">
           {!!asyncSongbook?.result && currentSongbook ? (
             <>
@@ -194,6 +225,9 @@ export default function NavBar({
                 fontSize="2xl"
                 align="center"
               >
+                {currentSongbook?.current_song_entry?.is_flagged && (
+                  <WarningTwoIcon />
+                )}{" "}
                 <Link
                   fontWeight="bold"
                   target="_blank"
@@ -226,7 +260,7 @@ export default function NavBar({
         </Flex>
       </Flex>
       {/* RIGHT COLUMN */}
-      <Flex w="33%" justifyContent="space-between">
+      <Flex width={!isMobileDevice ? "33%" : ""} justifyContent="space-between">
         <Flex></Flex>
         <Flex>
           <Flex justifyContent="center">
@@ -275,6 +309,24 @@ export default function NavBar({
         )}
         {addSongDrawerOutlet}
       </Flex>
+      {/* LIKE ICON */}
+      {!asyncSongbook?.result?.data?.is_songbook_owner && (
+        <Portal>
+          <Flex
+            position="fixed"
+            right="20px"
+            bottom="20px"
+            margin="0"
+            padding="0"
+          >
+            {isLiked ? (
+              <BsSuitHeartFill {...heartIconStyle} onClick={handleHeartClick} />
+            ) : (
+              <BsSuitHeart {...heartIconStyle} onClick={handleHeartClick} />
+            )}
+          </Flex>
+        </Portal>
+      )}
     </Flex>
   );
 }
