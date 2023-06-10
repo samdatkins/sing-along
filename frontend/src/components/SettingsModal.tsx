@@ -1,7 +1,7 @@
 import {
+  Avatar,
   Flex,
   FormLabel,
-  Image,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -11,6 +11,7 @@ import {
   Switch,
   Text,
   useColorMode,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
@@ -43,6 +44,11 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
   const [showingChords, setShowingChords] = useState<boolean>(false);
   const [columns, setColumns] = useState<number>(1);
 
+  const avatarBackgroundStyle = {
+    color: useColorModeValue("white", "black"),
+    bg: useColorModeValue("teal.500", "cyan.300"),
+  };
+
   return user ? (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -53,12 +59,14 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
         <ModalCloseButton />
         <ModalBody>
           <Flex direction="column" alignItems="center">
-            <Image
+            <Avatar
+              ml="5px"
+              mr="10px"
+              size="xl"
               referrerPolicy="no-referrer"
-              src={user?.social_auth.picture}
-              rounded="100%"
-              height="75px"
-              mb="1rem"
+              {...avatarBackgroundStyle}
+              name={`${user.first_name} ${user.last_name}`}
+              src={user.social_auth.picture}
             />
             <Text>
               {user?.first_name} {user?.last_name}{" "}

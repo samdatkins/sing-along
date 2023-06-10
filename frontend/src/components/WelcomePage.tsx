@@ -50,7 +50,7 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
       <Flex justifyContent="center">
         <Flex alignItems="center" direction="column">
           <Text
-            fontSize="3rem"
+            fontSize="2rem"
             fontFamily="Ubuntu Mono"
             color="blue.600"
             pt="2rem"
