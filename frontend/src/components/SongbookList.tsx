@@ -17,7 +17,7 @@ export default function SongbookList() {
   const navigate = useNavigate();
   const asyncSongbook = useAsync(
     async () => getSongbookDetails(sessionKey),
-    [],
+    []
   );
   const songbook = asyncSongbook.result?.data;
   return (
@@ -42,7 +42,7 @@ export default function SongbookList() {
                   onClick={async () => {
                     const result = await setSongbookSong(
                       sessionKey,
-                      entry.created_at,
+                      entry.created_at
                     );
                     if (result) {
                       navigate(`/live/${sessionKey}/`);

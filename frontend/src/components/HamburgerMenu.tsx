@@ -98,7 +98,7 @@ export default function HamburgerMenu({
       await prevSongbookSong(sessionKey);
     } else {
       await deleteSongbookSong(
-        asyncSongbook?.result?.data?.current_song_entry?.id,
+        asyncSongbook?.result?.data?.current_song_entry?.id
       );
     }
     asyncSongbook.execute();
@@ -122,7 +122,7 @@ export default function HamburgerMenu({
       performSongNavAction("delete");
     } else if (event.key === "!") {
       await setSongEntryFlagged(
-        asyncSongbook?.result?.data?.current_song_entry?.id,
+        asyncSongbook?.result?.data?.current_song_entry?.id
       );
       asyncSongbook.execute();
     } else if (event.code === "Space") {
@@ -260,7 +260,7 @@ export default function HamburgerMenu({
             icon={<Icon as={FaExclamationTriangle} />}
             onClick={async () => {
               await setSongEntryFlagged(
-                asyncSongbook?.result?.data?.current_song_entry?.id,
+                asyncSongbook?.result?.data?.current_song_entry?.id
               );
               asyncSongbook.execute();
             }}

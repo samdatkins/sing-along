@@ -63,7 +63,7 @@ export default function NavBar({
   // state for length of countdown timer in seconds
 
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
-    AppStateToTimerMap[applicationState],
+    AppStateToTimerMap[applicationState]
   );
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
@@ -81,9 +81,9 @@ export default function NavBar({
     () =>
       countTabColumns(
         asyncSongbook.result?.data?.current_song_entry?.song?.content,
-        LINES_PER_COLUMN,
+        LINES_PER_COLUMN
       ),
-    [asyncSongbook.result?.data?.current_song_entry?.song?.content],
+    [asyncSongbook.result?.data?.current_song_entry?.song?.content]
   );
 
   const timerControls = {

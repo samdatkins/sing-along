@@ -25,7 +25,7 @@ export async function toggleUserChordsDisplay(isShowingChords: boolean) {
     });
   } catch (error) {
     console.error(
-      `Couldn't toggle user's chords display preferences: ${error}`,
+      `Couldn't toggle user's chords display preferences: ${error}`
     );
   }
 }
@@ -46,7 +46,7 @@ export async function getCurrentSong(sessionKey: string | undefined) {
 
 export async function getSongbookDetails(sessionKey: string | undefined) {
   return await axios.get<SongbookDetails>(
-    `/api/songbooks/${sessionKey}/details/`,
+    `/api/songbooks/${sessionKey}/details/`
   );
 }
 
@@ -69,7 +69,7 @@ export async function nextSongbookSong(sessionKey: string | undefined) {
 export async function createNewSongbook(
   maxActiveSongs: string | undefined,
   songbookTitle: string | undefined,
-  isNoodleMode: boolean | undefined,
+  isNoodleMode: boolean | undefined
 ) {
   try {
     return await axios.post<Songbook>(`/api/songbooks/`, {
@@ -86,7 +86,7 @@ export async function createNewSongbook(
 
 export async function setSongbookSong(
   sessionKey: string | undefined,
-  songCreatedTime: string | undefined,
+  songCreatedTime: string | undefined
 ) {
   if (!sessionKey || !songCreatedTime) return;
 
@@ -145,7 +145,7 @@ export async function searchForSong(q: string) {
 
 export async function addSongToSongbook(
   song?: Song | undefined,
-  songbookId?: number,
+  songbookId?: number
 ) {
   try {
     return await axios.post<SongEntry>(`/api/song_entries/`, {

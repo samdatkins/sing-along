@@ -44,7 +44,7 @@ export default function TabDisplay({
         setUsesSharps(!usesSharps);
       }
     },
-    [handleTransposeChange, usesSharps, setUsesSharps],
+    [handleTransposeChange, usesSharps, setUsesSharps]
   );
 
   useEffect(() => {

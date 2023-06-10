@@ -21,7 +21,7 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
   const user = asyncUser.result && asyncUser.result.data;
   // state for showing ActionPrompt component instead of lyrics
   const [applicationState, setApplicationState] = useState(
-    ApplicationState.ShowSong,
+    ApplicationState.ShowSong
   );
   const [firstColDispIndex, setFirstColDispIndex] = useState(0);
   // const setColRef = useRef(setFirstColDispIndex);
