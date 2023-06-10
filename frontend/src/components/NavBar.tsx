@@ -310,7 +310,7 @@ export default function NavBar({
         {addSongDrawerOutlet}
       </Flex>
       {/* LIKE ICON */}
-      {!asyncSongbook?.result?.data?.is_songbook_owner && (
+      {(!asyncSongbook?.result?.data?.is_songbook_owner || isMobileDevice) && (
         <Portal>
           <Flex
             position="fixed"
