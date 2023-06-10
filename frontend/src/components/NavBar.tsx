@@ -296,6 +296,7 @@ export default function NavBar({
                 sessionKey={currentSongbook.session_key}
                 songbookTitle={currentSongbook.title}
                 totalSongs={currentSongbook.total_songs}
+                membersList={currentSongbook.membership_set}
               />
             </>
           )
