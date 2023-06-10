@@ -164,12 +164,14 @@ function MobileChords({
     <pre style={fontStyles}>
       {tabToDisplay &&
         tabToDisplay.map((tabLine: string) => {
-          if (tabLine.includes("[ch]") && showChords) {
-            return (
-              <Text color={chordColor} key={window.crypto.randomUUID()}>
-                {transposer(tabLine, 0, true)}
-              </Text>
-            );
+          if (tabLine.includes("[ch]")) {
+            if (showChords) {
+              return (
+                <Text color={chordColor} key={window.crypto.randomUUID()}>
+                  {transposer(tabLine, 0, true)}
+                </Text>
+              );
+            }
           } else {
             return (
               <Text key={window.crypto.randomUUID()}>
