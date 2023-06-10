@@ -16,7 +16,6 @@ const MemberAvatarGroup = ({ membersList }: MemberAvatarGroupProps) => {
         {membersList?.length &&
           membersList.map((member) => {
             return (
-              // <pre>{JSON.stringify(member, null, 4)}</pre>
               <Avatar
                 {...avatarBackgroundStyle}
                 name={`${member["user"].first_name} ${member["user"].last_initial}`}
