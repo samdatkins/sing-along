@@ -28,31 +28,12 @@ export type Songbook = {
   current_song_timestamp: string;
   is_songbook_owner: boolean;
   is_current_song_liked: boolean;
-  membership_set: PublicUser[];
+  membership_set: Member[];
 };
 
-/*
-
-interface Membership {
-  user: User;
-}
-
-interface User {
-  id: number;
-  first_name: string;
-  last_initial: string;
-  social_auth: SocialAuth[];
-}
-
-interface SocialAuth {
-  picture: string;
-}
-
-interface Data {
-  membership_set: Membership[];
-}
-
-*/
+export type Member = {
+  user: PublicUser;
+};
 
 export type SongbookDetails = {
   id: number; // we should remove this from the API and only use session_key eventually
@@ -104,7 +85,7 @@ export type User = {
   email: string;
   social_auth: {
     picture: string;
-  };
+  }[];
   last_login: string;
   date_joined: string;
   userprofile: UserProfile;

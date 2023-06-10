@@ -66,7 +66,7 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
               referrerPolicy="no-referrer"
               {...avatarBackgroundStyle}
               name={`${user.first_name} ${user.last_name}`}
-              src={user.social_auth.picture}
+              src={user.social_auth?.[0]?.picture}
             />
             <Text>
               {user?.first_name} {user?.last_name}{" "}

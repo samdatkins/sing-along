@@ -24,7 +24,7 @@ import {
 import { useState } from "react";
 import { useAsync } from "react-async-hook";
 import QRCode from "react-qr-code";
-import { PublicUser } from "../models";
+import { Member, PublicUser } from "../models";
 import { getSongbookStats } from "../services/songs";
 
 interface StatsModalProps {
@@ -33,7 +33,7 @@ interface StatsModalProps {
   sessionKey: string;
   songbookTitle: string;
   totalSongs: number;
-  membersList: PublicUser[];
+  membersList: Member[];
 }
 
 const StatsModal = ({
@@ -133,7 +133,7 @@ const StatsModal = ({
                     {(membersList?.length || 0) > 0 &&
                       membersList?.map((member) => {
                         return (
-                          <GridItem key={member["user"].id}>
+                          <GridItem key={member.user.id}>
                             <Flex
                               margin="5px"
                               padding="10px"
@@ -147,16 +147,16 @@ const StatsModal = ({
                                 mr="10px"
                                 referrerPolicy="no-referrer"
                                 {...avatarBackgroundStyle}
-                                name={`${member["user"].first_name} ${member["user"].last_initial}`}
-                                src={member["user"].social_auth[0].picture}
+                                name={`${member.user.first_name} ${member.user.last_initial}`}
+                                src={member.user.social_auth?.[0]?.picture}
                               />{" "}
                               <Heading
                                 size="sm"
                                 verticalAlign="center"
                                 ml="5px"
                               >
-                                {member["user"].first_name}{" "}
-                                {member["user"].last_initial}.
+                                {member.user.first_name}{" "}
+                                {member.user.last_initial}.
                               </Heading>
                             </Flex>
                           </GridItem>
@@ -202,7 +202,7 @@ const StatsModal = ({
                               referrerPolicy="no-referrer"
                               {...avatarBackgroundStyle}
                               name={`${stat.user.first_name} ${stat.user.last_initial}`}
-                              src={stat.user.social_auth[0].picture}
+                              src={stat.user.social_auth?.[0]?.picture}
                             />{" "}
                             <Heading size="sm" verticalAlign="center" ml="5px">
                               {stat.user.first_name} {stat.user.last_initial}.

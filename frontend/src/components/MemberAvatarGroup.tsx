@@ -1,8 +1,8 @@
 import { Avatar, AvatarGroup, Flex, useColorModeValue } from "@chakra-ui/react";
-import { PublicUser } from "../models";
+import { Member, PublicUser } from "../models";
 
 interface MemberAvatarGroupProps {
-  membersList: PublicUser[];
+  membersList: Member[];
 }
 
 const MemberAvatarGroup = ({ membersList }: MemberAvatarGroupProps) => {
@@ -18,10 +18,10 @@ const MemberAvatarGroup = ({ membersList }: MemberAvatarGroupProps) => {
             return (
               <Avatar
                 {...avatarBackgroundStyle}
-                name={`${member["user"].first_name} ${member["user"].last_initial}`}
+                name={`${member.user.first_name} ${member.user.last_initial}`}
                 referrerPolicy="no-referrer"
-                src={member["user"].social_auth.picture}
-                key={member["user"].id}
+                src={member.user.social_auth?.[0]?.picture}
+                key={member.user.id}
               />
             );
           })}
