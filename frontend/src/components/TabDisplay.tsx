@@ -159,15 +159,24 @@ function MobileChords({
   const chordColor = useColorModeValue("teal.500", "cyan.300");
   const fontStyles = showChords
     ? { fontSize: "1rem", fontFamily: "Ubuntu Mono" }
-    : { fontSize: "1rem", fontFamily: "Helvetica" };
+    : {
+        fontSize: "1rem",
+        fontFamily: "Helvetica",
+        whiteSpace: "pre-wrap",
+        wordWrap: "break-word",
+      };
   return (
-    <pre style={fontStyles}>
+    <pre style={fontStyles as any}>
       {tabToDisplay &&
         tabToDisplay.map((tabLine: string) => {
           if (tabLine.includes("[ch]")) {
             if (showChords) {
               return (
-                <Text color={chordColor} key={window.crypto.randomUUID()}>
+                <Text
+                  overflowWrap="anywhere"
+                  color={chordColor}
+                  key={window.crypto.randomUUID()}
+                >
                   {transposer(tabLine, 0, true)}
                 </Text>
               );

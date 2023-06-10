@@ -215,7 +215,8 @@ const StatsModal = ({
                             textAlign="center"
                             fontFamily="Ubuntu Mono"
                           >
-                            {stat.songs_requested} songs
+                            {stat.songs_requested}{" "}
+                            {stat.songs_requested === 1 ? `song` : `songs`}
                           </Heading>
                           <Flex width="85%" justifyContent="center">
                             <Progress

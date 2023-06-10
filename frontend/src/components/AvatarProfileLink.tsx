@@ -1,4 +1,9 @@
-import { Image, SkeletonCircle, useDisclosure } from "@chakra-ui/react";
+import {
+  Avatar,
+  SkeletonCircle,
+  useColorModeValue,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
 import { User } from "../models";
@@ -11,18 +16,22 @@ interface UserProfileProps {
 export default function UserProfile({ asyncUser }: UserProfileProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const user = asyncUser.result && asyncUser.result.data;
-
+  const avatarBackgroundStyle = {
+    color: useColorModeValue("white", "black"),
+    bg: useColorModeValue("teal.500", "cyan.300"),
+  };
   return (
     <>
       {user ? (
-        <Image
-          referrerPolicy="no-referrer"
-          src={user?.social_auth?.[0]?.picture}
-          rounded="100%"
-          margin="1rem"
-          height="32px"
-          cursor="pointer"
+        <Avatar
           onClick={onOpen}
+          mr="10px"
+          mt="10px"
+          size="sm"
+          referrerPolicy="no-referrer"
+          {...avatarBackgroundStyle}
+          name={`${user.first_name} ${user.last_name}`}
+          src={user.social_auth?.[0]?.picture}
         />
       ) : (
         <SkeletonCircle alignSelf="center" margin="1rem" size="32px" />
