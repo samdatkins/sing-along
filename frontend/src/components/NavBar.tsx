@@ -203,7 +203,6 @@ export default function NavBar({
         !isMobileDevice ? (
           <Box>
             <Heading fontFamily="Ubuntu Mono">
-              {" "}
               {currentSongbook.session_key}
             </Heading>
           </Box>
@@ -313,7 +312,13 @@ export default function NavBar({
       {/* LIKE ICON */}
       {!asyncSongbook?.result?.data?.is_songbook_owner && (
         <Portal>
-          <Flex mr="10px" position="fixed" right="10px" bottom="10px">
+          <Flex
+            position="fixed"
+            right="20px"
+            bottom="20px"
+            margin="0"
+            padding="0"
+          >
             {isLiked ? (
               <BsSuitHeartFill {...heartIconStyle} onClick={handleHeartClick} />
             ) : (
