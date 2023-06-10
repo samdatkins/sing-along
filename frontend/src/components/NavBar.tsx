@@ -234,9 +234,6 @@ export default function NavBar({
                   rel="noopener noreferrer"
                   href={currentSongbook.current_song_entry?.song.url}
                 >
-                  {currentSongbook?.current_song_entry?.is_flagged && (
-                    <WarningTwoIcon />
-                  )}{" "}
                   "{currentSongbook.current_song_entry?.song.title}" by{" "}
                   {currentSongbook.current_song_entry?.song.artist}
                 </Link>{" "}

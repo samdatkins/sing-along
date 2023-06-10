@@ -87,16 +87,18 @@ export type User = {
 };
 
 export type SongbookStats = {
-  user: {
-    id: number;
-    first_name: string;
-    last_name: string;
-    social_auth: {
-      picture: string;
-    }[];
-  };
+  user: PublicUser;
   songs_requested: number;
 }[];
+
+export type PublicUser = {
+  id: number;
+  first_name: string;
+  last_initial: string;
+  social_auth: {
+    picture: string;
+  }[];
+};
 
 export type ChakraAlertStatus =
   | "info"

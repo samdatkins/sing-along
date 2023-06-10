@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from api.models import Membership, Songbook
+from api.serializers.membership import MembershipSerializer
 from api.serializers.song_entry import SongEntrySerializer
 
 
@@ -10,6 +11,7 @@ class SongbookSerializer(serializers.ModelSerializer):
     current_song_entry = serializers.SerializerMethodField()
     is_songbook_owner = serializers.SerializerMethodField()
     is_current_song_liked = serializers.SerializerMethodField()
+    membership_set = serializers.SerializerMethodField()
 
     class Meta:
         model = Songbook
@@ -25,9 +27,33 @@ class SongbookSerializer(serializers.ModelSerializer):
             "current_song_timestamp",
             "is_songbook_owner",
             "is_current_song_liked",
+            "membership_set",
         ]
 
-        extra_kwargs = {"session_key": {"read_only": True}, "is_liked": {"read_only"}}
+        extra_kwargs = {
+            "session_key": {"read_only": True},
+            "is_liked": {"read_only": True},
+            "membership_set": {"read_only": True},
+        }
+
+    def get_membership_set(self, obj):
+        request = self.context.get("request")
+        if request is None:
+            return None
+
+        members = list(obj.membership_set.all())
+        if not self._get_is_user_songbook_owner(members, request):
+            members = [
+                member for member in members if member.user.id == request.user.id
+            ]
+        return MembershipSerializer(members, many=True).data
+
+    def _get_is_user_songbook_owner(self, members, req):
+        membership = [member for member in members if member.user.id == req.user.id]
+        if len(membership) == 0:
+            return False
+
+        return membership[0].type == Membership.MemberType.OWNER.value
 
     def get_total_songs(self, obj):
         return obj.get_total_song_count()

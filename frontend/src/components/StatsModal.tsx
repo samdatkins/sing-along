@@ -144,9 +144,7 @@ const StatsModal = ({
                                 mr="10px"
                                 referrerPolicy="no-referrer"
                                 {...avatarBackgroundStyle}
-                                name={`${
-                                  stat.user.first_name
-                                } ${stat.user.last_name.substring(0, 1)}`}
+                                name={`${stat.user.first_name} ${stat.user.last_initial}`}
                                 src={stat.user.social_auth[0].picture}
                               />{" "}
                               <Heading
@@ -154,8 +152,7 @@ const StatsModal = ({
                                 verticalAlign="center"
                                 ml="5px"
                               >
-                                {stat.user.first_name}{" "}
-                                {stat.user.last_name.substring(0, 1)}.
+                                {stat.user.first_name} {stat.user.last_initial}.
                               </Heading>
                             </Flex>
                           </GridItem>
@@ -200,14 +197,11 @@ const StatsModal = ({
                               mr="10px"
                               referrerPolicy="no-referrer"
                               {...avatarBackgroundStyle}
-                              name={`${
-                                stat.user.first_name
-                              } ${stat.user.last_name.substring(0, 1)}`}
+                              name={`${stat.user.first_name} ${stat.user.last_initial}`}
                               src={stat.user.social_auth[0].picture}
                             />{" "}
                             <Heading size="sm" verticalAlign="center" ml="5px">
-                              {stat.user.first_name}{" "}
-                              {stat.user.last_name.substring(0, 1)}.
+                              {stat.user.first_name} {stat.user.last_initial}.
                             </Heading>
                           </Flex>
                           <Heading
