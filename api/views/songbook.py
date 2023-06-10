@@ -57,7 +57,11 @@ class SongbookViewSet(
         if self.action == "retrieve":
             # Don't filter for retrieve, users get access to all songbooks
             # when retrieving (since session key is the password)
-            return self.queryset.prefetch_related("song_entries").all()
+            return (
+                self.queryset.prefetch_related("song_entries")
+                .prefetch_related("membership_set__user")
+                .all()
+            )
 
         queryset = self.queryset.filter(members__id=self.request.user.id)
 

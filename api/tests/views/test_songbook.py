@@ -143,7 +143,7 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(7):
             response = self.client.get(
                 reverse(
                     "songbook-detail",
@@ -162,7 +162,7 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(10):
             response = self.client.get(
                 reverse(
                     "songbook-detail",
@@ -385,7 +385,7 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(7):
             response = self.client.get(
                 reverse(
                     "songbook-detail",
@@ -403,7 +403,7 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(10):
             response = self.client.get(
                 reverse(
                     "songbook-detail",
@@ -484,3 +484,37 @@ class TestSongbookView(APITestCase):
             ][0],
             4,
         )
+
+    def test_user_list_for_owner(self):
+        # Arrange
+        session_key = self.multi_user_songbook.session_key
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.get(
+            reverse(
+                "songbook-detail",
+                kwargs={"session_key": session_key},
+            )
+        )
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["membership_set"]), 4)
+
+    def test_user_list_for_nonowner(self):
+        # Arrange
+        session_key = self.multi_user_songbook.session_key
+        self.client.force_authenticate(user=self.user2)
+
+        # Act
+        response = self.client.get(
+            reverse(
+                "songbook-detail",
+                kwargs={"session_key": session_key},
+            )
+        )
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["membership_set"]), 1)

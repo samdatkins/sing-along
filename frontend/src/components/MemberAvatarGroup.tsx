@@ -26,9 +26,7 @@ const MemberAvatarGroup = ({ sessionKey }: MemberAvatarGroupProps) => {
             return (
               <Avatar
                 {...avatarBackgroundStyle}
-                name={`${
-                  member.user.first_name
-                } ${member.user.last_name.substring(0, 1)}`}
+                name={`${member.user.first_name} ${member.user.last_initial}`}
                 referrerPolicy="no-referrer"
                 src={member.user.social_auth[0].picture}
                 key={member.user.id}

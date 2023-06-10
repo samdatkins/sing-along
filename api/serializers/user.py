@@ -25,12 +25,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 class PublicUserSerializer(serializers.ModelSerializer):
     social_auth = UserSocialAuthSerializer(many=True)
+    last_initial = serializers.SerializerMethodField()
 
     class Meta:
         model = get_user_model()
         fields = [
             "id",
             "first_name",
-            "last_name",
+            "last_initial",
             "social_auth",
         ]
+
+    def get_last_initial(self, obj):
+        return obj.last_name[0:1]
