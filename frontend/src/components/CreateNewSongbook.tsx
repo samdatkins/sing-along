@@ -82,7 +82,7 @@ export default function CreateNewSongbook() {
               const result = await createNewSongbook(
                 maxSongs,
                 title,
-                isNoodleMode,
+                isNoodleMode
               );
               if (result !== false) {
                 navigate(`/live/${result.data.session_key}`);
