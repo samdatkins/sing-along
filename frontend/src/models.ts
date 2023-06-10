@@ -60,7 +60,7 @@ export enum ApplicationState {
 }
 
 export const AppStateToTimerMap = {
-  [ApplicationState.ShowSong]: 60,
+  [ApplicationState.ShowSong]: 10,
   [ApplicationState.ActionPrompt]: 7,
   [ApplicationState.PrepForSong]: 8,
 };

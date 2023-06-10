@@ -120,6 +120,11 @@ export default function NavBar({
         await nextSongbookSong(sessionKey);
         asyncSongbook.execute();
       }
+      if (applicationState === ApplicationState.ActionPrompt) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "unset";
+      }
     }
 
     appStateChanged();
