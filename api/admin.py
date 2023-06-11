@@ -11,6 +11,7 @@ class MembershipInline(admin.TabularInline):
 class SongAdmin(admin.ModelAdmin):
     list_display = ("artist", "title", "url", "rating", "votes", "capo")
     search_fields = ("artist", "title", "url", "capo")
+    ordering = ("likes")
 
 
 class SongbookAdmin(admin.ModelAdmin):
