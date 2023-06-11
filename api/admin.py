@@ -9,9 +9,14 @@ class MembershipInline(admin.TabularInline):
 
 
 class SongAdmin(admin.ModelAdmin):
-    list_display = ("artist", "title", "url", "rating", "votes", "capo")
+    list_display = ("artist", "title", "url", "rating", "votes", "capo", "num_likes")
     search_fields = ("artist", "title", "url", "capo")
-    ordering = ["likes"]
+
+    def num_likes(self, obj):
+        return obj.likes.count()
+
+    num_likes.admin_order_field = "likes"
+    num_likes.short_description = "Number of Likes"
 
 
 class SongbookAdmin(admin.ModelAdmin):
