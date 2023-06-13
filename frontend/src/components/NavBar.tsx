@@ -161,6 +161,12 @@ export default function NavBar({
     cursor: "pointer",
   };
 
+  const addIconStyle = {
+    opacity: "65%",
+    margin: "0px",
+    padding: "0px",
+  };
+
   const handleHeartClick = async () => {
     if (!asyncSongbook?.result?.data) {
       return;
@@ -175,7 +181,10 @@ export default function NavBar({
   return (
     <Flex flexDir="row" justifyContent="space-between">
       {/* LEFT COLUMN */}
-      <Flex justifyContent="space-between" width={!isMobileDevice ? "33%" : ""}>
+      <Flex
+        justifyContent="space-between"
+        width={!isMobileDevice ? "33%" : "12%"}
+      >
         <Flex paddingRight="1rem">
           <HamburgerMenu
             isMobileDevice={isMobileDevice}
@@ -219,7 +228,7 @@ export default function NavBar({
       {/* MIDDLE COLUMN */}
       <Flex
         alignItems="center"
-        width={!isMobileDevice ? "34%" : ""}
+        width={!isMobileDevice ? "34%" : "78%"}
         justifyContent="center"
       >
         <Flex direction="column">
@@ -263,7 +272,10 @@ export default function NavBar({
         </Flex>
       </Flex>
       {/* RIGHT COLUMN */}
-      <Flex width={!isMobileDevice ? "33%" : ""} justifyContent="space-between">
+      <Flex
+        width={!isMobileDevice ? "33%" : "10%"}
+        justifyContent="space-between"
+      >
         <Flex></Flex>
         <Flex>
           <Flex justifyContent="center">
@@ -307,29 +319,34 @@ export default function NavBar({
             </>
           )
         ) : (
-          <Flex w="34%" justifyContent="end">
-            <Button colorScheme="blue" as={RouterLink} to={"add-song"}>
-              <AddIcon />
-            </Button>
-          </Flex>
+          <Flex justifyContent="end"> </Flex>
         )}
         {addSongDrawerOutlet}
       </Flex>
-      {/* LIKE ICON */}
+
       {(!asyncSongbook?.result?.data?.is_songbook_owner || isMobileDevice) && (
         <Portal>
-          <Flex
-            position="fixed"
-            right="20px"
-            bottom="20px"
-            margin="0"
-            padding="0"
-          >
+          <Flex position="fixed" right="10px" top="10px">
             {isLiked ? (
               <BsSuitHeartFill {...heartIconStyle} onClick={handleHeartClick} />
             ) : (
               <BsSuitHeart {...heartIconStyle} onClick={handleHeartClick} />
             )}
+          </Flex>
+        </Portal>
+      )}
+
+      {(!asyncSongbook?.result?.data?.is_songbook_owner || isMobileDevice) && (
+        <Portal>
+          <Flex position="fixed" right="10px" bottom="10px">
+            <Button
+              as={RouterLink}
+              to={"add-song"}
+              colorScheme="blue"
+              {...addIconStyle}
+            >
+              <AddIcon />
+            </Button>
           </Flex>
         </Portal>
       )}
