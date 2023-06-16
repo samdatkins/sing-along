@@ -8,7 +8,7 @@ import {
   Text,
   useBoolean,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useDebounce } from "usehooks-ts";
 import { Song } from "../models";
@@ -16,10 +16,12 @@ import { searchForSong } from "../services/songs";
 
 type SongSearchAutocompleteProps = {
   onSubmit: (song: Song) => Promise<boolean>;
+  songRequestInput: React.MutableRefObject<null>;
 };
 
 export default function SongSearchAutocomplete({
   onSubmit,
+  songRequestInput,
 }: SongSearchAutocompleteProps) {
   const [searchText, setSearchText] = useState("");
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
@@ -68,6 +70,7 @@ export default function SongSearchAutocomplete({
       <InputGroup size="md">
         <Input
           placeholder="Lynyrd Skynyrd - Free Bird"
+          ref={songRequestInput}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           disabled={isSubmitting}
