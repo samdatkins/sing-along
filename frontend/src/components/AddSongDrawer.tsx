@@ -57,7 +57,7 @@ export default function AddSongDrawer() {
           <DrawerHeader>Request a song for "{songbook?.title}"</DrawerHeader>
 
           <DrawerBody>
-            <Box height={windowHeight * 0.6}>
+            <Box height={windowHeight * 0.5}>
               <SongSearchAutocomplete
                 songRequestInput={songRequestInput}
                 onSubmit={async (song) => {
