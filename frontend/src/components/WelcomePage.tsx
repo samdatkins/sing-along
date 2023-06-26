@@ -59,7 +59,7 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
             livepowerhour.com
           </Text>
           <Flex direction="column" mb="2rem">
-            <Heading textAlign="center">Join a Power Hour:</Heading>
+            <Heading textAlign="center">Join a Power Hour</Heading>
             <Flex direction="row">
               <Input
                 value={sessionKey}
@@ -86,15 +86,9 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
                 "{songbook.title}" is live!
               </Button>
             ))}
-          <Text
-            mb="1rem"
-            fontSize="2rem"
-            fontFamily="Ubuntu Mono"
-            color="gray.400"
-            justifyContent="center"
-          >
+          <Heading textAlign="center" mt="2rem">
             Your Songbooks
-          </Text>
+          </Heading>
           <Button margin="1rem" mb="2rem" colorScheme="blue" onClick={onOpen}>
             Create a New Songbook
           </Button>
