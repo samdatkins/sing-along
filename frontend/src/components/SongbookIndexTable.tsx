@@ -16,6 +16,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { BsFillJournalBookmarkFill } from "react-icons/bs";
 import { RxLapTimer } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
+import MemberAvatarGroup from "./MemberAvatarGroup";
 
 export default function SongbookIndexTable({ songbooks }) {
   const navigate = useNavigate();
@@ -107,9 +108,7 @@ export default function SongbookIndexTable({ songbooks }) {
                       </Text>
                     </Tooltip>
                   )}
-                  <Text pt="20px" fontSize="10" textAlign="center">
-                    Members #
-                  </Text>
+                  <MemberAvatarGroup membersList={songbook.membership_set} />
                 </Flex>
               </Card>
             );
@@ -129,7 +128,6 @@ export default function SongbookIndexTable({ songbooks }) {
           <TabPanel>{renderSongbooks(false)}</TabPanel>
         </TabPanels>
       </Tabs>
-      <pre>{JSON.stringify(songbooks?.[0], null, 4)}</pre>
     </Flex>
   );
 }
