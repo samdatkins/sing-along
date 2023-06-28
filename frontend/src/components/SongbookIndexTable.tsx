@@ -12,15 +12,14 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { BsFillJournalBookmarkFill } from "react-icons/bs";
 import { RxLapTimer } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
 
 export default function SongbookIndexTable({ songbooks }) {
   const navigate = useNavigate();
-
-  //will read off cookie:
-  // const [displayNoodle, setDisplayNoodle] = useState<boolean>(false);
+  dayjs.extend(relativeTime);
 
   const renderSongbooks = (displayNoodle) => {
     return (
@@ -84,21 +83,30 @@ export default function SongbookIndexTable({ songbooks }) {
                 </Heading>
                 <Flex direction="column" height="100%" justifyContent="end">
                   <Text fontSize="10" textAlign="center">
-                    # songs
-                  </Text>
-                  <Text fontSize="10" textAlign="center">
-                    {songbook.is_noodle_mode ? (
-                      <>
-                        updated on{" "}
-                        {dayjs(songbook.updated_at).format("MM/DD/YY")}
-                      </>
+                    {songbook.total_songs > 0 ? (
+                      <>{songbook.total_songs} songs</>
                     ) : (
-                      <>
-                        created on{" "}
-                        {dayjs(songbook.created_at).format("MM/DD/YY")}
-                      </>
+                      <>no songs yet</>
                     )}
                   </Text>
+
+                  {songbook.is_noodle_mode ? (
+                    <Tooltip
+                      label={dayjs(songbook.updated_at).format("MM/DD/YY")}
+                    >
+                      <Text fontSize="10" textAlign="center">
+                        last updated {dayjs(songbook.updated_at).fromNow()}
+                      </Text>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip
+                      label={dayjs(songbook.created_at).format("MM/DD/YY")}
+                    >
+                      <Text fontSize="10" textAlign="center">
+                        created {dayjs(songbook.created_at).fromNow()}
+                      </Text>
+                    </Tooltip>
+                  )}
                   <Text pt="20px" fontSize="10" textAlign="center">
                     Members #
                   </Text>

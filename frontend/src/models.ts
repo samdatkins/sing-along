@@ -51,6 +51,10 @@ export type SongbookListItem = {
   is_noodle_mode: boolean;
   current_song_timestamp: string;
   created_at: string;
+  updated_at: string;
+  total_songs: number;
+  is_songbook_owner: boolean;
+  membership_set: Member[];
 };
 
 export enum ApplicationState {
