@@ -84,10 +84,10 @@ export default function SongbookIndexTable({ songbooks }) {
                 </Heading>
                 <Flex direction="column" height="100%" justifyContent="end">
                   <Text fontSize="10" textAlign="center">
-                    {songbook.total_songs > 0 ? (
+                    {songbook.total_songs === 0 && <>no songs yet</>}
+                    {songbook.total_songs === 1 && <>1 song</>}
+                    {songbook.total_songs > 1 && (
                       <>{songbook.total_songs} songs</>
-                    ) : (
-                      <>no songs yet</>
                     )}
                   </Text>
 
