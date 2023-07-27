@@ -62,7 +62,7 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     }
   }, SONGBOOK_POLL_INTERVAL);
 
-  return asyncSongbook?.result?.data.total_songs ? (
+  return (
     <>
       <SongbookContext.Provider value={asyncSongbook?.result?.data}>
         <Flex padding="1rem" paddingTop=".5rem" flexDir="column" height="100%">
@@ -76,31 +76,18 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
             columnsToDisplay={columnsToDisplay}
             asyncUser={asyncUser}
           />
-          <TabContainer
-            asyncSongbook={asyncSongbook}
-            asyncUser={asyncUser}
-            applicationState={applicationState}
-            firstColDispIndex={firstColDispIndex}
-            columnsToDisplay={columnsToDisplay}
-          />
+          {asyncSongbook?.result?.data.total_songs !== 0 && (
+            <TabContainer
+              asyncSongbook={asyncSongbook}
+              asyncUser={asyncUser}
+              applicationState={applicationState}
+              firstColDispIndex={firstColDispIndex}
+              columnsToDisplay={columnsToDisplay}
+            />
+          )}
         </Flex>
       </SongbookContext.Provider>
     </>
-  ) : (
-    <SongbookContext.Provider value={asyncSongbook?.result?.data}>
-      <Flex padding="1rem" paddingTop=".5rem" flexDir="column" height="100%">
-        <NavBar
-          asyncSongbook={asyncSongbook}
-          advanceToNextAppState={advanceToNextAppState}
-          resetAppState={resetAppState}
-          applicationState={applicationState}
-          firstColDispIndex={firstColDispIndex}
-          setFirstColDispIndex={setFirstColDispIndex}
-          columnsToDisplay={columnsToDisplay}
-          asyncUser={asyncUser}
-        />
-      </Flex>
-    </SongbookContext.Provider>
   );
 }
 
