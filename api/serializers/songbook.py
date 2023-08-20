@@ -90,6 +90,9 @@ class SongbookSerializer(serializers.ModelSerializer):
 
 class SongbookListSerializer(serializers.ModelSerializer):
     current_song_timestamp = serializers.DateTimeField(read_only=False, required=False)
+    total_songs = serializers.SerializerMethodField()
+    is_songbook_owner = serializers.SerializerMethodField()
+    membership_set = serializers.SerializerMethodField()
 
     class Meta:
         model = Songbook
@@ -100,9 +103,47 @@ class SongbookListSerializer(serializers.ModelSerializer):
             "is_noodle_mode",
             "current_song_timestamp",
             "created_at",
+            "updated_at",
+            "total_songs",
+            "is_songbook_owner",
+            "membership_set",
         ]
 
         extra_kwargs = {"session_key": {"read_only": True}}
+
+    def get_total_songs(self, obj):
+        return obj.get_total_song_count()
+
+    def _get_is_user_songbook_owner(self, members, req):
+        membership = [member for member in members if member.user.id == req.user.id]
+        if len(membership) == 0:
+            return False
+
+        return membership[0].type == Membership.MemberType.OWNER.value
+
+    def get_membership_set(self, obj):
+        request = self.context.get("request")
+        if request is None:
+            return None
+
+        members = list(obj.membership_set.all())
+        if not self._get_is_user_songbook_owner(members, request):
+            members = [
+                member for member in members if member.user.id == request.user.id
+            ]
+        return MembershipSerializer(members, many=True).data
+
+    def get_is_songbook_owner(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        membership = [
+            membership
+            for membership in obj.membership_set.all()
+            if membership.user == user
+        ][0]
+        return membership.type == Membership.MemberType.OWNER.value
 
 
 class SongbookDetailSerializer(serializers.ModelSerializer):

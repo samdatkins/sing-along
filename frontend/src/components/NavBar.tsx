@@ -4,6 +4,7 @@ import {
   Button,
   Flex,
   Heading,
+  Kbd,
   Link,
   Portal,
   Skeleton,
@@ -218,7 +219,9 @@ export default function NavBar({
         !isMobileDevice ? (
           <Box>
             <Heading fontFamily="Ubuntu Mono">
-              {currentSongbook.session_key}
+              {currentSongbook.session_key.split("").map((char, keyIdx) => (
+                <Kbd key={keyIdx}>{char}</Kbd>
+              ))}
             </Heading>
           </Box>
         ) : (

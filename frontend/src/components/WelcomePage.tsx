@@ -47,8 +47,8 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
       <Flex position="fixed" top="0" right="0">
         <UserProfile asyncUser={asyncUser} />
       </Flex>
-      <Flex justifyContent="center">
-        <Flex alignItems="center" direction="column">
+      <Flex justifyContent="center" width="100%">
+        <Flex alignItems="center" direction="column" width="100%">
           <Text
             fontSize="2rem"
             fontFamily="Ubuntu Mono"
@@ -59,15 +59,16 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
             livepowerhour.com
           </Text>
           <Flex direction="column" mb="2rem">
-            <Heading textAlign="center">Join a Power Hour:</Heading>
+            <Heading textAlign="center">Join a Power Hour</Heading>
             <Flex direction="row">
               <Input
                 value={sessionKey}
                 mr="1rem"
+                mt="1rem"
                 maxLength={4}
                 onChange={(e) => setSessionKey(e.target.value.toUpperCase())}
               ></Input>
-              <Button onClick={() => navigate(`/live/${sessionKey}`)}>
+              <Button mt="1rem" onClick={() => navigate(`/live/${sessionKey}`)}>
                 Join
               </Button>
             </Flex>
@@ -76,7 +77,7 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
             activePowerHours.map((songbook) => (
               <Button
                 key={songbook.session_key}
-                margin="2rem"
+                margin="1rem"
                 leftIcon={<WarningIcon />}
                 colorScheme="yellow"
                 textAlign="center"
@@ -85,19 +86,13 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
                 "{songbook.title}" is live!
               </Button>
             ))}
-          <Text
-            mb="1rem"
-            fontSize="2rem"
-            fontFamily="Ubuntu Mono"
-            color="gray.400"
-            justifyContent="center"
-          >
+          <Heading textAlign="center" mt="2rem">
             Your Songbooks
-          </Text>
-          <SongbookIndexTable songbooks={songbooks} />
-          <Button margin="2rem" colorScheme="blue" onClick={onOpen}>
+          </Heading>
+          <Button margin="1rem" mb="2rem" colorScheme="blue" onClick={onOpen}>
             Create a New Songbook
           </Button>
+          <SongbookIndexTable songbooks={songbooks} />
         </Flex>
       </Flex>
       <Modal isOpen={isOpen} onClose={onClose}>

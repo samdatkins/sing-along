@@ -74,6 +74,11 @@ class SongbookViewSet(
                     ),
                 )
             ).all()
+
+        queryset = queryset.prefetch_related("song_entries").prefetch_related(
+            "membership_set__user__social_auth"
+        )
+
         return queryset
 
     def get_serializer_class(self):
