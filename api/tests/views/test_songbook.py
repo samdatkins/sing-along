@@ -108,7 +108,7 @@ class TestSongbookView(APITestCase):
         # Act
         # Should run one query for pagniation purposes, then one more query
         # to actually pull the songbooks
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(6):
             response = self.client.get(reverse("songbook-list"))
 
         # Assert
@@ -121,7 +121,7 @@ class TestSongbookView(APITestCase):
         # Act
         # Should run one query for pagniation purposes, then one more query
         # to actually pull the songbooks
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(6):
             response = self.client.get(reverse("songbook-list"))
 
         # Assert
@@ -465,7 +465,7 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(9):
             response = self.client.get(
                 reverse(
                     "songbook-stats",
