@@ -106,27 +106,78 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        # Should run one query for pagniation purposes, then one more query
-        # to actually pull the songbooks
         with self.assertNumQueries(6):
             response = self.client.get(reverse("songbook-list"))
 
         # Assert
         self.assertEqual(response.status_code, 200)
 
-    def test_list_has_correct_count(self):
+    def test_list_has_correct_counts(self):
         # Arrange
         self.client.force_authenticate(user=self.user)
 
         # Act
-        # Should run one query for pagniation purposes, then one more query
-        # to actually pull the songbooks
         with self.assertNumQueries(6):
             response = self.client.get(reverse("songbook-list"))
 
         # Assert
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 4)
+        self.assertEqual(response.data["results"][0]["total_songs"], 7)
+        self.assertEqual(response.data["results"][1]["total_songs"], 0)
+        self.assertEqual(response.data["results"][2]["total_songs"], 3)
+        self.assertEqual(response.data["results"][3]["total_songs"], 0)
+
+    def test_list_has_correct_ownership_bool(self):
+        # Arrange
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.get(reverse("songbook-list"))
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 4)
+        self.assertEqual(response.data["results"][0]["is_songbook_owner"], True)
+        self.assertEqual(response.data["results"][1]["is_songbook_owner"], False)
+        self.assertEqual(response.data["results"][2]["is_songbook_owner"], True)
+        self.assertEqual(response.data["results"][3]["is_songbook_owner"], True)
+
+    def test_list_has_correct_member_list_as_owner(self):
+        # Arrange
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.get(reverse("songbook-list"))
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 4)
+
+        self.assertEqual(
+            len(response.data["results"][0]["membership_set"]),
+            self.multi_user_songbook.membership_set.count(),
+        )
+
+    def test_list_has_correct_member_list_as_participant(self):
+        # Arrange
+        self.client.force_authenticate(user=self.user2)
+
+        # Act
+        response = self.client.get(reverse("songbook-list"))
+
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+
+        self.assertEqual(
+            len(response.data["results"][0]["membership_set"]),
+            1,
+        )
+        self.assertEqual(
+            response.data["results"][0]["membership_set"][0]["user"]["id"],
+            self.user2.id,
+        )
 
     def test_unauthed_requests_fail(self):
         # Arrange
