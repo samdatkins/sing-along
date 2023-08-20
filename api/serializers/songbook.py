@@ -138,12 +138,15 @@ class SongbookListSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             user = request.user
-        membership = [
+        membership_list = [
             membership
             for membership in obj.membership_set.all()
             if membership.user == user
-        ][0]
-        return membership.type == Membership.MemberType.OWNER.value
+        ]
+
+        if len(membership_list) != 1:
+            return False
+        return membership_list[0].type == Membership.MemberType.OWNER.value
 
 
 class SongbookDetailSerializer(serializers.ModelSerializer):
