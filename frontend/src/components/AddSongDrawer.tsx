@@ -2,7 +2,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Button,
   Drawer,
   DrawerBody,
@@ -18,7 +17,6 @@ import {
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SongbookContext from "../contexts/SongbookContext";
-import useWindowDimensions from "../helpers/useWindowDimensions";
 import { ChakraAlertStatus } from "../models";
 import { addSongToSongbook, deleteSongbookSong } from "../services/songs";
 import SongSearchAutocomplete from "./SongSearchAutocomplete";
@@ -36,7 +34,7 @@ export default function AddSongDrawer() {
 
   const songRequestInput = React.useRef(null);
 
-  const { height: windowHeight } = useWindowDimensions();
+  // const { height: windowHeight } = useWindowDimensions();
 
   return (
     <>
@@ -51,66 +49,66 @@ export default function AddSongDrawer() {
         }}
         size="md"
       >
-        <DrawerOverlay />
-        <DrawerContent>
+        <DrawerOverlay height="100%" />
+        <DrawerContent height="90vh">
           <DrawerCloseButton />
           <DrawerHeader>Request a song for "{songbook?.title}"</DrawerHeader>
 
           <DrawerBody>
-            <Box height={windowHeight * 0.5}>
-              <SongSearchAutocomplete
-                songRequestInput={songRequestInput}
-                onSubmit={async (song) => {
-                  setAlertText("");
-                  setAlertStatus(undefined);
+            {/* <Box height={windowHeight * 0.5}> */}
+            {/* <Box height={"75vh"}> */}
+            <SongSearchAutocomplete
+              songRequestInput={songRequestInput}
+              onSubmit={async (song) => {
+                setAlertText("");
+                setAlertStatus(undefined);
 
-                  const addSongResult = await addSongToSongbook(
-                    song,
-                    songbook?.id
-                  );
-                  if (typeof addSongResult === "string") {
-                    const isWarning = addSongResult.includes("already");
-                    setAlertStatus(isWarning ? "warning" : "error");
-                    setAlertText(addSongResult);
-                    if (isWarning) {
-                      return true;
-                    }
-                    return false;
-                  } else {
-                    setUndoSongEntryID(addSongResult.data.id);
-                    setAlertStatus("success");
-                    setAlertText(
-                      `Successfully added "${song.title}" by ${song.artist}.`
-                    );
+                const addSongResult = await addSongToSongbook(
+                  song,
+                  songbook?.id
+                );
+                if (typeof addSongResult === "string") {
+                  const isWarning = addSongResult.includes("already");
+                  setAlertStatus(isWarning ? "warning" : "error");
+                  setAlertText(addSongResult);
+                  if (isWarning) {
                     return true;
                   }
-                }}
-              />
+                  return false;
+                } else {
+                  setUndoSongEntryID(addSongResult.data.id);
+                  setAlertStatus("success");
+                  setAlertText(
+                    `Successfully added "${song.title}" by ${song.artist}.`
+                  );
+                  return true;
+                }
+              }}
+            />
 
-              <SlideFade in={!!alertText} style={{ zIndex: 10 }} offsetY="20px">
-                <Alert status={alertStatus} py="2rem" rounded="md" mt="3rem">
-                  <Flex direction="column">
-                    <Flex direction="row" alignItems="center">
-                      <AlertIcon />
-                      <AlertDescription>{alertText}</AlertDescription>
-                    </Flex>
-                    {undoSongEntryID !== undefined && (
-                      <Button
-                        mt="1rem"
-                        onClick={() => {
-                          deleteSongbookSong(undoSongEntryID);
-                          setUndoSongEntryID(undefined);
-                          setAlertText("");
-                          setAlertStatus(undefined);
-                        }}
-                      >
-                        Undo
-                      </Button>
-                    )}
+            <SlideFade in={!!alertText} style={{ zIndex: 10 }} offsetY="20px">
+              <Alert status={alertStatus} py="2rem" rounded="md" mt="3rem">
+                <Flex direction="column">
+                  <Flex direction="row" alignItems="center">
+                    <AlertIcon />
+                    <AlertDescription>{alertText}</AlertDescription>
                   </Flex>
-                </Alert>
-              </SlideFade>
-            </Box>
+                  {undoSongEntryID !== undefined && (
+                    <Button
+                      mt="1rem"
+                      onClick={() => {
+                        deleteSongbookSong(undoSongEntryID);
+                        setUndoSongEntryID(undefined);
+                        setAlertText("");
+                        setAlertStatus(undefined);
+                      }}
+                    >
+                      Undo
+                    </Button>
+                  )}
+                </Flex>
+              </Alert>
+            </SlideFade>
           </DrawerBody>
 
           <DrawerFooter></DrawerFooter>
