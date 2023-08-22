@@ -34,8 +34,6 @@ export default function AddSongDrawer() {
 
   const songRequestInput = React.useRef(null);
 
-  // const { height: windowHeight } = useWindowDimensions();
-
   return (
     <>
       <Drawer
@@ -55,8 +53,6 @@ export default function AddSongDrawer() {
           <DrawerHeader>Request a song for "{songbook?.title}"</DrawerHeader>
 
           <DrawerBody>
-            {/* <Box height={windowHeight * 0.5}> */}
-            {/* <Box height={"75vh"}> */}
             <SongSearchAutocomplete
               songRequestInput={songRequestInput}
               onSubmit={async (song) => {
