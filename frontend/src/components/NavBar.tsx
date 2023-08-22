@@ -56,7 +56,7 @@ export default function NavBar({
   asyncUser,
 }: NavBarProps) {
   // Outlet that conditionally renders the add song drawer based on URL
-  const addSongDrawerOutlet = useOutlet();
+  const addSongModalOutlet = useOutlet();
   // ref for controlling the timer from parent component
   const timerRef = useRef<any>();
   // state for triggering refresh in Timer component when restart is clicked
@@ -192,7 +192,7 @@ export default function NavBar({
             timerControls={timerControls}
             isLive={isLive}
             setIsLive={setIsLive}
-            addSongDrawerOutlet={addSongDrawerOutlet}
+            addSongModalOutlet={addSongModalOutlet}
             asyncSongbook={asyncSongbook}
             resetAppState={resetAppState}
             firstColDispIndex={firstColDispIndex}
@@ -324,7 +324,7 @@ export default function NavBar({
         ) : (
           <Flex justifyContent="end"> </Flex>
         )}
-        {addSongDrawerOutlet}
+        {addSongModalOutlet}
       </Flex>
 
       {(!asyncSongbook?.result?.data?.is_songbook_owner || isMobileDevice) && (

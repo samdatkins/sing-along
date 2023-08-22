@@ -47,7 +47,7 @@ interface HamburgerMenuProps {
   };
   isLive: boolean;
   setIsLive: React.Dispatch<React.SetStateAction<boolean>>;
-  addSongDrawerOutlet: React.ReactElement<
+  addSongModalOutlet: React.ReactElement<
     any,
     string | React.JSXElementConstructor<any>
   > | null;
@@ -66,7 +66,7 @@ export default function HamburgerMenu({
   isLive,
   asyncSongbook,
   resetAppState,
-  addSongDrawerOutlet,
+  addSongModalOutlet,
   setIsLive,
   firstColDispIndex,
   setFirstColDispIndex,
@@ -110,7 +110,7 @@ export default function HamburgerMenu({
   // handle what happens on key press
   const handleKeyPress = async (event: KeyboardEvent) => {
     // if the add song drawer is open, ignore all typing
-    if (addSongDrawerOutlet || isJumpSearchOpen || !isSongbookOwner) return;
+    if (addSongModalOutlet || isJumpSearchOpen || !isSongbookOwner) return;
 
     if (event.metaKey || event.ctrlKey || event.altKey) {
       return;
