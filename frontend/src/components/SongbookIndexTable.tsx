@@ -29,7 +29,6 @@ export default function SongbookIndexTable({ songbooks }) {
   const avatarBackgroundStyle = {
     color: useColorModeValue("white", "black"),
     bg: useColorModeValue("teal.500", "cyan.300"),
-    size: "sm",
   };
 
   const renderSongbooks = (displayNoodle) => {
@@ -126,7 +125,7 @@ export default function SongbookIndexTable({ songbooks }) {
                         </Text>
                       </Tooltip>
                     )}
-                    <AvatarGroup max={6} mt="10px">
+                    <AvatarGroup size="sm" max={6} mt="10px">
                       {songbook.membership_set?.length &&
                         songbook.membership_set.map((member) => {
                           return (
