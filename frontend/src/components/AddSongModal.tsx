@@ -44,7 +44,7 @@ const AddSongModal = () => {
         size="lg"
       >
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent minH="80vh">
           <ModalHeader>Request a song for "{songbook?.title}"</ModalHeader>
           <ModalCloseButton />
           <ModalBody>

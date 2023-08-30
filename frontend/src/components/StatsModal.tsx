@@ -1,13 +1,6 @@
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
   Avatar,
-  Box,
   Flex,
-  FormLabel,
   Grid,
   GridItem,
   Heading,
@@ -18,10 +11,13 @@ import {
   ModalFooter,
   ModalOverlay,
   Progress,
-  Switch,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { useAsync } from "react-async-hook";
 import QRCode from "react-qr-code";
 import { Member } from "../models";
@@ -44,8 +40,6 @@ const StatsModal = ({
   totalSongs,
   membersList,
 }: StatsModalProps) => {
-  const [defaultTab, setDefaultTab] = useState(0);
-
   const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
   const asyncSongbookStats = useAsync(getSongbookStats, [sessionKey], {
@@ -64,9 +58,9 @@ const StatsModal = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} size="6xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="7xl">
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent minH="90vh">
           <ModalCloseButton />
           <ModalBody>
             <Heading textAlign="center" margin="1rem">
@@ -103,32 +97,13 @@ const StatsModal = ({
                 </Heading>
               </Flex>
             </Flex>
-            <Flex direction="row" justifyContent="center" margin="1rem">
-              <FormLabel mr="1rem">
-                {defaultTab ? `Hide Leaderboard:` : `View Leaderboard:`}
-              </FormLabel>
-              <Switch
-                isChecked={defaultTab > 0}
-                onChange={() => {
-                  defaultTab ? setDefaultTab(0) : setDefaultTab(1);
-                }}
-              />
-            </Flex>
-            <Accordion index={[defaultTab]} allowMultiple>
-              <AccordionItem>
-                <h2>
-                  <AccordionButton
-                    onClick={() => {
-                      setDefaultTab(0);
-                    }}
-                  >
-                    <Box as="span" flex="1" textAlign="left">
-                      <Heading size="lg">Songbook Members</Heading>
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
+            <Tabs variant="soft-rounded" colorScheme="blue" mt="20px">
+              <TabList justifyContent="center">
+                <Tab>Songbook Members</Tab>
+                <Tab>Requests Leaderboard</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
                   <Grid templateColumns="repeat(5, 1fr)" gap={1}>
                     {(membersList?.length || 0) > 0 &&
                       membersList?.map((member) => {
@@ -151,7 +126,7 @@ const StatsModal = ({
                                 src={member.user.social_auth?.[0]?.picture}
                               />{" "}
                               <Heading
-                                size="sm"
+                                size="md"
                                 verticalAlign="center"
                                 ml="5px"
                               >
@@ -163,23 +138,8 @@ const StatsModal = ({
                         );
                       })}
                   </Grid>
-                </AccordionPanel>
-              </AccordionItem>
-
-              <AccordionItem>
-                <h2>
-                  <AccordionButton
-                    onClick={() => {
-                      setDefaultTab(1);
-                    }}
-                  >
-                    <Box as="span" flex="1" textAlign="left">
-                      <Heading size="lg">Requests Leaderboard</Heading>
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4} justifyContent="center">
+                </TabPanel>
+                <TabPanel>
                   {(songbookStats?.length || 0) > 0 &&
                     songbookStats?.map((stat, idx) => {
                       return stat.songs_requested > 0 ? (
@@ -204,12 +164,12 @@ const StatsModal = ({
                               name={`${stat.user.first_name} ${stat.user.last_initial}`}
                               src={stat.user.social_auth?.[0]?.picture}
                             />{" "}
-                            <Heading size="sm" verticalAlign="center" ml="5px">
+                            <Heading size="md" verticalAlign="center" ml="5px">
                               {stat.user.first_name} {stat.user.last_initial}.
                             </Heading>
                           </Flex>
                           <Heading
-                            size="sm"
+                            size="md"
                             width="20%"
                             verticalAlign="center"
                             textAlign="center"
@@ -234,9 +194,9 @@ const StatsModal = ({
                         <span key={idx}></span>
                       );
                     })}
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
           </ModalBody>
           <ModalFooter></ModalFooter>
         </ModalContent>
