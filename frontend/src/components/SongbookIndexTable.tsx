@@ -76,18 +76,12 @@ export default function SongbookIndexTable({ songbooks }) {
                     ) : (
                       <Tooltip label="power hour">
                         <span>
-                          <RxLapTimer size="30px" color="black" />
+                          <RxLapTimer size="30px" />
                         </span>
                       </Tooltip>
                     )}
                   </Flex>
-                  <Heading
-                    size="md"
-                    color="blue.400"
-                    textAlign="center"
-                    mb="1rem"
-                    mt="5px"
-                  >
+                  <Heading size="md" textAlign="center" mb="1rem" mt="5px">
                     {songbook.session_key.split("").map((char, keyIdx) => (
                       <Kbd key={keyIdx}>{char}</Kbd>
                     ))}
