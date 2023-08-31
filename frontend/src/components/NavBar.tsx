@@ -25,12 +25,18 @@ import {
 
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
+import { FaFastBackward, FaFastForward } from "react-icons/fa";
 import { Link as RouterLink, useOutlet } from "react-router-dom";
 import { countTabColumns } from "../helpers/tab";
-import { nextSongbookSong, setSongLikeStatus } from "../services/songs";
+import {
+  nextSongbookSong,
+  prevSongbookSong,
+  setSongLikeStatus,
+} from "../services/songs";
 import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
 import MemberAvatarGroup from "./MemberAvatarGroup";
+import SongbookList from "./SongbookList";
 import StatsModal from "./StatsModal";
 import Timer from "./Timer";
 
@@ -79,6 +85,11 @@ export default function NavBar({
     isOpen: isStatsOpen,
     onOpen: onStatsOpen,
     onClose: onStatsClose,
+  } = useDisclosure();
+  const {
+    isOpen: isListOpen,
+    onOpen: onListOpen,
+    onClose: onListClose,
   } = useDisclosure();
 
   const totalColumns = useMemo(
@@ -168,6 +179,16 @@ export default function NavBar({
     padding: "0px",
   };
 
+  const handleNextClick = async (sessionKey) => {
+    if (asyncSongbook?.result?.data?.is_noodle_mode)
+      await nextSongbookSong(sessionKey);
+  };
+
+  const handlePreviousClick = async (sessionKey) => {
+    if (asyncSongbook?.result?.data?.is_noodle_mode)
+      await prevSongbookSong(sessionKey);
+  };
+
   const handleHeartClick = async () => {
     if (!asyncSongbook?.result?.data) {
       return;
@@ -177,6 +198,11 @@ export default function NavBar({
     const songId = asyncSongbook.result.data.current_song_entry.song.id;
     setSongLikeStatus(songId, newLikeState);
     asyncSongbook.execute();
+  };
+
+  const handleSongbookClick = () => {
+    if (!currentSongbook?.is_songbook_owner) return;
+    onListOpen();
   };
 
   return (
@@ -256,14 +282,57 @@ export default function NavBar({
                   {currentSongbook.current_song_entry?.song.artist}
                 </Link>{" "}
               </Text>
-              <RouterLink to={`/live/${currentSongbook.session_key}/list`}>
-                <Text align="center" fontSize="1.5xl">
+              <Flex direction="row" justifyContent="center" alignItems="center">
+                {asyncSongbook?.result?.data?.is_noodle_mode && (
+                  <Button
+                    mr="20px"
+                    size="xs"
+                    colorScheme="blue"
+                    isDisabled={currentSongbook.current_song_position === 1}
+                    onClick={() =>
+                      handlePreviousClick(
+                        asyncSongbook?.result?.data?.session_key
+                      )
+                    }
+                  >
+                    <FaFastBackward />
+                  </Button>
+                )}
+                <Text
+                  onClick={handleSongbookClick}
+                  cursor={
+                    currentSongbook?.is_songbook_owner ? "pointer" : "default"
+                  }
+                  align="center"
+                  fontSize="1.5xl"
+                >
                   {currentSongbook.title}
                   {" - "} ({"song "}
                   {currentSongbook.current_song_position} of{" "}
                   {currentSongbook.total_songs})
                 </Text>
-              </RouterLink>
+                <SongbookList
+                  isListOpen={isListOpen}
+                  onListClose={onListClose}
+                  sessionKey={asyncSongbook?.result?.data?.session_key}
+                />
+                {asyncSongbook?.result?.data?.is_noodle_mode && (
+                  <Button
+                    ml="20px"
+                    size="xs"
+                    colorScheme="blue"
+                    isDisabled={
+                      currentSongbook.current_song_position ===
+                      currentSongbook.total_songs
+                    }
+                    onClick={() =>
+                      handleNextClick(asyncSongbook?.result?.data?.session_key)
+                    }
+                  >
+                    <FaFastForward />
+                  </Button>
+                )}
+              </Flex>
             </>
           ) : (
             <Skeleton
@@ -327,7 +396,9 @@ export default function NavBar({
         {addSongModalOutlet}
       </Flex>
 
-      {(!asyncSongbook?.result?.data?.is_songbook_owner || isMobileDevice) && (
+      {(!asyncSongbook?.result?.data?.is_songbook_owner ||
+        isMobileDevice ||
+        asyncSongbook?.result?.data?.is_noodle_mode) && (
         <Portal>
           <Flex position="fixed" right="10px" top="10px">
             {isLiked ? (
@@ -339,7 +410,9 @@ export default function NavBar({
         </Portal>
       )}
 
-      {(!asyncSongbook?.result?.data?.is_songbook_owner || isMobileDevice) && (
+      {(!asyncSongbook?.result?.data?.is_songbook_owner ||
+        isMobileDevice ||
+        asyncSongbook?.result?.data?.is_noodle_mode) && (
         <Portal>
           <Flex position="fixed" right="10px" bottom="10px">
             <Button

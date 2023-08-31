@@ -76,18 +76,12 @@ export default function SongbookIndexTable({ songbooks }) {
                     ) : (
                       <Tooltip label="power hour">
                         <span>
-                          <RxLapTimer size="30px" color="black" />
+                          <RxLapTimer size="30px" />
                         </span>
                       </Tooltip>
                     )}
                   </Flex>
-                  <Heading
-                    size="md"
-                    color="blue.400"
-                    textAlign="center"
-                    mb="1rem"
-                    mt="5px"
-                  >
+                  <Heading size="md" textAlign="center" mb="1rem" mt="5px">
                     {songbook.session_key.split("").map((char, keyIdx) => (
                       <Kbd key={keyIdx}>{char}</Kbd>
                     ))}
@@ -110,7 +104,9 @@ export default function SongbookIndexTable({ songbooks }) {
 
                     {songbook.is_noodle_mode ? (
                       <Tooltip
-                        label={dayjs(songbook.updated_at).format("MM/DD/YY")}
+                        label={`updated ${dayjs(songbook.updated_at).format(
+                          "MM/DD/YY"
+                        )}`}
                       >
                         <Text fontSize="10" textAlign="center">
                           last updated {dayjs(songbook.updated_at).fromNow()}
@@ -118,7 +114,9 @@ export default function SongbookIndexTable({ songbooks }) {
                       </Tooltip>
                     ) : (
                       <Tooltip
-                        label={dayjs(songbook.created_at).format("MM/DD/YY")}
+                        label={`created ${dayjs(songbook.created_at).format(
+                          "MM/DD/YY"
+                        )}`}
                       >
                         <Text fontSize="10" textAlign="center">
                           created {dayjs(songbook.created_at).fromNow()}
@@ -129,17 +127,13 @@ export default function SongbookIndexTable({ songbooks }) {
                       {songbook.membership_set?.length &&
                         songbook.membership_set.map((member) => {
                           return (
-                            <Tooltip
-                              label={member.user.first_name}
+                            <Avatar
+                              {...avatarBackgroundStyle}
                               key={member.user.id}
-                            >
-                              <Avatar
-                                {...avatarBackgroundStyle}
-                                name={`${member.user.first_name} ${member.user.last_initial}`}
-                                referrerPolicy="no-referrer"
-                                src={member.user.social_auth?.[0]?.picture}
-                              />
-                            </Tooltip>
+                              name={`${member.user.first_name} ${member.user.last_initial}`}
+                              referrerPolicy="no-referrer"
+                              src={member.user.social_auth?.[0]?.picture}
+                            />
                           );
                         })}
                     </AvatarGroup>

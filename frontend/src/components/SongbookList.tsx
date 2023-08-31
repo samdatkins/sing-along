@@ -1,42 +1,41 @@
-import {
-  Box,
-  Button,
-  Heading,
-  Icon,
-  Link,
-  ListItem,
-  UnorderedList,
-} from "@chakra-ui/react";
-import { useAsync } from "react-async-hook";
-import { FaEdit } from "react-icons/fa";
-import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
+import { Link, ListItem, UnorderedList } from "@chakra-ui/react";
 import { getSongbookDetails, setSongbookSong } from "../services/songs";
 
-export default function SongbookList() {
-  const { sessionKey } = useParams();
-  const navigate = useNavigate();
+import {
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+} from "@chakra-ui/react";
+import { useAsync } from "react-async-hook";
+
+interface SongbookListProps {
+  isListOpen: boolean;
+  onListClose: () => void;
+  sessionKey: string;
+}
+
+export default function SongbookList({
+  isListOpen,
+  onListClose,
+  sessionKey,
+}: SongbookListProps) {
   const asyncSongbook = useAsync(
     async () => getSongbookDetails(sessionKey),
     []
   );
-  const songbook = asyncSongbook.result?.data;
+  const songbook = asyncSongbook?.result?.data;
   return (
-    <Box margin="3rem">
-      {songbook && (
-        <>
-          <Heading mb="2rem" fontFamily="Ubuntu Mono">
-            Song List for{" "}
-            <RouterLink to={`../live/${sessionKey}/`}>
-              {songbook.title}
-            </RouterLink>
-          </Heading>
-          <RouterLink to={`../live/${sessionKey}/`}>
-            <Button colorScheme="blue" mb="2rem">
-              Back to Songbook
-            </Button>
-          </RouterLink>
-          <UnorderedList>
-            {songbook.song_entries.map((entry) => (
+    <Modal isOpen={isListOpen} onClose={onListClose} size="lg">
+      <ModalOverlay />
+      <ModalContent p="10px">
+        <ModalHeader>Song List for {songbook?.title}</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <UnorderedList mb="50px">
+            {songbook?.song_entries.map((entry) => (
               <ListItem key={entry.id}>
                 <Link
                   onClick={async () => {
@@ -45,20 +44,18 @@ export default function SongbookList() {
                       entry.created_at
                     );
                     if (result) {
-                      navigate(`/live/${sessionKey}/`);
+                      onListClose();
+                      // navigate(`/live/${sessionKey}/`);
                     }
                   }}
                 >
                   "{entry.song.title}" by {entry.song.artist}
-                </Link>{" "}
-                <RouterLink to={`../admin/api/song/${entry.song.id}/change/`}>
-                  <Icon as={FaEdit} />
-                </RouterLink>
+                </Link>
               </ListItem>
             ))}
           </UnorderedList>
-        </>
-      )}
-    </Box>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }

@@ -12,7 +12,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
-import { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { UseAsyncReturn } from "react-async-hook";
 import {
   FaExclamationTriangle,
@@ -28,7 +28,7 @@ import {
 import { GrUnorderedList } from "react-icons/gr";
 import { MdOutlineMenuOpen } from "react-icons/md";
 import QRCode from "react-qr-code";
-import { Link as RouterLink, useParams } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { ApplicationState, Songbook, User } from "../models";
 import {
   deleteSongbookSong,
@@ -38,6 +38,15 @@ import {
 } from "../services/songs";
 import JumpSearch from "./JumpSearch";
 import SettingModal from "./SettingsModal";
+
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+} from "@chakra-ui/react";
 
 interface HamburgerMenuProps {
   isMobileDevice: boolean;
@@ -82,13 +91,25 @@ export default function HamburgerMenu({
     onOpen: onProfileOpen,
     onClose: onProfileClose,
   } = useDisclosure();
-
+  const {
+    isOpen: isAlertOpen,
+    onOpen: onAlertOpen,
+    onClose: onAlertClose,
+  } = useDisclosure();
+  const cancelRef = useRef<HTMLButtonElement>(null);
   const isSongbookOwner = asyncSongbook.result
     ? asyncSongbook.result.data.is_songbook_owner
     : false;
   const { sessionKey } = useParams();
   const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
+  const handleFlagSong = async () => {
+    await setSongEntryFlagged(
+      asyncSongbook?.result?.data?.current_song_entry?.id
+    );
+    onAlertClose();
+    asyncSongbook.execute();
+  };
   const performSongNavAction = async (action: "next" | "prev" | "delete") => {
     const sessionKey = asyncSongbook?.result?.data?.session_key;
     setIsLive(false);
@@ -165,6 +186,12 @@ export default function HamburgerMenu({
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [handleKeyPress]);
+
+  const navigate = useNavigate();
+
+  const handleQRClick = () => {
+    navigate(`add-song`);
+  };
 
   return (
     <>
@@ -262,16 +289,37 @@ export default function HamburgerMenu({
           <MenuItem
             color={"red.600"}
             icon={<Icon as={FaExclamationTriangle} />}
-            onClick={async () => {
-              await setSongEntryFlagged(
-                asyncSongbook?.result?.data?.current_song_entry?.id
-              );
-              asyncSongbook.execute();
-            }}
+            onClick={onAlertOpen}
           >
             Flag Song
           </MenuItem>
+          <AlertDialog
+            isOpen={isAlertOpen}
+            leastDestructiveRef={cancelRef}
+            onClose={onClose}
+          >
+            <AlertDialogOverlay>
+              <AlertDialogContent>
+                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  Proceed to Flag Song?
+                </AlertDialogHeader>
 
+                <AlertDialogBody>
+                  Flag this song if the tab is inaccurate or there is some other
+                  reason to mark it for further review.
+                </AlertDialogBody>
+
+                <AlertDialogFooter>
+                  <Button ref={cancelRef} onClick={onAlertClose}>
+                    Cancel
+                  </Button>
+                  <Button colorScheme="yellow" onClick={handleFlagSong} ml={3}>
+                    Flag Song
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialogOverlay>
+          </AlertDialog>
           {isSongbookOwner && (
             <MenuItem
               icon={<Icon as={MdOutlineMenuOpen} boxSize={4} />}
@@ -280,18 +328,18 @@ export default function HamburgerMenu({
               Jump To...
             </MenuItem>
           )}
-          <Flex direction="column" justifyContent="center" alignItems="center">
+          <MenuItem onClick={handleQRClick}>
             <Flex
               flexDirection="row"
+              width="100%"
               justifyContent="center"
               alignItems="center"
               bgColor="white"
-              width="166px"
               border="8px solid white"
             >
               <QRCode size={150} value={addSongUrl} />
             </Flex>
-          </Flex>
+          </MenuItem>
         </MenuList>
       </Menu>
       <SettingModal

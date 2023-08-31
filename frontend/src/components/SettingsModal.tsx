@@ -73,15 +73,14 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
             </Text>
             <Text>{user?.email}</Text>
             <Text mb="1rem">Joined on {joinedDate.toDateString()}</Text>
-            <Flex direction="column" alignItems="space-between" width="200px">
+            <Flex direction="column" alignItems="space-between">
               <Flex
                 direction="row"
                 margin="1rem"
                 justifyContent="space-between"
               >
                 <FormLabel htmlFor="show-chords" mb="0">
-                  {showingChords && <>Showing chords</>}
-                  {!showingChords && <>Hiding chords</>}
+                  Chords on Mobile
                 </FormLabel>
                 <Switch
                   id="show-chords"
@@ -100,8 +99,7 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
                 justifyContent="space-between"
               >
                 <FormLabel htmlFor="number-of-columns" mb="0">
-                  {columns === 1 && <>Single column</>}
-                  {columns === 2 && <>Two columns</>}
+                  Two Columns
                 </FormLabel>
                 <Switch
                   id="number-of-columns"
@@ -127,8 +125,7 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
                 mb="2rem"
               >
                 <FormLabel htmlFor="night-mode" mb="0">
-                  {colorMode === "light" && <>Day mode</>}
-                  {colorMode === "dark" && <>Night mode</>}
+                  Night Mode
                 </FormLabel>
                 <Switch
                   id="night-mode"
