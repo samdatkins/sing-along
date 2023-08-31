@@ -25,6 +25,7 @@ import {
 
 import { AxiosResponse } from "axios";
 import { UseAsyncReturn } from "react-async-hook";
+import { FaFastBackward, FaFastForward } from "react-icons/fa";
 import { Link as RouterLink, useOutlet } from "react-router-dom";
 import { countTabColumns } from "../helpers/tab";
 import {
@@ -35,6 +36,7 @@ import {
 import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
 import MemberAvatarGroup from "./MemberAvatarGroup";
+import SongbookList from "./SongbookList";
 import StatsModal from "./StatsModal";
 import Timer from "./Timer";
 
@@ -83,6 +85,11 @@ export default function NavBar({
     isOpen: isStatsOpen,
     onOpen: onStatsOpen,
     onClose: onStatsClose,
+  } = useDisclosure();
+  const {
+    isOpen: isListOpen,
+    onOpen: onListOpen,
+    onClose: onListClose,
   } = useDisclosure();
 
   const totalColumns = useMemo(
@@ -283,17 +290,25 @@ export default function NavBar({
                       )
                     }
                   >
-                    {"<<"}
+                    <FaFastBackward />
                   </Button>
                 )}
-                <RouterLink to={`/live/${currentSongbook.session_key}/list`}>
-                  <Text align="center" fontSize="1.5xl">
-                    {currentSongbook.title}
-                    {" - "} ({"song "}
-                    {currentSongbook.current_song_position} of{" "}
-                    {currentSongbook.total_songs})
-                  </Text>
-                </RouterLink>
+                <Text
+                  onClick={onListOpen}
+                  cursor="pointer"
+                  align="center"
+                  fontSize="1.5xl"
+                >
+                  {currentSongbook.title}
+                  {" - "} ({"song "}
+                  {currentSongbook.current_song_position} of{" "}
+                  {currentSongbook.total_songs})
+                </Text>
+                <SongbookList
+                  isListOpen={isListOpen}
+                  onListClose={onListClose}
+                  sessionKey={asyncSongbook?.result?.data?.session_key}
+                />
                 {asyncSongbook?.result?.data?.is_noodle_mode && (
                   <Button
                     ml="20px"
@@ -307,7 +322,7 @@ export default function NavBar({
                       handleNextClick(asyncSongbook?.result?.data?.session_key)
                     }
                   >
-                    {">>"}
+                    <FaFastForward />
                   </Button>
                 )}
               </Flex>
