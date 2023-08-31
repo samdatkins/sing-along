@@ -28,7 +28,7 @@ import {
 import { GrUnorderedList } from "react-icons/gr";
 import { MdOutlineMenuOpen } from "react-icons/md";
 import QRCode from "react-qr-code";
-import { Link as RouterLink, useParams } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { ApplicationState, Songbook, User } from "../models";
 import {
   deleteSongbookSong,
@@ -110,7 +110,6 @@ export default function HamburgerMenu({
     onAlertClose();
     asyncSongbook.execute();
   };
-
   const performSongNavAction = async (action: "next" | "prev" | "delete") => {
     const sessionKey = asyncSongbook?.result?.data?.session_key;
     setIsLive(false);
@@ -187,6 +186,12 @@ export default function HamburgerMenu({
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [handleKeyPress]);
+
+  const navigate = useNavigate();
+
+  const handleQRClick = () => {
+    navigate(`add-song`);
+  };
 
   return (
     <>
@@ -323,18 +328,18 @@ export default function HamburgerMenu({
               Jump To...
             </MenuItem>
           )}
-          <Flex direction="column" justifyContent="center" alignItems="center">
+          <MenuItem onClick={handleQRClick}>
             <Flex
               flexDirection="row"
+              width="100%"
               justifyContent="center"
               alignItems="center"
               bgColor="white"
-              width="166px"
               border="8px solid white"
             >
               <QRCode size={150} value={addSongUrl} />
             </Flex>
-          </Flex>
+          </MenuItem>
         </MenuList>
       </Menu>
       <SettingModal

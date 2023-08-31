@@ -200,6 +200,11 @@ export default function NavBar({
     asyncSongbook.execute();
   };
 
+  const handleSongbookClick = () => {
+    if (!currentSongbook?.is_songbook_owner) return;
+    onListOpen();
+  };
+
   return (
     <Flex flexDir="row" justifyContent="space-between">
       {/* LEFT COLUMN */}
@@ -294,8 +299,10 @@ export default function NavBar({
                   </Button>
                 )}
                 <Text
-                  onClick={onListOpen}
-                  cursor="pointer"
+                  onClick={handleSongbookClick}
+                  cursor={
+                    currentSongbook?.is_songbook_owner ? "pointer" : "default"
+                  }
                   align="center"
                   fontSize="1.5xl"
                 >
