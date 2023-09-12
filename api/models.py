@@ -196,3 +196,9 @@ class UserProfile(SafeDeleteModel, CreatedUpdated):
     is_showing_chords = models.BooleanField(blank=True, null=False, default=False)
     columns_to_display = models.IntegerField(blank=True, null=False, default=2)
     is_day_mode = models.BooleanField(blank=True, null=False, default=True)
+
+
+class WishlistSong(SafeDeleteModel, CreatedUpdated):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    artist = models.CharField(max_length=120, null=False, blank=False)
+    title = models.CharField(max_length=120, null=False, blank=False)
