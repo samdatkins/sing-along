@@ -136,6 +136,7 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
                 />
               </Flex>
             </Flex>
+            <a href="redir">iOS Login</a>
           </Flex>
         </ModalBody>
       </ModalContent>
