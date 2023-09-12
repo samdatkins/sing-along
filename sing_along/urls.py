@@ -29,6 +29,7 @@ urlpatterns = [
         name="index",
     ),
     path("logout/", login_required(views.logout), name="logout"),
+    path("redir/", login_required(views.redirector), name="redir"),
     path("api/", include("api.urls")),
     path("admin/", admin.site.urls),
     re_path(

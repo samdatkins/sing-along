@@ -56,12 +56,18 @@ SECRET_KEY = os.environ.get(
     "django-insecure-p@)42jg)9u6-yr)id+kv5j5kdmmxu+&u8((y_4=&hg4g_ebe9j",
 )
 
+# Session lasts 4 weeks
+SESSION_COOKIE_AGE = 2419200
+
 # Auth0 settings
 SOCIAL_AUTH_TRAILING_SLASH = False  # Remove trailing slash from routes
 SOCIAL_AUTH_AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN", "fake_domain")
 SOCIAL_AUTH_AUTH0_KEY = os.environ.get("AUTH0_CLIENT_ID", "fake_id")
 SOCIAL_AUTH_AUTH0_SECRET = os.environ.get("AUTH0_CLIENT_SECRET", "fake_secret")
 SOCIAL_AUTH_AUTH0_SCOPE = ["openid", "profile", "email"]
+
+DEEP_LINK = os.environ.get("DEEP_LINK")
+DEEP_LINK_SCHEME = os.environ.get("DEEP_LINK_SCHEME")
 
 AUTHENTICATION_BACKENDS = {
     "social_core.backends.auth0.Auth0OAuth2",
