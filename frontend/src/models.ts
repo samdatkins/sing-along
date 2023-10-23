@@ -16,6 +16,21 @@ export type SongEntry = {
   is_flagged: boolean;
 };
 
+type WishlistSong = {
+  id: number;
+  artist: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type WishlistSongs = {
+  count: number;
+  next: null;
+  previous: null;
+  results: WishlistSong[];
+};
+
 export type Songbook = {
   id: number; // we should remove this from the API and only use session_key eventually
   session_key: string;
