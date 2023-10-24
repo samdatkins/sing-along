@@ -1,4 +1,4 @@
-import { CloseIcon } from "@chakra-ui/icons";
+import { DeleteIcon } from "@chakra-ui/icons";
 import {
   Button,
   Flex,
@@ -49,6 +49,7 @@ const WishlistForm = () => {
         <Input value={title} onChange={(e) => setTitle(e.target.value)} />
         <Button
           m="1.5rem"
+          mb="0"
           colorScheme="blue"
           alignSelf="center"
           onClick={() => handleAdd()}
@@ -59,14 +60,16 @@ const WishlistForm = () => {
       {asyncWishlist &&
         asyncWishlist?.result?.data?.results.map((song) => {
           return (
-            <Text key={song.id} mr="1rem">
-              {song.artist} - {song.title}
-              <CloseIcon
-                ml="1rem"
+            <Flex dir="row" alignItems="center" key={song.id} mb="3px">
+              <DeleteIcon
+                color="blue.500"
                 cursor="pointer"
                 onClick={() => handleDelete(song)}
               />
-            </Text>
+              <Text ml="1rem">
+                {song.artist} - {song.title}
+              </Text>
+            </Flex>
           );
         })}
     </Flex>
