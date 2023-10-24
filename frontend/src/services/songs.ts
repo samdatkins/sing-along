@@ -8,6 +8,7 @@ import {
   SongbookStats,
   SongEntry,
   User,
+  WishlistSong,
 } from "../models";
 
 export async function getUserDetails() {
@@ -193,4 +194,34 @@ export async function setSongLikeStatus(song_id: number, isLiked: boolean) {
 
 export async function getSongbookStats(sessionKey: string) {
   return await axios.get<SongbookStats>(`/api/songbooks/${sessionKey}/stats/`);
+}
+
+export async function getWishlistSongs() {
+  return await axios.get<DjangoPaginatedResponse<WishlistSong>>(
+    `/api/wishlist_songs/`
+  );
+}
+
+export async function deleteWishlistSong(song) {
+  if (!song.id) return;
+
+  try {
+    await axios.delete(`/api/wishlist_songs/${song.id}/`);
+    return true;
+  } catch (error) {
+    console.error(`Couldn't delete wishlist song: ${error}`);
+    return false;
+  }
+}
+
+type WishlistSongPost = {
+  artist: string;
+  title: string;
+};
+
+export async function addSongToWishlist(song: WishlistSongPost) {
+  try {
+    return await axios.post<WishlistSongPost>(`/api/wishlist_songs/`, song);
+  } catch (error: any | AxiosError) {}
+  return "Could not add song, please try again later.";
 }

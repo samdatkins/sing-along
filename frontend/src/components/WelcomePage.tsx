@@ -22,6 +22,7 @@ import { getAllSongbooks } from "../services/songs";
 import UserProfile from "./AvatarProfileLink";
 import CreateNewSongbook from "./CreateNewSongbook";
 import SongbookIndexTable from "./SongbookIndexTable";
+import WishlistForm from "./WishlistForm";
 
 interface WelcomePageProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
@@ -86,6 +87,7 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
                 "{songbook.title}" is live!
               </Button>
             ))}
+          <WishlistForm />
           <Heading textAlign="center" mt="2rem">
             Your Songbooks
           </Heading>

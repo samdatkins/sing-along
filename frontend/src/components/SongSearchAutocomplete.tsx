@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Flex,
   Input,
   InputGroup,
@@ -10,9 +11,15 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useAsync } from "react-async-hook";
+import { BsInputCursorText } from "react-icons/bs";
+import { MdCancel } from "react-icons/md";
 import { useDebounce } from "usehooks-ts";
 import { Song } from "../models";
-import { searchForSong } from "../services/songs";
+import {
+  deleteWishlistSong,
+  getWishlistSongs,
+  searchForSong,
+} from "../services/songs";
 
 type SongSearchAutocompleteProps = {
   onSubmit: (song: Song) => Promise<boolean>;
@@ -33,6 +40,11 @@ export default function SongSearchAutocomplete({
     }
     return await searchForSong(trimmedSearch);
   }, []);
+
+  const asyncWishlist = useAsync(async () => getWishlistSongs(), [], {
+    setLoading: (state) => ({ ...state, loading: true }),
+  });
+
   const debouncedSearchText = useDebounce(searchText, 250);
   const updateSelectedIndexWithValidValue = (index: number) => {
     let newIndex = index;
@@ -65,6 +77,13 @@ export default function SongSearchAutocomplete({
     setIsSubmitting.off();
   };
 
+  const handleWishlistClick = async (wishlistSong) => {
+    const songString = `${wishlistSong.artist} - ${wishlistSong.title}`;
+    setSearchText(songString);
+    await deleteWishlistSong(wishlistSong);
+    asyncWishlist.execute();
+  };
+
   return (
     <>
       <InputGroup size="md">
@@ -91,7 +110,19 @@ export default function SongSearchAutocomplete({
           }}
         />
         <InputRightElement>
-          {asyncSongSearch.loading && <Spinner />}
+          {asyncSongSearch.loading ? (
+            <Spinner />
+          ) : (
+            <>
+              {searchText.length > 0 && (
+                <MdCancel
+                  onClick={() => {
+                    setSearchText("");
+                  }}
+                />
+              )}
+            </>
+          )}
         </InputRightElement>
       </InputGroup>
       {!isSubmitting && searchText.length >= 3 && !asyncSongSearch.loading && (
@@ -125,6 +156,42 @@ export default function SongSearchAutocomplete({
             </Box>
           )}
         </Flex>
+      )}
+
+      {searchText?.length < 1 && (
+        <>
+          {asyncWishlist && asyncWishlist?.result?.data.results ? (
+            <Flex direction="column" mt="1rem">
+              {asyncWishlist.result.data.results.length > 0 ? (
+                asyncWishlist.result.data.results.slice(0, 5).map((song) => {
+                  return (
+                    <Button
+                      key={song.id}
+                      m="5px"
+                      justifyContent="left"
+                      size="md"
+                      leftIcon={<BsInputCursorText />}
+                      colorScheme="gray"
+                      onClick={() => handleWishlistClick(song)}
+                      overflow="hidden"
+                      padding=".5rem"
+                    >
+                      {song.artist} - {song.title}
+                    </Button>
+                  );
+                })
+              ) : (
+                <Text justifySelf="center" fontSize="xs">
+                  You have no wishlist songs.
+                </Text>
+              )}
+            </Flex>
+          ) : (
+            <Flex mt="4px" justifyContent="center" fontSize="xs">
+              Loading wishlist... <Spinner size="sm" color="blue.500" />
+            </Flex>
+          )}
+        </>
       )}
     </>
   );

@@ -7,6 +7,7 @@ class WishlistSongSerializer(serializers.ModelSerializer):
     class Meta:
         model = WishlistSong
         fields = [
+            "id",
             "artist",
             "title",
             "created_at",
