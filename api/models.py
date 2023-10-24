@@ -1,4 +1,5 @@
 import random
+import secrets
 import string
 from operator import attrgetter
 
@@ -196,6 +197,15 @@ class UserProfile(SafeDeleteModel, CreatedUpdated):
     is_showing_chords = models.BooleanField(blank=True, null=False, default=False)
     columns_to_display = models.IntegerField(blank=True, null=False, default=2)
     is_day_mode = models.BooleanField(blank=True, null=False, default=True)
+    token = models.CharField(blank=True, null=True, max_length=24)
+
+    def get_or_create_token(self):
+        if self.token is None:
+            self.token = secrets.token_urlsafe(
+                16
+            )  # This will create a token of 24 characters
+            self.save()
+        return self.token
 
 
 class WishlistSong(SafeDeleteModel, CreatedUpdated):

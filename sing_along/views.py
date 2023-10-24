@@ -4,6 +4,8 @@ from django.http import HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import redirect, render
 from django.utils.encoding import iri_to_uri
 
+from api.models import UserProfile
+
 
 class DeepLinkRedirect(HttpResponsePermanentRedirect):
     deep_link_scheme = settings.DEEP_LINK_SCHEME
@@ -34,5 +36,13 @@ def react(request):
 
 def redirector(request):
     deep_link = settings.DEEP_LINK
-    session_id = request.session.session_key
-    return DeepLinkRedirect(iri_to_uri(f"{deep_link}?session={session_id}"))
+    user = request.user
+    profile = UserProfile.objects.get(user=user)
+
+    try:
+        profile = user.userprofile
+    except UserProfile.DoesNotExist:
+        profile = UserProfile.objects.create(user=user)
+
+    token = profile.get_or_create_token()
+    return DeepLinkRedirect(iri_to_uri(f"{deep_link}?token={token}"))
