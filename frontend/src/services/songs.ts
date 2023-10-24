@@ -211,3 +211,15 @@ export async function deleteWishlistSong(song) {
     return false;
   }
 }
+
+type WishlistSongPost = {
+  artist: string;
+  title: string;
+};
+
+export async function addSongToWishlist(song: WishlistSongPost) {
+  try {
+    return await axios.post<WishlistSongPost>(`/api/wishlist_songs/`, song);
+  } catch (error: any | AxiosError) {}
+  return "Could not add song, please try again later.";
+}

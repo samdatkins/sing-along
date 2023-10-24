@@ -1,4 +1,3 @@
-import { CloseIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -13,6 +12,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { BsInputCursorText } from "react-icons/bs";
+import { MdCancel } from "react-icons/md";
 import { useDebounce } from "usehooks-ts";
 import { Song } from "../models";
 import {
@@ -115,7 +115,7 @@ export default function SongSearchAutocomplete({
           ) : (
             <>
               {searchText.length > 0 && (
-                <CloseIcon
+                <MdCancel
                   onClick={() => {
                     setSearchText("");
                   }}
