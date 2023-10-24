@@ -5,6 +5,7 @@ import {
   FormLabel,
   Heading,
   Input,
+  Spinner,
   Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -16,9 +17,7 @@ import {
 } from "../services/songs";
 
 const WishlistForm = () => {
-  const asyncWishlist = useAsync(async () => getWishlistSongs(), [], {
-    setLoading: (state) => ({ ...state, loading: true }),
-  });
+  const asyncWishlist = useAsync(async () => getWishlistSongs(), []);
 
   const [artist, setArtist] = useState<string>("");
   const [title, setTitle] = useState<string>("");
@@ -29,15 +28,19 @@ const WishlistForm = () => {
   };
 
   const handleAdd = async () => {
-    const newSong = { artist: artist || "?", title: title || "?" };
-    await addSongToWishlist(newSong);
-    setArtist("");
-    setTitle("");
-    asyncWishlist.execute();
+    if (!artist && !title) {
+      return;
+    } else {
+      const newSong = { artist: artist || "?", title: title || "?" };
+      await addSongToWishlist(newSong);
+      setArtist("");
+      setTitle("");
+      asyncWishlist.execute();
+    }
   };
 
   return (
-    <Flex direction="column">
+    <Flex direction="column" maxW="80%">
       <Heading textAlign="center" mt="2rem">
         Your Song Wishlist
       </Heading>
@@ -57,7 +60,7 @@ const WishlistForm = () => {
           Add Song to Wishlist
         </Button>
       </Flex>
-      {asyncWishlist &&
+      {asyncWishlist && asyncWishlist?.result?.data?.results ? (
         asyncWishlist?.result?.data?.results.map((song) => {
           return (
             <Flex dir="row" alignItems="center" key={song.id} mb="3px">
@@ -66,12 +69,17 @@ const WishlistForm = () => {
                 cursor="pointer"
                 onClick={() => handleDelete(song)}
               />
-              <Text ml="1rem">
+              <Text isTruncated ml="1rem">
                 {song.artist} - {song.title}
               </Text>
             </Flex>
           );
-        })}
+        })
+      ) : (
+        <Flex dir="row">
+          Loading wishlist songs ... <Spinner size="sm" />
+        </Flex>
+      )}
     </Flex>
   );
 };
