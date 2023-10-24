@@ -16,19 +16,12 @@ export type SongEntry = {
   is_flagged: boolean;
 };
 
-type WishlistSong = {
+export type WishlistSong = {
   id: number;
   artist: string;
   title: string;
   created_at: string;
   updated_at: string;
-};
-
-export type WishlistSongs = {
-  count: number;
-  next: null;
-  previous: null;
-  results: WishlistSong[];
 };
 
 export type Songbook = {

@@ -8,7 +8,7 @@ import {
   SongbookStats,
   SongEntry,
   User,
-  WishlistSongs,
+  WishlistSong,
 } from "../models";
 
 export async function getUserDetails() {
@@ -197,7 +197,9 @@ export async function getSongbookStats(sessionKey: string) {
 }
 
 export async function getWishlistSongs() {
-  return await axios.get<WishlistSongs>(`/api/wishlist_songs/`);
+  return await axios.get<DjangoPaginatedResponse<WishlistSong>>(
+    `/api/wishlist_songs/`
+  );
 }
 
 export async function deleteWishlistSong(song) {
