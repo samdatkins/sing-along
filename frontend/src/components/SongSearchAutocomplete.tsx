@@ -41,9 +41,7 @@ export default function SongSearchAutocomplete({
     return await searchForSong(trimmedSearch);
   }, []);
 
-  const asyncWishlist = useAsync(async () => getWishlistSongs(), [], {
-    setLoading: (state) => ({ ...state, loading: true }),
-  });
+  const asyncWishlist = useAsync(async () => getWishlistSongs(), []);
 
   const debouncedSearchText = useDebounce(searchText, 250);
   const updateSelectedIndexWithValidValue = (index: number) => {
