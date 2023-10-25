@@ -45,7 +45,11 @@ const AddSongModal = () => {
       >
         <ModalOverlay />
         <ModalContent minH="80vh">
-          <ModalHeader>Request a song for "{songbook?.title}"</ModalHeader>
+          {songbook?.title ? (
+            <ModalHeader>Request a song for "{songbook?.title}"</ModalHeader>
+          ) : (
+            <ModalHeader>Loading Songbook...</ModalHeader>
+          )}
           <ModalCloseButton />
           <ModalBody>
             <SongSearchAutocomplete

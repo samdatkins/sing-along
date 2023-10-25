@@ -1,17 +1,25 @@
+import { QuestionIcon, RepeatIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
   Flex,
+  Heading,
   Input,
   InputGroup,
   InputRightElement,
+  Popover,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverTrigger,
+  Skeleton,
   Spinner,
+  Stack,
   Text,
   useBoolean,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useAsync } from "react-async-hook";
-import { BsInputCursorText } from "react-icons/bs";
 import { MdCancel } from "react-icons/md";
 import { useDebounce } from "usehooks-ts";
 import { Song } from "../models";
@@ -41,7 +49,8 @@ export default function SongSearchAutocomplete({
     return await searchForSong(trimmedSearch);
   }, []);
 
-  const asyncWishlist = useAsync(async () => getWishlistSongs(), [], {
+  const asyncRecommendations = useAsync(async () => getWishlistSongs(), [], {
+    //use a different api call here
     setLoading: (state) => ({ ...state, loading: true }),
   });
 
@@ -81,7 +90,11 @@ export default function SongSearchAutocomplete({
     const songString = `${wishlistSong.artist} - ${wishlistSong.title}`;
     setSearchText(songString);
     await deleteWishlistSong(wishlistSong);
-    asyncWishlist.execute();
+    asyncRecommendations.execute();
+  };
+
+  const refreshRecommendations = () => {
+    asyncRecommendations.execute();
   };
 
   return (
@@ -160,36 +173,81 @@ export default function SongSearchAutocomplete({
 
       {searchText?.length < 1 && (
         <>
-          {asyncWishlist && asyncWishlist?.result?.data.results ? (
-            <Flex direction="column" mt="1rem">
-              {asyncWishlist.result.data.results.length > 0 ? (
-                asyncWishlist.result.data.results.slice(0, 5).map((song) => {
-                  return (
-                    <Button
-                      key={song.id}
-                      m="5px"
-                      justifyContent="left"
-                      size="md"
-                      leftIcon={<BsInputCursorText />}
-                      colorScheme="gray"
-                      onClick={() => handleWishlistClick(song)}
-                      overflow="hidden"
-                      padding=".5rem"
-                    >
-                      {song.artist} - {song.title}
-                    </Button>
-                  );
-                })
+          <Flex direction="row" alignItems="center">
+            <Heading size="sm" mt="1rem" mb=".5rem">
+              Recommended Songs:
+            </Heading>
+            <Popover size="sm">
+              <PopoverTrigger>
+                <QuestionIcon ml="5px" />
+              </PopoverTrigger>
+              <PopoverContent>
+                <PopoverCloseButton />
+                <PopoverBody>
+                  <Text fontSize="sm" p="5px">
+                    Your wishlist, your favorites, and most common requests all
+                    help build your recommendation list.
+                  </Text>
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
+          </Flex>
+          {asyncRecommendations &&
+          asyncRecommendations?.result?.data.results &&
+          !asyncRecommendations.loading ? (
+            <Flex direction="column">
+              {asyncRecommendations?.result?.data?.results?.length > 0 ? (
+                asyncRecommendations.result.data.results
+                  .slice(0, 6)
+                  .map((song) => {
+                    return (
+                      <Button
+                        key={song.id}
+                        size="xs"
+                        p="1rem"
+                        my="5px"
+                        isTruncated
+                        justifyContent="left"
+                        colorScheme="gray"
+                        onClick={() => handleWishlistClick(song)}
+                      >
+                        <Text isTruncated>
+                          {song.artist} - {song.title}
+                        </Text>
+                      </Button>
+                    );
+                  })
               ) : (
                 <Text justifySelf="center" fontSize="xs">
-                  You have no wishlist songs.
+                  You have no recommendations.
                 </Text>
               )}
+              <Flex
+                direction="row"
+                justifyContent="center"
+                cursor="pointer"
+                onClick={() => refreshRecommendations()}
+              >
+                <Text mt="5px" fontSize="xs">
+                  <RepeatIcon mr="3px" /> Refresh Recommendations
+                </Text>
+              </Flex>
             </Flex>
           ) : (
-            <Flex mt="4px" justifyContent="center" fontSize="xs">
-              Loading wishlist... <Spinner size="sm" color="blue.500" />
-            </Flex>
+            <>
+              <Stack>
+                <Skeleton height="32px" my="2px" />
+                <Skeleton height="32px" my="2px" />
+                <Skeleton height="32px" my="2px" />
+                <Skeleton height="32px" my="2px" />
+                <Skeleton height="32px" my="2px" />
+                <Skeleton height="32px" my="2px" />
+              </Stack>
+              <Flex mt="4px" justifyContent="center" fontSize="xs">
+                Loading recommendations...{" "}
+                <Spinner size="sm" color="blue.500" />
+              </Flex>
+            </>
           )}
         </>
       )}
