@@ -25,17 +25,19 @@ import { useDebounce } from "usehooks-ts";
 import { Song } from "../models";
 import {
   deleteWishlistSong,
-  getWishlistSongs,
+  getRecommendations,
   searchForSong,
 } from "../services/songs";
 
 type SongSearchAutocompleteProps = {
   onSubmit: (song: Song) => Promise<boolean>;
+  session_key: string;
   songRequestInput: React.MutableRefObject<null>;
 };
 
 export default function SongSearchAutocomplete({
   onSubmit,
+  session_key,
   songRequestInput,
 }: SongSearchAutocompleteProps) {
   const [searchText, setSearchText] = useState("");
@@ -49,10 +51,13 @@ export default function SongSearchAutocomplete({
     return await searchForSong(trimmedSearch);
   }, []);
 
-  const asyncRecommendations = useAsync(async () => getWishlistSongs(), [], {
-    //use a different api call here
-    setLoading: (state) => ({ ...state, loading: true }),
-  });
+  const asyncRecommendations = useAsync(
+    async () => getRecommendations(session_key),
+    [],
+    {
+      setLoading: (state) => ({ ...state, loading: true }),
+    }
+  );
 
   const debouncedSearchText = useDebounce(searchText, 250);
   const updateSelectedIndexWithValidValue = (index: number) => {
@@ -89,7 +94,9 @@ export default function SongSearchAutocomplete({
   const handleWishlistClick = async (wishlistSong) => {
     const songString = `${wishlistSong.artist} - ${wishlistSong.title}`;
     setSearchText(songString);
-    await deleteWishlistSong(wishlistSong);
+    if (wishlistSong.id) {
+      await deleteWishlistSong(wishlistSong);
+    }
     asyncRecommendations.execute();
   };
 
@@ -193,16 +200,16 @@ export default function SongSearchAutocomplete({
             </Popover>
           </Flex>
           {asyncRecommendations &&
-          asyncRecommendations?.result?.data.results &&
+          asyncRecommendations?.result?.data &&
           !asyncRecommendations.loading ? (
             <Flex direction="column">
-              {asyncRecommendations?.result?.data?.results?.length > 0 ? (
-                asyncRecommendations.result.data.results
+              {asyncRecommendations?.result?.data?.length > 0 ? (
+                asyncRecommendations.result.data
                   .slice(0, 6)
-                  .map((song) => {
+                  .map((song, index: number) => {
                     return (
                       <Button
-                        key={song.id}
+                        key={index}
                         size="xs"
                         p="1rem"
                         my="5px"
@@ -219,7 +226,7 @@ export default function SongSearchAutocomplete({
                   })
               ) : (
                 <Text justifySelf="center" fontSize="xs">
-                  You have no recommendations.
+                  No recommendations were found.
                 </Text>
               )}
               <Flex
