@@ -30,27 +30,26 @@ class RecommendationViewSet(
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    # add session_key as third parameter:
     def retrieve(self, request, *args, **kwargs):
         session_key = self.kwargs["pk"]
 
         wishes_list = list(
             WishlistSong.objects.filter(user=request.user).order_by("?")[0:6]
         )
-        joined_list = self._get_six_recommendations(request, session_key)
-
-        wishes_list.extend(joined_list)
+        if len(wishes_list) < 6:
+            self._get_six_recommendations(request, wishes_list, session_key)
 
         results = [item for item in wishes_list][0:6]
 
         serializer = self.get_serializer(results, many=True)
         return Response(serializer.data)
 
-    def _get_six_recommendations(self, request, session_key):
+    def _get_six_recommendations(self, request, wishes_list, session_key):
         likes_list = list(
             Song.objects.filter(likes=request.user)
             .exclude(song_entry__songbook__session_key=session_key)
-            .order_by("?")[0:6]
+            .order_by("?")
+            .values("artist", "title")[0:6]
         )
 
         used_songs_entry = list(
@@ -64,39 +63,51 @@ class RecommendationViewSet(
                 entry_count__gt=0,
                 song_entry__songbook__is_noodle_mode=False,
             )
-            .order_by("-entry_count")[:100]
+            .order_by("-entry_count")
+            .values("artist", "title")[:100]
         )
 
-        recommendations_list = random.sample(list(first_hundred), len(first_hundred))[
-            0:12
+        recommendations_list = random.sample(
+            list(first_hundred), min(18, len(first_hundred))
+        )
+
+        [
+            self._remove_duplicates(
+                {"artist": wish_song.artist, "title": wish_song.title},
+                likes_list,
+                recommendations_list,
+            )
+            for wish_song in wishes_list
         ]
 
-        joined_list = []
+        while len(wishes_list) < 6:
+            item = self._get_song_recommendation(likes_list, recommendations_list)
+            if item is None:
+                break
+            self._remove_duplicates(item, likes_list, recommendations_list)
+            wishes_list.append(item)
 
-        # for _ in range(6):
-        while len(joined_list) < 6:
-            item = self._get_liked_song(likes_list, joined_list)
+        return wishes_list
 
-            if item is None and len(recommendations_list) > 0:
-                item = random.choice(recommendations_list)
-                recommendations_list.remove(item)
-                joined_list.append(item)
+    def _get_song_recommendation(self, likes_list, recommendations_list):
+        if len(likes_list) > 0:
+            item = random.choice(likes_list)
+            LIKE_THRESHOLD = 0.9
+            if random.random() > LIKE_THRESHOLD or len(recommendations_list) > 0:
+                return item
 
-        return [{"artist": rec.artist, "title": rec.title} for rec in joined_list]
+        if len(recommendations_list) > 0:
+            return random.choice(recommendations_list)
 
-    def _get_liked_song(self, likes_list, joined_list):
-        if len(likes_list) < 1:
-            return None
-        item = random.choice(likes_list)
-        random_number = random.random()
-        LIKE_THRESHOLD = 0.9
-        if random_number > LIKE_THRESHOLD and self._check_if_unique(item, joined_list):
-            likes_list.remove(item)
-            return item
         return None
 
-    def _check_if_unique(self, song, joined_list):
-        for rec in joined_list:
-            if rec.artist == song.artist and rec.title == song.title:
-                return False
-        return True
+    def _remove_duplicates(self, item, likes_list, recommendations_list):
+        item = {"artist": item["artist"], "title": item["title"]}
+        try:
+            likes_list.remove(item)
+        except ValueError:
+            pass
+        try:
+            recommendations_list.remove(item)
+        except ValueError:
+            pass
