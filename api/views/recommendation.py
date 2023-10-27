@@ -22,10 +22,6 @@ class RecommendationViewSet(
 
     serializer_class = RecommendationSerializer
     queryset = WishlistSong.objects.all()
-    authentication_classes = [
-        SessionAuthentication,
-        TokenBasedAuthentication,
-    ]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -37,14 +33,12 @@ class RecommendationViewSet(
             WishlistSong.objects.filter(user=request.user).order_by("?")[0:6]
         )
         if len(wishes_list) < 6:
-            self._get_six_recommendations(request, wishes_list, session_key)
+            self._populate_recommendations_list(request, wishes_list, session_key)
 
-        results = [item for item in wishes_list][0:6]
-
-        serializer = self.get_serializer(results, many=True)
+        serializer = self.get_serializer(wishes_list[0:6], many=True)
         return Response(serializer.data)
 
-    def _get_six_recommendations(self, request, wishes_list, session_key):
+    def _populate_recommendations_list(self, request, wishes_list, session_key):
         likes_list = list(
             Song.objects.filter(likes=request.user)
             .exclude(song_entry__songbook__session_key=session_key)
@@ -56,7 +50,7 @@ class RecommendationViewSet(
             SongEntry.objects.filter(songbook__session_key=session_key)
         )
 
-        first_hundred = (
+        top_hundred = (
             Song.objects.annotate(entry_count=models.Count("song_entry"))
             .exclude(pk__in=[song_entry.song.id for song_entry in used_songs_entry])
             .filter(
@@ -68,7 +62,7 @@ class RecommendationViewSet(
         )
 
         recommendations_list = random.sample(
-            list(first_hundred), min(18, len(first_hundred))
+            list(top_hundred), min(18, len(top_hundred))
         )
 
         [
@@ -86,8 +80,6 @@ class RecommendationViewSet(
                 break
             self._remove_duplicates(item, likes_list, recommendations_list)
             wishes_list.append(item)
-
-        return wishes_list
 
     def _get_song_recommendation(self, likes_list, recommendations_list):
         if len(likes_list) > 0:
