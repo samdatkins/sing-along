@@ -85,7 +85,7 @@ class RecommendationViewSet(
         if len(likes_list) > 0:
             item = random.choice(likes_list)
             LIKE_THRESHOLD = 0.9
-            if random.random() > LIKE_THRESHOLD or len(recommendations_list) > 0:
+            if random.random() > LIKE_THRESHOLD or len(recommendations_list) < 1:
                 return item
 
         if len(recommendations_list) > 0:
