@@ -45,37 +45,44 @@ const AddSongModal = () => {
       >
         <ModalOverlay />
         <ModalContent minH="80vh">
-          <ModalHeader>Request a song for "{songbook?.title}"</ModalHeader>
+          {songbook?.title ? (
+            <ModalHeader>Request a song for "{songbook?.title}"</ModalHeader>
+          ) : (
+            <ModalHeader>Loading Songbook...</ModalHeader>
+          )}
           <ModalCloseButton />
           <ModalBody>
-            <SongSearchAutocomplete
-              songRequestInput={songRequestInput}
-              onSubmit={async (song) => {
-                setAlertText("");
-                setAlertStatus(undefined);
+            {songbook?.session_key && (
+              <SongSearchAutocomplete
+                songRequestInput={songRequestInput}
+                session_key={songbook.session_key}
+                onSubmit={async (song) => {
+                  setAlertText("");
+                  setAlertStatus(undefined);
 
-                const addSongResult = await addSongToSongbook(
-                  song,
-                  songbook?.id
-                );
-                if (typeof addSongResult === "string") {
-                  const isWarning = addSongResult.includes("already");
-                  setAlertStatus(isWarning ? "warning" : "error");
-                  setAlertText(addSongResult);
-                  if (isWarning) {
+                  const addSongResult = await addSongToSongbook(
+                    song,
+                    songbook?.id
+                  );
+                  if (typeof addSongResult === "string") {
+                    const isWarning = addSongResult.includes("already");
+                    setAlertStatus(isWarning ? "warning" : "error");
+                    setAlertText(addSongResult);
+                    if (isWarning) {
+                      return true;
+                    }
+                    return false;
+                  } else {
+                    setUndoSongEntryID(addSongResult.data.id);
+                    setAlertStatus("success");
+                    setAlertText(
+                      `Successfully added "${song.title}" by ${song.artist}.`
+                    );
                     return true;
                   }
-                  return false;
-                } else {
-                  setUndoSongEntryID(addSongResult.data.id);
-                  setAlertStatus("success");
-                  setAlertText(
-                    `Successfully added "${song.title}" by ${song.artist}.`
-                  );
-                  return true;
-                }
-              }}
-            />
+                }}
+              />
+            )}
             <SlideFade in={!!alertText} style={{ zIndex: 10 }} offsetY="20px">
               <Alert status={alertStatus} py="2rem" rounded="md" mt="3rem">
                 <Flex direction="column">

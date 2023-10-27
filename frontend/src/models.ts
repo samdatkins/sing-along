@@ -24,6 +24,12 @@ export type WishlistSong = {
   updated_at: string;
 };
 
+export type Recommendation = {
+  id: number | null;
+  artist: string;
+  title: string;
+};
+
 export type Songbook = {
   id: number; // we should remove this from the API and only use session_key eventually
   session_key: string;
