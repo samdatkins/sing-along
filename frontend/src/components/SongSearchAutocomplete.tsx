@@ -51,13 +51,7 @@ export default function SongSearchAutocomplete({
     return await searchForSong(trimmedSearch);
   }, []);
 
-  const asyncRecommendations = useAsync(
-    async () => getRecommendations(session_key),
-    [],
-    {
-      setLoading: (state) => ({ ...state, loading: true }),
-    }
-  );
+  const asyncRecommendations = useAsync(async () => getRecommendations(session_key), [session_key]);
 
   const debouncedSearchText = useDebounce(searchText, 250);
   const updateSelectedIndexWithValidValue = (index: number) => {

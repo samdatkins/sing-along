@@ -1,10 +1,11 @@
-import { CloseIcon } from "@chakra-ui/icons";
+import { DeleteIcon } from "@chakra-ui/icons";
 import {
   Button,
   Flex,
   FormLabel,
   Heading,
   Input,
+  Spinner,
   Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -16,9 +17,7 @@ import {
 } from "../services/songs";
 
 const WishlistForm = () => {
-  const asyncWishlist = useAsync(async () => getWishlistSongs(), [], {
-    setLoading: (state) => ({ ...state, loading: true }),
-  });
+  const asyncWishlist = useAsync(async () => getWishlistSongs(), []);
 
   const [artist, setArtist] = useState<string>("");
   const [title, setTitle] = useState<string>("");
@@ -29,15 +28,19 @@ const WishlistForm = () => {
   };
 
   const handleAdd = async () => {
-    const newSong = { artist: artist || "?", title: title || "?" };
-    await addSongToWishlist(newSong);
-    setArtist("");
-    setTitle("");
-    asyncWishlist.execute();
+    if (!artist && !title) {
+      return;
+    } else {
+      const newSong = { artist: artist || "?", title: title || "?" };
+      await addSongToWishlist(newSong);
+      setArtist("");
+      setTitle("");
+      asyncWishlist.execute();
+    }
   };
 
   return (
-    <Flex direction="column">
+    <Flex direction="column" maxW="80%">
       <Heading textAlign="center" mt="2rem">
         Your Song Wishlist
       </Heading>
@@ -49,6 +52,7 @@ const WishlistForm = () => {
         <Input value={title} onChange={(e) => setTitle(e.target.value)} />
         <Button
           m="1.5rem"
+          mb="0"
           colorScheme="blue"
           alignSelf="center"
           onClick={() => handleAdd()}
@@ -56,19 +60,26 @@ const WishlistForm = () => {
           Add Song to Wishlist
         </Button>
       </Flex>
-      {asyncWishlist &&
+      {asyncWishlist && asyncWishlist?.result?.data?.results ? (
         asyncWishlist?.result?.data?.results.map((song) => {
           return (
-            <Text key={song.id} mr="1rem">
-              {song.artist} - {song.title}
-              <CloseIcon
-                ml="1rem"
+            <Flex dir="row" alignItems="center" key={song.id} mb="3px">
+              <DeleteIcon
+                color="blue.500"
                 cursor="pointer"
                 onClick={() => handleDelete(song)}
               />
-            </Text>
+              <Text isTruncated ml="1rem">
+                {song.artist} - {song.title}
+              </Text>
+            </Flex>
           );
-        })}
+        })
+      ) : (
+        <Flex dir="row">
+          Loading wishlist songs ... <Spinner size="sm" />
+        </Flex>
+      )}
     </Flex>
   );
 };
