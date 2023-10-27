@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import {
   DjangoPaginatedResponse,
+  Recommendation,
   Song,
   Songbook,
   SongbookDetails,
@@ -224,4 +225,10 @@ export async function addSongToWishlist(song: WishlistSongPost) {
     return await axios.post<WishlistSongPost>(`/api/wishlist_songs/`, song);
   } catch (error: any | AxiosError) {}
   return "Could not add song, please try again later.";
+}
+
+export async function getRecommendations(session_key) {
+  return await axios.get<Recommendation[]>(
+    `/api/recommendations/${session_key}`
+  );
 }
