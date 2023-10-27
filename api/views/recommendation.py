@@ -53,47 +53,50 @@ class RecommendationViewSet(
             .order_by("?")[0:6]
         )
 
+        used_songs_entry = list(
+            SongEntry.objects.filter(songbook__session_key=session_key)
+        )
+
         first_hundred = (
             Song.objects.annotate(entry_count=models.Count("song_entry"))
-            .exclude(
-                Q(song_entry__songbook__session_key=session_key)
-                & Q(song_entry__deleted__isnull=True)
-            )
+            .exclude(pk__in=[song_entry.song.id for song_entry in used_songs_entry])
             .filter(
                 entry_count__gt=0,
                 song_entry__songbook__is_noodle_mode=False,
-                # song_entry__is_active=True,
-                # deleted_at
-                # is_cascade_deleted
             )
             .order_by("-entry_count")[:100]
         )
+
         recommendations_list = random.sample(list(first_hundred), len(first_hundred))[
-            0:6
+            0:12
         ]
 
-        LIKE_THRESHOLD = 0.9
-
         joined_list = []
-        for _ in range(6):
-            item = None
-            random_number = random.random()
-            if likes_list and random_number > LIKE_THRESHOLD and len(likes_list) > 0:
-                # don't add it if it's already in joined_list
-                item = random.choice(likes_list)
 
-                # use a set or dictionary with "artist title" as property and object as value
-                # while loop until the set/dictionary has 6 properties
-                # build a new list of 6 from the dictionary, discluding id prop
+        # for _ in range(6):
+        while len(joined_list) < 6:
+            item = self._get_liked_song(likes_list, joined_list)
 
-                likes_list.remove(item)
-            else:
-                if recommendations_list and len(recommendations_list) > 0:
-                    item = random.choice(recommendations_list)
-                    recommendations_list.remove(item)
-            if item is not None:
-                if hasattr(item, "id"):
-                    delattr(item, "id")
+            if item is None and len(recommendations_list) > 0:
+                item = random.choice(recommendations_list)
+                recommendations_list.remove(item)
                 joined_list.append(item)
 
-        return joined_list
+        return [{"artist": rec.artist, "title": rec.title} for rec in joined_list]
+
+    def _get_liked_song(self, likes_list, joined_list):
+        if len(likes_list) < 1:
+            return None
+        item = random.choice(likes_list)
+        random_number = random.random()
+        LIKE_THRESHOLD = 0.9
+        if random_number > LIKE_THRESHOLD and self._check_if_unique(item, joined_list):
+            likes_list.remove(item)
+            return item
+        return None
+
+    def _check_if_unique(self, song, joined_list):
+        for rec in joined_list:
+            if rec.artist == song.artist and rec.title == song.title:
+                return False
+        return True
