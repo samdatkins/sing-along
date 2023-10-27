@@ -1,6 +1,6 @@
 import { useAsync } from "react-async-hook";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import AddSongModal from "./components/AddSongModal";
+import AddSongPage from "./components/AddSongPage";
 import CurrentSongView from "./components/CurrentSongView";
 import WelcomePage from "./components/WelcomePage";
 import { getUserDetails } from "./services/songs";
@@ -16,9 +16,8 @@ function App() {
         <Route
           path="/live/:sessionKey/"
           element={<CurrentSongView asyncUser={asyncUser} />}
-        >
-          <Route path="add-song" element={<AddSongModal />} />
-        </Route>
+        />
+        <Route path="/live/:sessionKey/add-song" element={<AddSongPage />} />
         <Route path="/live" element={<WelcomePage asyncUser={asyncUser} />} />
         <Route path="/" element={<Navigate to="/live" />} />
       </Routes>
