@@ -51,7 +51,10 @@ export default function SongSearchAutocomplete({
     return await searchForSong(trimmedSearch);
   }, []);
 
-  const asyncRecommendations = useAsync(async () => getRecommendations(session_key), [session_key]);
+  const asyncRecommendations = useAsync(
+    async () => getRecommendations(session_key),
+    [session_key]
+  );
 
   const debouncedSearchText = useDebounce(searchText, 250);
   const updateSelectedIndexWithValidValue = (index: number) => {
@@ -102,6 +105,8 @@ export default function SongSearchAutocomplete({
     <>
       <InputGroup size="md">
         <Input
+          m="1rem"
+          mt="0"
           placeholder="Lynyrd Skynyrd - Free Bird"
           ref={songRequestInput}
           value={searchText}
@@ -123,7 +128,7 @@ export default function SongSearchAutocomplete({
             }
           }}
         />
-        <InputRightElement>
+        <InputRightElement m="1rem" mt="0">
           {asyncSongSearch.loading ? (
             <Spinner />
           ) : (
@@ -145,6 +150,8 @@ export default function SongSearchAutocomplete({
           bg="gray.100"
           borderRadius="md"
           overflow="hidden"
+          m="1rem"
+          mt="0"
         >
           {typeof asyncSongSearch?.result !== "string" &&
           (asyncSongSearch?.result?.data?.length || 0) > 0 ? (
@@ -174,10 +181,8 @@ export default function SongSearchAutocomplete({
 
       {searchText?.length < 1 && (
         <>
-          <Flex direction="row" alignItems="center">
-            <Heading size="sm" mt="1rem" mb=".5rem">
-              Recommended Songs:
-            </Heading>
+          <Flex direction="row" alignItems="center" m="1rem" mt="0">
+            <Heading size="sm">Recommended Songs:</Heading>
             <Popover size="sm">
               <PopoverTrigger>
                 <QuestionIcon ml="5px" />
@@ -196,7 +201,7 @@ export default function SongSearchAutocomplete({
           {asyncRecommendations &&
           asyncRecommendations?.result?.data &&
           !asyncRecommendations.loading ? (
-            <Flex direction="column">
+            <Flex direction="column" m="1rem">
               {asyncRecommendations?.result?.data?.length > 0 ? (
                 asyncRecommendations.result.data
                   .slice(0, 6)
@@ -229,7 +234,7 @@ export default function SongSearchAutocomplete({
                 cursor="pointer"
                 onClick={() => refreshRecommendations()}
               >
-                <Text mt="5px" fontSize="xs">
+                <Text m="1rem" fontSize="xs">
                   <RepeatIcon mr="3px" /> Refresh Recommendations
                 </Text>
               </Flex>
@@ -244,9 +249,8 @@ export default function SongSearchAutocomplete({
                 <Skeleton height="32px" my="2px" />
                 <Skeleton height="32px" my="2px" />
               </Stack>
-              <Flex mt="4px" justifyContent="center" fontSize="xs">
-                Loading recommendations...{" "}
-                <Spinner size="sm" color="blue.500" />
+              <Flex justifyContent="center" m="1rem" fontSize="xs">
+                Loading recommendations... <Spinner color="blue.500" />
               </Flex>
             </>
           )}
