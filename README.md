@@ -4,8 +4,10 @@
 
 - Backend
   - Install [Docker Desktop](https://www.docker.com/products/docker-desktop)
+  - Install pipx
+    - `brew install pipx`
   - Install poetry
-    - `curl -sSL https://install.python-poetry.org | python3 -`
+    - `pipx install poetry==1.2.2`
     - The command will tell you to run a command that looks something like this: `export PATH="/Users/{your username}/.local/bin:$PATH"`, so add that to the end of your `~/.zshrc` file and re-open your terminal
   - run `poetry config virtualenvs.in-project true`
 - Frontend
