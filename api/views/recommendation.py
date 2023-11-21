@@ -7,7 +7,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.models import Song, SongEntry, WishlistSong
+from api.models import Song, Songbook, SongEntry, WishlistSong
 from api.serializers.recommendation import RecommendationSerializer
 from api.views.authentication.token import TokenBasedAuthentication
 
@@ -38,9 +38,16 @@ class RecommendationViewSet(
         serializer = self.get_serializer(wishes_list[0:6], many=True)
         return Response(serializer.data)
 
+    def _get_theme_for_session_key(self, session_key):
+        songbook = Songbook.objects.get(session_key=session_key)
+        return songbook.theme
+
     def _populate_recommendations_list(self, request, wishes_list, session_key):
+        theme = self._get_theme_for_session_key(session_key)
+
         likes_list = list(
             Song.objects.filter(likes=request.user)
+            .filter(song_entry__songbook__theme=theme)
             .exclude(song_entry__songbook__session_key=session_key)
             .order_by("?")
             .values("artist", "title")[0:6]
@@ -54,6 +61,7 @@ class RecommendationViewSet(
             Song.objects.annotate(entry_count=models.Count("song_entry"))
             .exclude(pk__in=[song_entry.song.id for song_entry in used_songs_entry])
             .filter(
+                song_entry__songbook__theme=theme,
                 entry_count__gt=0,
                 song_entry__songbook__is_noodle_mode=False,
             )
