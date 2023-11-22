@@ -46,7 +46,7 @@ class TestSongEntry(APITestCase):
 
         self.not_my_songbook = SongbookFactory.create()
 
-    def test_authed_requests_fail(self):
+    def test_authed_requests_succeed(self):
         # Arrange
         self.client.force_authenticate(user=self.user)
 
