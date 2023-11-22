@@ -3,6 +3,8 @@
 ## Installation
 
 - Backend
+  - Ensure you're running python 3.9 or 3.10 (`python3 --version`)
+    - If not, install and use python 3.9 or 3.10 using `pyenv`
   - Install [Docker Desktop](https://www.docker.com/products/docker-desktop)
   - Install pipx
     - `brew install pipx`
