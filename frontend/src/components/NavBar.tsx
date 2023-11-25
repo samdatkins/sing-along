@@ -15,7 +15,7 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BsSuitHeart, BsSuitHeartFill } from "react-icons/bs";
+import { BsSuitHeartFill } from "react-icons/bs";
 import {
   AppStateToTimerMap,
   ApplicationState,
@@ -29,17 +29,14 @@ import { UseAsyncReturn } from "react-async-hook";
 import { FaFastBackward, FaFastForward } from "react-icons/fa";
 import { Link as RouterLink, useOutlet } from "react-router-dom";
 import { countTabColumns } from "../helpers/tab";
-import {
-  nextSongbookSong,
-  prevSongbookSong,
-  setSongLikeStatus,
-} from "../services/songs";
+import { nextSongbookSong, prevSongbookSong } from "../services/songs";
 import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
 import MemberAvatarGroup from "./MemberAvatarGroup";
 import SongbookList from "./SongbookList";
 import StatsModal from "./StatsModal";
 import Timer from "./Timer";
+import HeartButton from "./LikeButton";
 
 interface NavBarProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
@@ -80,7 +77,6 @@ export default function NavBar({
     AppStateToTimerMap[applicationState]
   );
   const [isTimerVisible, setIsTimerVisible] = useBoolean(false);
-  const [isLiked, setIsLiked] = useBoolean(false);
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   const isMobileDevice = isSmallerThan900;
 
@@ -149,12 +145,6 @@ export default function NavBar({
   }, [applicationState]);
 
   useEffect(() => {
-    asyncSongbook?.result?.data?.is_current_song_liked
-      ? setIsLiked.on()
-      : setIsLiked.off();
-  }, [asyncSongbook?.result?.data?.is_current_song_liked, setIsLiked]);
-
-  useEffect(() => {
     timerControls.refresh();
   }, [countdownTimerInSeconds]);
 
@@ -171,14 +161,6 @@ export default function NavBar({
     currentSongbook?.is_songbook_owner,
   ]);
 
-  const heartIconStyle = {
-    size: "34px",
-    color: "red",
-    opacity: "65%",
-    filter: "drop-shadow(1px 1px 0 #666666",
-    cursor: "pointer",
-  };
-
   const addIconStyle = {
     opacity: "65%",
     margin: "0px",
@@ -193,17 +175,6 @@ export default function NavBar({
   const handlePreviousClick = async (sessionKey) => {
     if (asyncSongbook?.result?.data?.is_noodle_mode)
       await prevSongbookSong(sessionKey);
-  };
-
-  const handleHeartClick = async () => {
-    if (!asyncSongbook?.result?.data) {
-      return;
-    }
-    setIsLiked.toggle();
-    const newLikeState = !isLiked;
-    const entry_id = asyncSongbook.result.data.current_song_entry.id;
-    setSongLikeStatus(entry_id, newLikeState);
-    asyncSongbook.execute();
   };
 
   const handleSongbookClick = () => {
@@ -417,15 +388,7 @@ export default function NavBar({
       {(!asyncSongbook?.result?.data?.is_songbook_owner ||
         isMobileDevice ||
         asyncSongbook?.result?.data?.is_noodle_mode) && (
-        <Portal>
-          <Flex position="fixed" right="10px" top="10px">
-            {isLiked ? (
-              <BsSuitHeartFill {...heartIconStyle} onClick={handleHeartClick} />
-            ) : (
-              <BsSuitHeart {...heartIconStyle} onClick={handleHeartClick} />
-            )}
-          </Flex>
-        </Portal>
+        <HeartButton asyncSongbook={asyncSongbook} />
       )}
 
       {(!asyncSongbook?.result?.data?.is_songbook_owner ||
