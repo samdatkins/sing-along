@@ -9,15 +9,17 @@ import transposer from "./transposer";
 interface TabDisplayProps {
   tab: string | false | undefined;
   firstColDispIndex: number;
-  columnsToDisplay: number;
+  columnsOnScreen: number;
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
+  fontScale: number;
 }
 
 export default function TabDisplay({
   tab,
   firstColDispIndex,
-  columnsToDisplay,
+  columnsOnScreen,
   asyncUser,
+  fontScale,
 }: TabDisplayProps) {
   const [toneSteps, setToneSteps] = useState(0);
   const [usesSharps, setUsesSharps] = useState(true);
@@ -63,7 +65,11 @@ export default function TabDisplay({
   }, [setToneSteps, setUsesSharps, tab]);
 
   const formattedTabArray = formatTab(tab, toneSteps);
-  const tabColumns = splitTabIntoColumns(formattedTabArray, LINES_PER_COLUMN);
+  const tabColumns = splitTabIntoColumns(
+    formattedTabArray,
+    LINES_PER_COLUMN,
+    fontScale
+  );
   const [isSmallerThan900] = useMediaQuery("(max-width: 900px)");
   const isMobileDevice = isSmallerThan900;
 
@@ -82,7 +88,8 @@ export default function TabDisplay({
             toneSteps={toneSteps}
             usesSharps={usesSharps}
             firstColDispIndex={firstColDispIndex}
-            columnsToDisplay={columnsToDisplay}
+            columnsOnScreen={columnsOnScreen}
+            fontScale={fontScale}
           />
         ))}
     </>
@@ -95,7 +102,8 @@ type DesktopChordsProps = {
   toneSteps: number;
   usesSharps: boolean;
   firstColDispIndex: number;
-  columnsToDisplay: number;
+  columnsOnScreen: number;
+  fontScale: number;
 };
 
 function DesktopChords({
@@ -103,17 +111,18 @@ function DesktopChords({
   toneSteps,
   usesSharps,
   firstColDispIndex,
-  columnsToDisplay,
+  columnsOnScreen,
   isLoading,
+  fontScale,
 }: DesktopChordsProps) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
   const totalPercentageWidthOfScreen =
-    100 * (tabToDisplay?.length / columnsToDisplay);
+    100 * (tabToDisplay?.length / columnsOnScreen);
 
   return (
     <Flex
       direction="row"
-      left={`-${50 * firstColDispIndex}%`}
+      left={`-${50 * (firstColDispIndex * (columnsOnScreen === 2 ? 1 : 2))}%`}
       width={`${totalPercentageWidthOfScreen}%`}
       position="relative"
       transition={isLoading ? "left 0.4s ease" : ""}
@@ -123,8 +132,11 @@ function DesktopChords({
           <Text
             key={idx}
             as="pre"
-            style={{ fontSize: "1.2rem", fontFamily: "Ubuntu Mono" }}
-            w={`${100 / columnsToDisplay}%`}
+            style={{
+              fontSize: `${fontScale / 10}rem`,
+              fontFamily: "Ubuntu Mono",
+            }}
+            w={`${100 / columnsOnScreen}%`}
             pl="1rem"
             overflow="hidden"
           >

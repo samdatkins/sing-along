@@ -50,6 +50,8 @@ interface NavBarProps {
   setFirstColDispIndex: React.Dispatch<React.SetStateAction<number>>;
   columnsToDisplay: number;
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
+  setFontScale: React.Dispatch<React.SetStateAction<number>>;
+  fontScale: number;
 }
 
 export default function NavBar({
@@ -61,6 +63,8 @@ export default function NavBar({
   setFirstColDispIndex,
   columnsToDisplay,
   asyncUser,
+  setFontScale,
+  fontScale,
 }: NavBarProps) {
   // Outlet that conditionally renders the add song drawer based on URL
   const addSongModalOutlet = useOutlet();
@@ -97,9 +101,10 @@ export default function NavBar({
     () =>
       countTabColumns(
         asyncSongbook.result?.data?.current_song_entry?.song?.content,
-        LINES_PER_COLUMN
+        LINES_PER_COLUMN,
+        fontScale
       ),
-    [asyncSongbook.result?.data?.current_song_entry?.song?.content]
+    [fontScale, asyncSongbook.result?.data?.current_song_entry?.song?.content]
   );
 
   const timerControls = {
@@ -228,6 +233,8 @@ export default function NavBar({
             columnsToDisplay={columnsToDisplay}
             asyncUser={asyncUser}
             applicationState={applicationState}
+            setFontScale={setFontScale}
+            fontScale={fontScale}
           />
         </Flex>
         <Box pt=".5rem">
