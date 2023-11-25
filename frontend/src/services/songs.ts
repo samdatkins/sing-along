@@ -180,12 +180,12 @@ export async function setSongEntryFlagged(id: number | undefined) {
   }
 }
 
-export async function setSongLikeStatus(song_id: number, isLiked: boolean) {
+export async function setSongLikeStatus(entry_id: number, isLiked: boolean) {
   try {
     if (isLiked) {
-      return await axios.put(`/api/songs/${song_id}/like/`);
+      return await axios.put(`/api/song_entries/${entry_id}/like/`);
     } else {
-      return await axios.delete(`/api/songs/${song_id}/like/`);
+      return await axios.delete(`/api/song_entries/${entry_id}/like/`);
     }
   } catch (error) {
     console.error(`Couldn't update like status: ${error}`);

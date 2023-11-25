@@ -138,7 +138,6 @@ class Song(SafeDeleteModel, CreatedUpdated):
     rating = models.DecimalField(max_digits=8, decimal_places=6, null=True, blank=True)
     votes = models.IntegerField(null=True, blank=True)
     capo = models.IntegerField(null=True, blank=True)
-    likes = models.ManyToManyField(get_user_model(), blank=True)
 
 
 class SongEntry(SafeDeleteModel, CreatedUpdated):
@@ -169,6 +168,9 @@ class SongEntry(SafeDeleteModel, CreatedUpdated):
     is_flagged = models.BooleanField(null=True, blank=True)
     requested_by = models.ForeignKey(
         get_user_model(), null=True, blank=True, on_delete=models.DO_NOTHING
+    )
+    likes = models.ManyToManyField(
+        get_user_model(), blank=True, related_name="song_entries", through="Like"
     )
 
 
@@ -213,3 +215,26 @@ class WishlistSong(SafeDeleteModel, CreatedUpdated):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     artist = models.CharField(max_length=120, null=False, blank=False)
     title = models.CharField(max_length=120, null=False, blank=False)
+
+
+class Like(CreatedUpdated):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "song_entry"],
+                name="unique song_entry like",
+            )
+        ]
+
+    song_entry = models.ForeignKey(
+        SongEntry,
+        on_delete=models.CASCADE,
+        related_name="song_entry_likes",
+        related_query_name="like",
+    )
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="song_entry_likes",
+        related_query_name="like",
+    )
