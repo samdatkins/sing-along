@@ -1,4 +1,4 @@
-import { AddIcon, WarningTwoIcon } from "@chakra-ui/icons";
+import { AddIcon, Icon, WarningTwoIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -10,9 +10,11 @@ import {
   Portal,
   Skeleton,
   Text,
+  keyframes,
   useBoolean,
   useDisclosure,
   useMediaQuery,
+  usePrevious,
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BsSuitHeartFill } from "react-icons/bs";
@@ -71,7 +73,8 @@ export default function NavBar({
   const [timerKey, setTimerKey] = useState(Date.now());
   // state for whether time is running or not
   const [isLive, setIsLive] = useState(true);
-  // state for length of countdown timer in seconds
+
+  const [shouldAnimateHeart, setShouldAnimateHeart] = useState(false);
 
   const [countdownTimerInSeconds, setCountdownTimerInSeconds] = useState(
     AppStateToTimerMap[applicationState]
@@ -81,6 +84,21 @@ export default function NavBar({
   const isMobileDevice = isSmallerThan900;
 
   const currentSongbook = asyncSongbook.result?.data;
+  const likesCount =
+    asyncSongbook?.result?.data?.current_song_entry?.likes_count;
+  const previousLikesCount = usePrevious(
+    asyncSongbook?.result?.data?.current_song_entry?.likes_count
+  );
+
+  useEffect(() => {
+    if (
+      previousLikesCount !== undefined &&
+      likesCount !== undefined &&
+      likesCount > previousLikesCount
+    ) {
+      setShouldAnimateHeart(true);
+    }
+  }, [likesCount, previousLikesCount]);
 
   const {
     isOpen: isStatsOpen,
@@ -166,6 +184,12 @@ export default function NavBar({
     margin: "0px",
     padding: "0px",
   };
+
+  const animationKeyframes = keyframes`
+0% { transform: scale(1); }
+25% { transform: scale(1.5) }
+50% { transform: scale(1); }
+`;
 
   const handleNextClick = async (sessionKey) => {
     if (asyncSongbook?.result?.data?.is_noodle_mode)
@@ -263,7 +287,17 @@ export default function NavBar({
                   </Link>
                   {currentSongbook?.current_song_entry?.likes_count > 0 && (
                     <HStack spacing="4px">
-                      <BsSuitHeartFill color="red" size="16px" />
+                      <Icon
+                        as={BsSuitHeartFill}
+                        color="red"
+                        size="16px"
+                        animation={
+                          shouldAnimateHeart
+                            ? `${animationKeyframes} 1s ease-in-out`
+                            : ""
+                        }
+                        onAnimationEnd={() => setShouldAnimateHeart(false)}
+                      />
                       <Text fontSize="16px">
                         {currentSongbook.current_song_entry.likes_count || 0}
                       </Text>
