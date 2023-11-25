@@ -1,10 +1,15 @@
 from django.contrib import admin
 
-from .models import Membership, Song, Songbook, SongEntry
+from .models import Like, Membership, Song, Songbook, SongEntry
 
 
 class MembershipInline(admin.TabularInline):
     model = Membership
+    extra = 1
+
+
+class LikeInline(admin.TabularInline):
+    model = Like
     extra = 1
 
 
@@ -35,6 +40,7 @@ class SongEntryAdmin(admin.ModelAdmin):
         "song__title",
         "song__artist",
     )
+    inlines = (LikeInline,)
 
     raw_id_fields = ("song", "songbook")
 
