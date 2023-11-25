@@ -19,6 +19,7 @@ import {
   getCurrentSong,
 } from "../services/songs";
 import SongSearchAutocomplete from "./SongSearchAutocomplete";
+import HeartButton from "./LikeButton";
 
 const AddSongPage = () => {
   const [alertText, setAlertText] = useState("");
@@ -36,13 +37,16 @@ const AddSongPage = () => {
 
   return (
     <>
+      <HeartButton asyncSongbook={asyncSongbook} />
       <Text
         cursor="pointer"
         onClick={() => navigate(`/live/${sessionKey}`)}
         align="center"
         m="1rem"
       >
-        <ArrowBackIcon /> Back to Songbook
+        <ArrowBackIcon /> Back to "
+        {asyncSongbook?.result?.data?.current_song_entry?.song?.title}" by{" "}
+        {asyncSongbook?.result?.data?.current_song_entry?.song?.artist}
       </Text>
       {asyncSongbook.result?.data.title ? (
         <Heading m="1rem" size="md">
