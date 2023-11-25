@@ -10,16 +10,18 @@ interface TabsProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
   applicationState: ApplicationState;
   firstColDispIndex: number;
-  columnsToDisplay: number;
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
+  fontScale: number;
+  columnsOnScreen: number;
 }
 
 function TabContainer({
   asyncSongbook,
   applicationState,
   firstColDispIndex,
-  columnsToDisplay,
+  columnsOnScreen,
   asyncUser,
+  fontScale,
 }: TabsProps) {
   const tab = asyncSongbook.result?.data?.current_song_entry?.song?.content;
 
@@ -40,8 +42,9 @@ function TabContainer({
         <TabDisplay
           tab={tab}
           firstColDispIndex={firstColDispIndex}
-          columnsToDisplay={columnsToDisplay}
+          columnsOnScreen={columnsOnScreen}
           asyncUser={asyncUser}
+          fontScale={fontScale}
         />
       </Box>
     </>

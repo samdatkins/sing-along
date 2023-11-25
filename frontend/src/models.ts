@@ -133,3 +133,8 @@ export type ChakraAlertStatus =
   | undefined;
 
 export const LINES_PER_COLUMN = 34;
+
+export const MIN_FONT_SCALE = 12;
+export const MAX_FONT_SCALE = 20;
+export const FONT_SCALE_INCREMENT = 2;
+export const MAX_FONT_ONE_COLUMN = 16;

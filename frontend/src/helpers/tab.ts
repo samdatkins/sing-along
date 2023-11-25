@@ -25,17 +25,29 @@ export function formatTab(
   return fixedTab;
 }
 
+const fontSizeAdjustmentMapping = {
+  12: 0,
+  14: 6,
+  16: 8,
+  18: 12,
+  20: 14,
+};
+
 export function splitTabIntoColumns(
   tab: string[],
-  maxLength: number
+  maxLength: number,
+  fontScale: number
 ): string[][] {
   let linesInColumnCount = 0;
+  const fontSizeAdjustment = fontSizeAdjustmentMapping[fontScale];
+  const adjustedMaxLength = maxLength - fontSizeAdjustment;
   return tab.reduce(
     (acc, cur) => {
-      const isFinalLine = linesInColumnCount % maxLength === maxLength - 1;
+      const isFinalLine =
+        linesInColumnCount % adjustedMaxLength === adjustedMaxLength - 1;
       const hasChords = cur.includes("[ch]");
       const curColumn =
-        Math.floor(linesInColumnCount / maxLength) +
+        Math.floor(linesInColumnCount / adjustedMaxLength) +
         (isFinalLine && hasChords ? 1 : 0);
 
       linesInColumnCount++;
@@ -54,7 +66,9 @@ export function splitTabIntoColumns(
 
 export function countTabColumns(
   tab: string | false | undefined,
-  maxColumnLength: number
+  maxColumnLength: number,
+  fontScale: number
 ): number {
-  return splitTabIntoColumns(formatTab(tab, 0), maxColumnLength).length;
+  return splitTabIntoColumns(formatTab(tab, 0), maxColumnLength, fontScale)
+    .length;
 }

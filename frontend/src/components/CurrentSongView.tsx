@@ -1,7 +1,7 @@
 import { Flex } from "@chakra-ui/react";
 import { useState } from "react";
 import { UseAsyncReturn, useAsync } from "react-async-hook";
-import { ApplicationState, User } from "../models";
+import { ApplicationState, MAX_FONT_ONE_COLUMN, User } from "../models";
 import NavBar from "./NavBar";
 import TabContainer from "./TabContainer";
 
@@ -23,8 +23,13 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
   const [applicationState, setApplicationState] = useState(
     ApplicationState.ShowSong
   );
+  const [fontScale, setFontScale] = useState(12);
   const [firstColDispIndex, setFirstColDispIndex] = useState(0);
-  const columnsToDisplay = user ? user.userprofile.columns_to_display : 1;
+  const columnsOnScreenUserSetting = user
+    ? user.userprofile.columns_to_display
+    : 1;
+  const columnsOnScreen =
+    fontScale > MAX_FONT_ONE_COLUMN ? 1 : columnsOnScreenUserSetting;
 
   const advanceToNextAppState = () => {
     switch (applicationState) {
@@ -73,8 +78,10 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
             applicationState={applicationState}
             firstColDispIndex={firstColDispIndex}
             setFirstColDispIndex={setFirstColDispIndex}
-            columnsToDisplay={columnsToDisplay}
+            columnsToDisplay={columnsOnScreen}
             asyncUser={asyncUser}
+            setFontScale={setFontScale}
+            fontScale={fontScale}
           />
           {asyncSongbook?.result?.data.total_songs !== 0 && (
             <TabContainer
@@ -82,7 +89,8 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
               asyncUser={asyncUser}
               applicationState={applicationState}
               firstColDispIndex={firstColDispIndex}
-              columnsToDisplay={columnsToDisplay}
+              columnsOnScreen={columnsOnScreen}
+              fontScale={fontScale}
             />
           )}
         </Flex>

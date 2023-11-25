@@ -29,7 +29,15 @@ import { GrUnorderedList } from "react-icons/gr";
 import { MdOutlineMenuOpen } from "react-icons/md";
 import QRCode from "react-qr-code";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
-import { ApplicationState, Songbook, User } from "../models";
+import {
+  ApplicationState,
+  FONT_SCALE_INCREMENT,
+  MAX_FONT_ONE_COLUMN,
+  MAX_FONT_SCALE,
+  MIN_FONT_SCALE,
+  Songbook,
+  User,
+} from "../models";
 import {
   deleteSongbookSong,
   nextSongbookSong,
@@ -68,6 +76,8 @@ interface HamburgerMenuProps {
   columnsToDisplay: number;
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
   applicationState: ApplicationState;
+  setFontScale: React.Dispatch<React.SetStateAction<number>>;
+  fontScale: number;
 }
 export default function HamburgerMenu({
   isMobileDevice,
@@ -83,6 +93,8 @@ export default function HamburgerMenu({
   columnsToDisplay,
   asyncUser,
   applicationState,
+  setFontScale,
+  fontScale,
 }: HamburgerMenuProps) {
   const { toggleColorMode } = useColorMode();
   const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
@@ -134,6 +146,23 @@ export default function HamburgerMenu({
     if (addSongModalOutlet || isJumpSearchOpen || !isSongbookOwner) return;
 
     if (event.metaKey || event.ctrlKey || event.altKey) {
+      if (event.code === "Equal" || event.code === "Minus") {
+        const delta =
+          event.code === "Equal"
+            ? FONT_SCALE_INCREMENT
+            : -1 * FONT_SCALE_INCREMENT;
+        setFontScale((scale) => {
+          const newScale = delta + scale;
+          if (newScale < MIN_FONT_SCALE) {
+            return MIN_FONT_SCALE;
+          } else if (newScale > MAX_FONT_SCALE) {
+            return MAX_FONT_SCALE;
+          } else {
+            return newScale;
+          }
+        });
+        setFirstColDispIndex(0);
+      }
       return;
     }
 
@@ -153,15 +182,18 @@ export default function HamburgerMenu({
       performSongNavAction("prev");
     } else if (event.code === "ArrowRight" && event.shiftKey) {
       performSongNavAction("next");
-    } else if (event.code === "ArrowLeft") {
-      if (firstColDispIndex - 2 >= 0) {
-        setFirstColDispIndex(firstColDispIndex - 2);
-      } else if (firstColDispIndex - 1 >= 0) {
-        setFirstColDispIndex(firstColDispIndex - 1);
-      }
-    } else if (event.code === "ArrowRight") {
-      if (firstColDispIndex + columnsToDisplay + 2 <= totalColumns + 1) {
-        setFirstColDispIndex(firstColDispIndex + 2);
+    } else if (event.code === "ArrowLeft" || event.code === "ArrowRight") {
+      const absoluteColumnDelta =
+        fontScale > MAX_FONT_ONE_COLUMN ? 1 : columnsToDisplay;
+      const columnDelta =
+        event.code === "ArrowLeft"
+          ? -1 * absoluteColumnDelta
+          : absoluteColumnDelta;
+      if (
+        firstColDispIndex + columnDelta >= 0 &&
+        firstColDispIndex + columnDelta <= totalColumns - 1
+      ) {
+        setFirstColDispIndex(firstColDispIndex + columnDelta);
       }
     } else if (event.code === "KeyR") {
       if (applicationState === ApplicationState.ShowSong) {
