@@ -53,7 +53,8 @@ class RecommendationViewSet(
             .select_related("song")[:50]
         )
         likes_list = [
-            {"artist": i.song.artist, "title": i.song.title} for i in likes_list
+            {"artist": like.song.artist, "title": like.song.title}
+            for like in likes_list
         ]
 
         used_songs_entry = list(

@@ -180,7 +180,7 @@ export async function setSongEntryFlagged(id: number | undefined) {
   }
 }
 
-export async function setSongLikeStatus(entry_id, isLiked: boolean) {
+export async function setSongLikeStatus(entry_id: number, isLiked: boolean) {
   try {
     if (isLiked) {
       return await axios.put(`/api/song_entries/${entry_id}/like/`);
