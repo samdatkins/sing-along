@@ -9,14 +9,8 @@ class MembershipInline(admin.TabularInline):
 
 
 class SongAdmin(admin.ModelAdmin):
-    list_display = ("artist", "title", "url", "rating", "votes", "capo", "num_likes")
+    list_display = ("artist", "title", "url", "rating", "votes", "capo")
     search_fields = ("artist", "title", "url", "capo")
-
-    def num_likes(self, obj):
-        return obj.likes.count()
-
-    num_likes.admin_order_field = "likes"
-    num_likes.short_description = "Number of Likes"
 
 
 class SongbookAdmin(admin.ModelAdmin):
@@ -34,6 +28,7 @@ class SongEntryAdmin(admin.ModelAdmin):
         "get_song_title",
         "get_song_artist",
         "play_time",
+        "num_likes",
     )
     search_fields = (
         "songbook__title",
@@ -63,6 +58,12 @@ class SongEntryAdmin(admin.ModelAdmin):
     )
     def get_song_artist(self, obj):
         return obj.song.artist
+
+    def num_likes(self, obj):
+        return obj.likes.count()
+
+    num_likes.admin_order_field = "likes"
+    num_likes.short_description = "Number of Likes"
 
 
 admin.site.register(Songbook, SongbookAdmin)

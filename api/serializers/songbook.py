@@ -85,7 +85,7 @@ class SongbookSerializer(serializers.ModelSerializer):
         if song_entry is None or user is None:
             return False
 
-        return song_entry.song.likes.filter(pk=user.pk).exists()
+        return song_entry.likes.filter(pk=user.pk).exists()
 
 
 class SongbookListSerializer(serializers.ModelSerializer):

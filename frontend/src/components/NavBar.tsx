@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Flex,
+  HStack,
   Heading,
   Kbd,
   Link,
@@ -195,8 +196,8 @@ export default function NavBar({
     }
     setIsLiked.toggle();
     const newLikeState = !isLiked;
-    const songId = asyncSongbook.result.data.current_song_entry.song.id;
-    setSongLikeStatus(songId, newLikeState);
+    const entry_id = asyncSongbook.result.data.current_song_entry.id;
+    setSongLikeStatus(entry_id, newLikeState);
     asyncSongbook.execute();
   };
 
@@ -272,15 +273,25 @@ export default function NavBar({
                 {currentSongbook?.current_song_entry?.is_flagged && (
                   <WarningTwoIcon />
                 )}{" "}
-                <Link
-                  fontWeight="bold"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={currentSongbook.current_song_entry?.song.url}
-                >
-                  "{currentSongbook.current_song_entry?.song.title}" by{" "}
-                  {currentSongbook.current_song_entry?.song.artist}
-                </Link>{" "}
+                <HStack spacing="8px" justifyContent="center">
+                  <Link
+                    fontWeight="bold"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={currentSongbook.current_song_entry?.song.url}
+                  >
+                    "{currentSongbook.current_song_entry?.song.title}" by{" "}
+                    {currentSongbook.current_song_entry?.song.artist}
+                  </Link>
+                  {currentSongbook?.current_song_entry?.likes_count > 0 && (
+                    <HStack spacing="4px">
+                      <BsSuitHeartFill color="red" size="16px" />
+                      <Text fontSize="16px">
+                        {currentSongbook.current_song_entry.likes_count || 0}
+                      </Text>
+                    </HStack>
+                  )}
+                </HStack>
               </Text>
               <Flex direction="row" justifyContent="center" alignItems="center">
                 {asyncSongbook?.result?.data?.is_noodle_mode && (

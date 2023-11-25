@@ -1,4 +1,5 @@
 from rest_framework import mixins, permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 
@@ -90,3 +91,17 @@ class SongEntryViewSet(
 
     def perform_create(self, serializer):
         serializer.save(requested_by=self.request.user)
+
+    @action(methods=["put", "delete"], detail=True, url_path="like", url_name="like")
+    def like(self, request, pk):
+        user = request.user
+        instance = self.get_object()
+
+        if request.method == "PUT":
+            instance.likes.add(user)
+            return Response(status=status.HTTP_201_CREATED)
+        elif request.method == "DELETE":
+            instance.likes.remove(user)
+            return Response(status=status.HTTP_202_ACCEPTED)
+
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

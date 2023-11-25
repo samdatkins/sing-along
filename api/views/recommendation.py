@@ -30,28 +30,31 @@ class RecommendationViewSet(
         session_key = self.kwargs["pk"]
 
         wishes_list = list(
-            WishlistSong.objects.filter(user=request.user).order_by("?")[0:6]
+            WishlistSong.objects.filter(user=request.user).order_by("?")[:6]
         )
         if len(wishes_list) < 6:
             self._populate_recommendations_list(request, wishes_list, session_key)
 
-        serializer = self.get_serializer(wishes_list[0:6], many=True)
+        serializer = self.get_serializer(wishes_list[:6], many=True)
         return Response(serializer.data)
 
-    def _get_theme_for_session_key(self, session_key):
-        songbook = Songbook.objects.get(session_key=session_key)
-        return songbook.theme
-
     def _populate_recommendations_list(self, request, wishes_list, session_key):
-        theme = self._get_theme_for_session_key(session_key)
+        songbook = Songbook.objects.get(session_key=session_key)
+        theme = songbook.theme
 
         likes_list = list(
-            Song.objects.filter(likes=request.user)
-            .filter(song_entry__songbook__theme=theme)
-            .exclude(song_entry__songbook__session_key=session_key)
+            SongEntry.objects.filter(likes=request.user)
+            .filter(
+                songbook__theme=theme,
+                songbook__is_noodle_mode=songbook.is_noodle_mode,
+            )
+            .exclude(songbook__session_key=session_key)
             .order_by("?")
-            .values("artist", "title")[0:6]
+            .select_related("song")[:50]
         )
+        likes_list = [
+            {"artist": i.song.artist, "title": i.song.title} for i in likes_list
+        ]
 
         used_songs_entry = list(
             SongEntry.objects.filter(songbook__session_key=session_key)
@@ -63,7 +66,7 @@ class RecommendationViewSet(
             .filter(
                 song_entry__songbook__theme=theme,
                 entry_count__gt=0,
-                song_entry__songbook__is_noodle_mode=False,
+                song_entry__songbook__is_noodle_mode=songbook.is_noodle_mode,
             )
             .order_by("-entry_count")
             .values("artist", "title")[:100]
@@ -73,20 +76,19 @@ class RecommendationViewSet(
             list(top_hundred), min(18, len(top_hundred))
         )
 
-        [
-            self._remove_duplicates(
-                {"artist": wish_song.artist, "title": wish_song.title},
-                likes_list,
-                recommendations_list,
+        for wish_song in wishes_list:
+            entry = {"artist": wish_song.artist, "title": wish_song.title}
+            likes_list, recommendations_list = self._remove_duplicates(
+                entry, likes_list, recommendations_list
             )
-            for wish_song in wishes_list
-        ]
 
         while len(wishes_list) < 6:
             item = self._get_song_recommendation(likes_list, recommendations_list)
             if item is None:
                 break
-            self._remove_duplicates(item, likes_list, recommendations_list)
+            likes_list, recommendations_list = self._remove_duplicates(
+                item, likes_list, recommendations_list
+            )
             wishes_list.append(item)
 
     def _get_song_recommendation(self, likes_list, recommendations_list):
@@ -103,11 +105,20 @@ class RecommendationViewSet(
 
     def _remove_duplicates(self, item, likes_list, recommendations_list):
         item = {"artist": item["artist"], "title": item["title"]}
-        try:
-            likes_list.remove(item)
-        except ValueError:
-            pass
-        try:
-            recommendations_list.remove(item)
-        except ValueError:
-            pass
+        likes_list = [
+            liked_song
+            for liked_song in likes_list
+            if (
+                liked_song["artist"] != item["artist"]
+                and liked_song["title"] != item["title"]
+            )
+        ]
+        recommendations_list = [
+            recommended_song
+            for recommended_song in recommendations_list
+            if (
+                recommended_song["artist"] != item["artist"]
+                and recommended_song["title"] != item["title"]
+            )
+        ]
+        return likes_list, recommendations_list

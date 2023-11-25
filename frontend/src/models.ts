@@ -14,6 +14,7 @@ export type SongEntry = {
   play_time: string;
   song: Song;
   is_flagged: boolean;
+  likes_count: number;
 };
 
 export type WishlistSong = {
