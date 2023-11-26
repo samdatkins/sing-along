@@ -20,6 +20,7 @@ import {
 } from "../services/songs";
 import SongSearchAutocomplete from "./SongSearchAutocomplete";
 import HeartButton from "./LikeButton";
+import { useInterval } from "usehooks-ts";
 
 const AddSongPage = () => {
   const [alertText, setAlertText] = useState("");
@@ -32,6 +33,12 @@ const AddSongPage = () => {
   const asyncSongbook = useAsync(async () => getCurrentSong(sessionKey), [], {
     setLoading: (state) => ({ ...state, loading: true }),
   });
+
+  useInterval(() => {
+    if (!asyncSongbook.loading) {
+      asyncSongbook.execute();
+    }
+  }, 5000);
 
   const songRequestInput = React.useRef(null);
 
