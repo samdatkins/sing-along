@@ -1,7 +1,12 @@
 import { Flex } from "@chakra-ui/react";
 import { useState } from "react";
 import { UseAsyncReturn, useAsync } from "react-async-hook";
-import { ApplicationState, MAX_FONT_ONE_COLUMN, User } from "../models";
+import {
+  ApplicationState,
+  DEFAULT_FONT_SCALE,
+  MAX_FONT_ONE_COLUMN,
+  User,
+} from "../models";
 import NavBar from "./NavBar";
 import TabContainer from "./TabContainer";
 
@@ -23,7 +28,7 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
   const [applicationState, setApplicationState] = useState(
     ApplicationState.ShowSong
   );
-  const [fontScale, setFontScale] = useState(12);
+  const [fontScale, setFontScale] = useState(DEFAULT_FONT_SCALE);
   const [firstColDispIndex, setFirstColDispIndex] = useState(0);
   const columnsOnScreenUserSetting = user
     ? user.userprofile.columns_to_display

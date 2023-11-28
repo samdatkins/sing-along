@@ -4,7 +4,7 @@ export type Song = {
   url: string;
   title: string;
   id: number;
-  capo: number;
+  transpose: number;
   spotify_ID: string;
 };
 
@@ -139,3 +139,4 @@ export const MIN_FONT_SCALE = 12;
 export const MAX_FONT_SCALE = 20;
 export const FONT_SCALE_INCREMENT = 2;
 export const MAX_FONT_ONE_COLUMN = 16;
+export const DEFAULT_FONT_SCALE = 16;
