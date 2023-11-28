@@ -9058,6 +9058,14 @@ react-scripts@5.0.1:
   optionalDependencies:
     fsevents "^2.3.2"
 
+react-spotify-embed@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/react-spotify-embed/-/react-spotify-embed-2.0.3.tgz#3360c0fdf7994c0473cf262f0236aad75b0a820b"
+  integrity sha512-buiiaaPrGTyOlciJFJiHz1o2a4iSJMuH9ewi2KaIjVGcedz6szM8plz7Y6HtcDxApxCv2Rwx38xS1z8Zs3M/ZA==
+  dependencies:
+    react "^18.2.0"
+    react-dom "^18.2.0"
+
 react-style-singleton@^2.2.1:
   version "2.2.1"
   resolved "https://registry.npmjs.org/react-style-singleton/-/react-style-singleton-2.2.1.tgz"

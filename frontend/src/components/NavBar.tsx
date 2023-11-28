@@ -39,6 +39,7 @@ import SongbookList from "./SongbookList";
 import StatsModal from "./StatsModal";
 import Timer from "./Timer";
 import HeartButton from "./LikeButton";
+import SpotifyPlayModal from "./SpotifyPlayModal";
 
 interface NavBarProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
@@ -272,10 +273,10 @@ export default function NavBar({
                 fontSize="2xl"
                 align="center"
               >
-                {currentSongbook?.current_song_entry?.is_flagged && (
-                  <WarningTwoIcon />
-                )}{" "}
                 <HStack spacing="8px" justifyContent="center">
+                  {currentSongbook?.current_song_entry?.is_flagged && (
+                    <WarningTwoIcon />
+                  )}{" "}
                   <Link
                     fontWeight="bold"
                     target="_blank"
@@ -285,24 +286,31 @@ export default function NavBar({
                     "{currentSongbook.current_song_entry?.song.title}" by{" "}
                     {currentSongbook.current_song_entry?.song.artist}
                   </Link>
-                  {currentSongbook?.current_song_entry?.likes_count > 0 && (
-                    <HStack spacing="4px">
-                      <Icon
-                        as={BsSuitHeartFill}
-                        color="red"
-                        size="16px"
-                        animation={
-                          shouldAnimateHeart
-                            ? `${animationKeyframes} 1s ease-in-out`
-                            : ""
-                        }
-                        onAnimationEnd={() => setShouldAnimateHeart(false)}
-                      />
-                      <Text fontSize="16px">
-                        {currentSongbook.current_song_entry.likes_count || 0}
-                      </Text>
-                    </HStack>
-                  )}
+                  <SpotifyPlayModal
+                    spotify_ID={
+                      asyncSongbook?.result?.data?.current_song_entry?.song
+                        ?.spotify_ID
+                    }
+                  />
+                  {currentSongbook?.current_song_entry?.likes_count > 0 &&
+                    currentSongbook?.is_songbook_owner && (
+                      <HStack spacing="4px">
+                        <Icon
+                          as={BsSuitHeartFill}
+                          color="red"
+                          size="16px"
+                          animation={
+                            shouldAnimateHeart
+                              ? `${animationKeyframes} 1s ease-in-out`
+                              : ""
+                          }
+                          onAnimationEnd={() => setShouldAnimateHeart(false)}
+                        />
+                        <Text fontSize="16px">
+                          {currentSongbook.current_song_entry.likes_count || 0}
+                        </Text>
+                      </HStack>
+                    )}
                 </HStack>
               </Text>
               <Flex direction="row" justifyContent="center" alignItems="center">
