@@ -1,6 +1,22 @@
+from django import forms
 from django.contrib import admin
 
+from sing_along.utils.tabs import TabScraper
+
 from .models import Like, Membership, Song, Songbook, SongEntry
+
+
+class SongForm(forms.ModelForm):
+    # Adding a custom field for user input
+    tab_url = forms.CharField(
+        required=False,
+        widget=forms.TextInput,
+        help_text="Enter a URL to load to overwrite the current tab with an updated version (optional and DANGEROUS)",
+    )
+
+    class Meta:
+        model = Song
+        fields = "__all__"
 
 
 class MembershipInline(admin.TabularInline):
@@ -14,8 +30,22 @@ class LikeInline(admin.TabularInline):
 
 
 class SongAdmin(admin.ModelAdmin):
-    list_display = ("artist", "title", "url", "rating", "votes", "capo")
-    search_fields = ("artist", "title", "url", "capo")
+    form = SongForm
+    list_display = ("artist", "title", "url", "rating", "votes", "transpose")
+    search_fields = ("artist", "title", "url", "transpose")
+
+    def save_model(self, request, obj, form, change):
+        tab_url = form.cleaned_data.get("tab_url")
+
+        if tab_url:
+            scraper = TabScraper()
+            tab = scraper.load_tab_from_url(tab_url)
+
+            # Write the result to a specific field
+            obj.content = tab["content"]
+            obj.url = tab_url
+
+        super().save_model(request, obj, form, change)
 
 
 class SongbookAdmin(admin.ModelAdmin):
