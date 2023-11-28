@@ -7,10 +7,6 @@ import reportWebVitals from "./reportWebVitals";
 import theme from "./theme";
 import axios from "axios";
 
-// const randomCSRF = createCSRF();
-// axios.defaults.headers.common["X-CSRFTOKEN"] = randomCSRF;
-// cookie.save("csrftoken", randomCSRF, { path: "/" });
-
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 axios.defaults.xsrfCookieName = "csrftoken";
 
