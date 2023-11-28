@@ -5,6 +5,7 @@ export type Song = {
   title: string;
   id: number;
   capo: number;
+  spotify_ID: string;
 };
 
 export type SongEntry = {

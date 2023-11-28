@@ -27,6 +27,7 @@ social-auth-app-django = "^5.0.0"
 pytest = "^7.4.0"
 pytest-django = "^4.5.2"
 pytest-env = "^0.8.2"
+spotipy = "^2.23.0"
 
 [tool.poetry.group.dev.dependencies]
 factory-boy = "^3.2.1"
