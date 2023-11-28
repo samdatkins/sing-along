@@ -56,7 +56,7 @@ class SongbookAdmin(admin.ModelAdmin):
 
 
 class SongEntryAdmin(admin.ModelAdmin):
-    list_filter = ["is_flagged"]
+    list_filter = ["is_flagged", "songbook__theme"]
     list_select_related = ("song", "songbook")
     list_display = (
         "get_songbook_title",
