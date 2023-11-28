@@ -31,8 +31,8 @@ class LikeInline(admin.TabularInline):
 
 class SongAdmin(admin.ModelAdmin):
     form = SongForm
-    list_display = ("artist", "title", "url", "rating", "votes", "capo")
-    search_fields = ("artist", "title", "url", "capo")
+    list_display = ("artist", "title", "url", "rating", "votes", "transpose")
+    search_fields = ("artist", "title", "url", "transpose")
 
     def save_model(self, request, obj, form, change):
         tab_url = form.cleaned_data.get("tab_url")

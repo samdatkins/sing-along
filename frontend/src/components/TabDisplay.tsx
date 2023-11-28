@@ -12,6 +12,7 @@ interface TabDisplayProps {
   columnsOnScreen: number;
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
   fontScale: number;
+  defaultTranspose: number | undefined;
 }
 
 export default function TabDisplay({
@@ -20,6 +21,7 @@ export default function TabDisplay({
   columnsOnScreen,
   asyncUser,
   fontScale,
+  defaultTranspose,
 }: TabDisplayProps) {
   const [toneSteps, setToneSteps] = useState(0);
   const [usesSharps, setUsesSharps] = useState(true);
@@ -60,7 +62,11 @@ export default function TabDisplay({
   }, [handleKeyPress]);
 
   useEffect(() => {
-    setToneSteps(0);
+    if (typeof defaultTranspose === "number") {
+      setToneSteps(defaultTranspose);
+    } else {
+      setToneSteps(0);
+    }
     setUsesSharps(true);
   }, [setToneSteps, setUsesSharps, tab]);
 
@@ -116,13 +122,17 @@ function DesktopChords({
   fontScale,
 }: DesktopChordsProps) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
+  const columnsToDisplayOnScreen = Math.min(
+    columnsOnScreen,
+    tabToDisplay.length
+  );
   const totalPercentageWidthOfScreen =
-    100 * (tabToDisplay?.length / columnsOnScreen);
+    100 * (tabToDisplay?.length / columnsToDisplayOnScreen);
 
   return (
     <Flex
       direction="row"
-      left={`-${50 * (firstColDispIndex * (columnsOnScreen === 2 ? 1 : 2))}%`}
+      left={`-${50 * firstColDispIndex}%`}
       width={`${totalPercentageWidthOfScreen}%`}
       position="relative"
       transition={isLoading ? "left 0.4s ease" : ""}
@@ -136,7 +146,7 @@ function DesktopChords({
               fontSize: `${fontScale / 10}rem`,
               fontFamily: "Ubuntu Mono",
             }}
-            w={`${100 / columnsOnScreen}%`}
+            w={`${100 / columnsToDisplayOnScreen}%`}
             pl="1rem"
             overflow="hidden"
           >

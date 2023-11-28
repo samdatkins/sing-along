@@ -45,6 +45,7 @@ function TabContainer({
           columnsOnScreen={columnsOnScreen}
           asyncUser={asyncUser}
           fontScale={fontScale}
+          defaultTranspose={asyncSongbook?.result?.data?.current_song_entry?.song?.transpose}
         />
       </Box>
     </>

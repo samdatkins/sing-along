@@ -28,24 +28,27 @@ class RecommendationViewSet(
 
     def retrieve(self, request, *args, **kwargs):
         session_key = self.kwargs["pk"]
+        songbook = Songbook.objects.get(session_key=session_key)
 
-        wishes_list = list(
-            WishlistSong.objects.filter(user=request.user).order_by("?")[:6]
-        )
+        wishes_list = []
+        # Only use wishlist if this is a non-themed songbook
+        if songbook.theme == "":
+            wishes_list = list(
+                WishlistSong.objects.filter(user=request.user).order_by("?")[:6]
+            )
         if len(wishes_list) < 6:
-            self._populate_recommendations_list(request, wishes_list, session_key)
+            self._populate_recommendations_list(
+                request, wishes_list, session_key, songbook
+            )
 
         serializer = self.get_serializer(wishes_list[:6], many=True)
         return Response(serializer.data)
 
-    def _populate_recommendations_list(self, request, wishes_list, session_key):
-        songbook = Songbook.objects.get(session_key=session_key)
-        theme = songbook.theme
-
+    def _populate_recommendations_list(self, request, wishes_list, songbook):
         likes_list = list(
             SongEntry.objects.filter(likes=request.user)
             .filter(
-                songbook__theme=theme,
+                songbook__theme=songbook.theme,
                 songbook__is_noodle_mode=songbook.is_noodle_mode,
             )
             .exclude(songbook__session_key=session_key)
