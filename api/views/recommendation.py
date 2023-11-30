@@ -37,14 +37,13 @@ class RecommendationViewSet(
                 WishlistSong.objects.filter(user=request.user).order_by("?")[:6]
             )
         if len(wishes_list) < 6:
-            self._populate_recommendations_list(
-                request, wishes_list, session_key, songbook
-            )
+            self._populate_recommendations_list(request, wishes_list, songbook)
 
         serializer = self.get_serializer(wishes_list[:6], many=True)
         return Response(serializer.data)
 
     def _populate_recommendations_list(self, request, wishes_list, songbook):
+        session_key = songbook.session_key
         likes_list = list(
             SongEntry.objects.filter(likes=request.user)
             .filter(
@@ -68,7 +67,7 @@ class RecommendationViewSet(
             Song.objects.annotate(entry_count=models.Count("song_entry"))
             .exclude(pk__in=[song_entry.song.id for song_entry in used_songs_entry])
             .filter(
-                song_entry__songbook__theme=theme,
+                song_entry__songbook__theme=songbook.theme,
                 entry_count__gt=0,
                 song_entry__songbook__is_noodle_mode=songbook.is_noodle_mode,
             )
