@@ -1,65 +1,51 @@
 import { DeleteIcon } from "@chakra-ui/icons";
-import {
-  Button,
-  Flex,
-  FormLabel,
-  Heading,
-  Input,
-  Spinner,
-  Text,
-} from "@chakra-ui/react";
-import { useState } from "react";
+import { Flex, Heading, Spinner, Text } from "@chakra-ui/react";
+import React from "react";
 import { useAsync } from "react-async-hook";
+import { Song } from "../models";
 import {
   addSongToWishlist,
   deleteWishlistSong,
   getWishlistSongs,
 } from "../services/songs";
+import SongSearchAutocomplete from "./SongSearchAutocomplete";
 
 const WishlistForm = () => {
   const asyncWishlist = useAsync(async () => getWishlistSongs(), []);
-
-  const [artist, setArtist] = useState<string>("");
-  const [title, setTitle] = useState<string>("");
 
   const handleDelete = async (song) => {
     await deleteWishlistSong(song);
     asyncWishlist.execute();
   };
 
-  const handleAdd = async () => {
-    if (!artist && !title) {
-      return;
-    } else {
-      const newSong = { artist: artist || "?", title: title || "?" };
-      await addSongToWishlist(newSong);
-      setArtist("");
-      setTitle("");
-      asyncWishlist.execute();
-    }
+  const handleSongSubmit = async (song: Song) => {
+    const newSong = { artist: song.artist || "?", title: song.title || "?" };
+    await addSongToWishlist(newSong);
+    asyncWishlist.execute();
+    return true;
   };
 
-  return (
-    <Flex direction="column" maxW="80%">
-      <Heading textAlign="center" mt="2rem">
-        Your Song Wishlist
-      </Heading>
+  const songRequestInput = React.useRef(null);
 
-      <Flex direction="column" mb="1.5rem">
-        <FormLabel mt="1rem">Artist:</FormLabel>
-        <Input value={artist} onChange={(e) => setArtist(e.target.value)} />
-        <FormLabel mt="1rem">Title:</FormLabel>
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} />
-        <Button
-          m="1.5rem"
-          mb="0"
-          colorScheme="blue"
-          alignSelf="center"
-          onClick={() => handleAdd()}
-        >
-          Add Song to Wishlist
-        </Button>
+  return (
+    <Flex direction="column">
+      <Flex direction="column" mb="1.5rem" width="100%">
+        <Heading size="md" mb="10px" mt="10px">
+          Add to Wishlist:
+        </Heading>
+        <SongSearchAutocomplete
+          onSubmit={handleSongSubmit}
+          session_key={""}
+          songRequestInput={songRequestInput}
+        />
       </Flex>
+      <Heading size="md" mb="10px">
+        {asyncWishlist &&
+        asyncWishlist.result &&
+        asyncWishlist?.result?.data?.results?.length > 0
+          ? `Wishlist Songs:`
+          : `No Wishlist Songs`}
+      </Heading>
       {asyncWishlist && asyncWishlist?.result?.data?.results ? (
         asyncWishlist?.result?.data?.results.map((song) => {
           return (

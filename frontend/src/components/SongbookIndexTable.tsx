@@ -5,6 +5,12 @@ import {
   Flex,
   Heading,
   Kbd,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   SimpleGrid,
   Skeleton,
   Tab,
@@ -15,17 +21,20 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
+  useDisclosure,
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { BsFillJournalBookmarkFill } from "react-icons/bs";
 import { RxLapTimer } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
+import CreateNewSongbook from "./CreateNewSongbook";
+import WishlistForm from "./WishlistForm";
 
 export default function SongbookIndexTable({ songbooks }) {
   const navigate = useNavigate();
   dayjs.extend(relativeTime);
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const avatarBackgroundStyle = {
     color: useColorModeValue("white", "black"),
     bg: useColorModeValue("teal.500", "cyan.300"),
@@ -43,6 +52,14 @@ export default function SongbookIndexTable({ songbooks }) {
     } else {
       return (
         <SimpleGrid columns={[1, 2, 3]} spacing="10px" maxW="900px">
+          <Card
+            alignItems="center"
+            justifyContent="center"
+            onClick={onOpen}
+            cursor="pointer"
+          >
+            <Heading size="2xl">+</Heading>
+          </Card>
           {songbooks
             ?.filter((songbook) => songbook.is_noodle_mode === displayNoodle)
             .map((songbook, idx) => {
@@ -93,6 +110,27 @@ export default function SongbookIndexTable({ songbooks }) {
                   >
                     {songbook.title}
                   </Heading>
+                  {songbook.is_songbook_owner && (
+                    <AvatarGroup
+                      size="sm"
+                      max={6}
+                      mt="10px"
+                      justifyContent="center"
+                    >
+                      {songbook.membership_set?.length &&
+                        songbook.membership_set.map((member) => {
+                          return (
+                            <Avatar
+                              {...avatarBackgroundStyle}
+                              key={member.user.id}
+                              name={`${member.user.first_name} ${member.user.last_initial}`}
+                              referrerPolicy="no-referrer"
+                              src={member.user.social_auth?.[0]?.picture}
+                            />
+                          );
+                        })}
+                    </AvatarGroup>
+                  )}
                   <Flex direction="column" height="100%" justifyContent="end">
                     <Text fontSize="10" textAlign="center">
                       {songbook.total_songs === 0 && <>no songs yet</>}
@@ -123,20 +161,6 @@ export default function SongbookIndexTable({ songbooks }) {
                         </Text>
                       </Tooltip>
                     )}
-                    <AvatarGroup size="sm" max={6} mt="10px">
-                      {songbook.membership_set?.length &&
-                        songbook.membership_set.map((member) => {
-                          return (
-                            <Avatar
-                              {...avatarBackgroundStyle}
-                              key={member.user.id}
-                              name={`${member.user.first_name} ${member.user.last_initial}`}
-                              referrerPolicy="no-referrer"
-                              src={member.user.social_auth?.[0]?.picture}
-                            />
-                          );
-                        })}
-                    </AvatarGroup>
                   </Flex>
                 </Card>
               );
@@ -147,12 +171,26 @@ export default function SongbookIndexTable({ songbooks }) {
   };
   return (
     <Flex direction="column" alignItems="center">
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader textAlign="center">Create a New Songbook</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <CreateNewSongbook />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <Tabs variant="soft-rounded" colorScheme="blue">
         <TabList justifyContent="center">
+          <Tab>Wishlist</Tab>
           <Tab>Songbooks</Tab>
           <Tab>Power Hours</Tab>
         </TabList>
         <TabPanels>
+          <TabPanel>
+            <WishlistForm />
+          </TabPanel>
           <TabPanel>{renderSongbooks(true)}</TabPanel>
           <TabPanel>{renderSongbooks(false)}</TabPanel>
         </TabPanels>

@@ -1,18 +1,5 @@
 import { WarningIcon } from "@chakra-ui/icons";
-import {
-  Button,
-  Flex,
-  Heading,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { useState } from "react";
 import { UseAsyncReturn, useAsync } from "react-async-hook";
@@ -20,16 +7,13 @@ import { useNavigate } from "react-router-dom";
 import { User } from "../models";
 import { getAllSongbooks } from "../services/songs";
 import UserProfile from "./AvatarProfileLink";
-import CreateNewSongbook from "./CreateNewSongbook";
 import SongbookIndexTable from "./SongbookIndexTable";
-import WishlistForm from "./WishlistForm";
 
 interface WelcomePageProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
 }
 
 export default function WelcomePage({ asyncUser }: WelcomePageProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [sessionKey, setSessionKey] = useState<string>("");
   const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
   const songbooks = asyncSongbooks.result?.data.results;
@@ -87,26 +71,9 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
                 "{songbook.title}" is live!
               </Button>
             ))}
-          <WishlistForm />
-          <Heading textAlign="center" mt="2rem">
-            Your Songbooks
-          </Heading>
-          <Button margin="1rem" mb="2rem" colorScheme="blue" onClick={onOpen}>
-            Create a New Songbook
-          </Button>
           <SongbookIndexTable songbooks={songbooks} />
         </Flex>
       </Flex>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader textAlign="center">Create a New Songbook</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <CreateNewSongbook />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
     </>
   );
 }
