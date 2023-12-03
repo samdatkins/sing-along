@@ -6,6 +6,7 @@ export type Song = {
   id: number;
   transpose: number;
   spotify_ID: string;
+  song_entry_count?: number;
 };
 
 export type SongEntry = {

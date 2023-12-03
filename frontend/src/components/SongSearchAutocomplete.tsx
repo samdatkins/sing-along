@@ -1,4 +1,6 @@
 import { QuestionIcon, RepeatIcon } from "@chakra-ui/icons";
+import { IoSparklesSharp } from "react-icons/io5";
+
 import {
   Box,
   Button,
@@ -166,9 +168,17 @@ export default function SongSearchAutocomplete({
                 onMouseOver={() => setSelectedIndex(index)}
                 bg={index === selectedIndex ? undefined : "gray.400"}
               >
-                <Text color="gray.900">
-                  {song.artist} - {song.title}
-                </Text>
+                <Flex direction="row" alignItems="center">
+                  <Text color="gray.900">
+                    {song.artist} - {song.title}{" "}
+                  </Text>
+                  {song?.song_entry_count !== undefined &&
+                    song.song_entry_count === 0 && (
+                      <Box ml="8px" color="yellow.300">
+                        <IoSparklesSharp />
+                      </Box>
+                    )}
+                </Flex>
               </Box>
             ))
           ) : (
