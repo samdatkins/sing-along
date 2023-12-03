@@ -7,15 +7,36 @@ from api.models import Song
 
 class SongSerializer(serializers.ModelSerializer):
     spotify_ID = serializers.SerializerMethodField()
+    song_entry_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Song
-        fields = "__all__"
+        fields = [
+            "id",
+            "spotify_ID",
+            "deleted",
+            "deleted_by_cascade",
+            "created_at",
+            "updated_at",
+            "artist",
+            "title",
+            "url",
+            "content",
+            "rating",
+            "votes",
+            "transpose",
+            "song_entry_count",
+        ]
+
+    def get_song_entry_count(self, obj):
+        try:
+            return obj.song_entry_count
+        except AttributeError:
+            return None
 
     def get_spotify_ID(self, obj):
         if obj.spotify_ID:
             return obj.spotify_ID
-
         try:
             auth_manager = SpotifyClientCredentials()
             spotify = spotipy.Spotify(auth_manager=auth_manager)

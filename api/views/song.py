@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.postgres.search import TrigramSimilarity
-from django.db.models import F, Q
+from django.db.models import Count, F, Q
 from django.db.models.functions import Greatest, Ln
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -38,6 +38,7 @@ class SongViewSet(viewsets.GenericViewSet):
                 rank=(F("artist_similarity") + F("title_similarity"))
                 * Ln(Greatest(F("votes"), 20))
             )
+            .annotate(song_entry_count=Count("song_entry"))
             .order_by("-rank")
             .all()[0:5]
         )
