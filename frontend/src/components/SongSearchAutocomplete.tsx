@@ -76,7 +76,7 @@ export default function SongSearchAutocomplete({
   useEffect(() => {
     asyncSongSearch.execute();
     setSelectedIndex(-1);
-  }, [debouncedSearchText]);
+  }, [debouncedSearchText]); //missing asyncSongSearch
 
   const submit = async (song: Song | undefined | false) => {
     if (!song) return;
@@ -189,7 +189,7 @@ export default function SongSearchAutocomplete({
         </Flex>
       )}
 
-      {searchText?.length < 1 && (
+      {searchText?.length < 1 && session_key && (
         <>
           <Flex direction="row" alignItems="center" m="1rem" mt="0">
             <Heading size="sm">Recommended Songs:</Heading>

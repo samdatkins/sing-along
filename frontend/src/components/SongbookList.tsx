@@ -38,7 +38,7 @@ export default function SongbookList({
     if (isListOpen && !asyncSongbookDetails.loading) {
       asyncSongbookDetails.execute(sessionKey);
     }
-  }, [isListOpen, sessionKey]);
+  }, [isListOpen, sessionKey]); //missing asyncSongbookDetails
 
   return (
     <Modal isOpen={isListOpen} onClose={onListClose} size="lg">
@@ -69,7 +69,6 @@ export default function SongbookList({
                       );
                       if (result) {
                         onListClose();
-                        // navigate(`/live/${sessionKey}/`);
                       }
                     }}
                   >
