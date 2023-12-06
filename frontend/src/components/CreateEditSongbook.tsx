@@ -89,7 +89,7 @@ export default function CreateEditSongbook({
       if (result !== false) {
         onClose();
       } else {
-        console.log("Couldn't create new songbook.");
+        console.log("Couldn't edit songbook details.");
       }
     }
   };
