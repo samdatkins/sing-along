@@ -28,6 +28,8 @@ class SongbookSerializer(serializers.ModelSerializer):
             "is_songbook_owner",
             "is_current_song_liked",
             "membership_set",
+            "theme",
+            "action_verb",
         ]
 
         extra_kwargs = {
@@ -100,6 +102,8 @@ class SongbookListSerializer(serializers.ModelSerializer):
             "session_key",
             "max_active_songs",
             "title",
+            "theme",
+            "action_verb",
             "is_noodle_mode",
             "current_song_timestamp",
             "created_at",
@@ -158,6 +162,8 @@ class SongbookDetailSerializer(serializers.ModelSerializer):
             "session_key",
             "max_active_songs",
             "title",
+            "theme",
+            "action_verb",
             "is_noodle_mode",
             "song_entries",
             "current_song_timestamp",

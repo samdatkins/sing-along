@@ -46,6 +46,8 @@ export type Songbook = {
   is_songbook_owner: boolean;
   is_current_song_liked: boolean;
   membership_set: Member[];
+  theme: string;
+  action_verb: string;
 };
 
 export type Member = {

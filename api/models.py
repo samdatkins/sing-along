@@ -49,6 +49,9 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
     )
     members = models.ManyToManyField(get_user_model(), through="Membership")
     theme = models.CharField(max_length=40, null=False, blank=True, default="")
+    action_verb = models.CharField(
+        max_length=8, null=False, blank=False, default="DANCE"
+    )
 
     def get_next_song_entry(self):
         current_song_entry = self.get_current_song_entry()

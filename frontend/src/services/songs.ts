@@ -74,7 +74,9 @@ export async function nextSongbookSong(sessionKey: string | undefined) {
 export async function createNewSongbook(
   maxActiveSongs: string | undefined,
   songbookTitle: string | undefined,
-  isNoodleMode: boolean | undefined
+  actionVerb: string | undefined,
+  isNoodleMode: boolean | undefined,
+  theme: string | undefined
 ) {
   try {
     return await axios.post<Songbook>(`/api/songbooks/`, {
@@ -82,9 +84,34 @@ export async function createNewSongbook(
         maxActiveSongs && maxActiveSongs.length > 0 ? maxActiveSongs : null,
       title: songbookTitle,
       is_noodle_mode: isNoodleMode,
+      action_verb: actionVerb,
+      theme: theme,
     });
   } catch (error) {
     console.error(`Couldn't create new songbook: ${error}`);
+    return false;
+  }
+}
+
+export async function editSongbook(
+  session_key: string,
+  maxActiveSongs: string | undefined,
+  songbookTitle: string | undefined,
+  actionVerb: string | undefined,
+  isNoodleMode: boolean | undefined,
+  theme: string | undefined
+) {
+  try {
+    return await axios.patch<Songbook>(`/api/songbooks/${session_key}/`, {
+      max_active_songs:
+        maxActiveSongs && maxActiveSongs.length > 0 ? maxActiveSongs : null,
+      title: songbookTitle,
+      is_noodle_mode: isNoodleMode,
+      action_verb: actionVerb,
+      theme: theme,
+    });
+  } catch (error) {
+    console.error(`Couldn't edit songbook details: ${error}`);
     return false;
   }
 }
