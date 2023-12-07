@@ -80,8 +80,7 @@ export async function createNewSongbook(
 ) {
   try {
     return await axios.post<Songbook>(`/api/songbooks/`, {
-      max_active_songs:
-        maxActiveSongs && maxActiveSongs > 0 ? maxActiveSongs : null,
+      max_active_songs: maxActiveSongs,
       title: songbookTitle,
       is_noodle_mode: isNoodleMode,
       action_verb: actionVerb,
@@ -102,8 +101,7 @@ export async function editSongbook(
 ) {
   try {
     return await axios.patch<Songbook>(`/api/songbooks/${session_key}/`, {
-      max_active_songs:
-        maxActiveSongs && maxActiveSongs > 0 ? maxActiveSongs : null,
+      max_active_songs: maxActiveSongs,
       title: songbookTitle,
       action_verb: actionVerb,
       theme: theme,
