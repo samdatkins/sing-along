@@ -40,6 +40,9 @@ class SongSerializer(serializers.ModelSerializer):
         try:
             auth_manager = SpotifyClientCredentials()
             spotify = spotipy.Spotify(auth_manager=auth_manager)
+            track_search = obj.title
+            if "misc " not in obj.artist.lower() and "misc. " in obj.artist.lower():
+                track_search += f" artist:{obj.artist}"
             results = spotify.search(
                 q=f"{obj.title} artist:{obj.artist}",
                 type="track",
