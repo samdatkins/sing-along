@@ -98,13 +98,15 @@ const AddSongPage = () => {
       <Flex direction="column" m="1rem">
         <SlideFade in={!!alertText} style={{ zIndex: 10 }} offsetY="20px">
           <Alert status={alertStatus} py="1rem" rounded="md">
-            <Flex direction="column">
+            <Flex direction="column" alignItems="center" width="100%">
               <Flex direction="row" alignItems="center">
                 <AlertIcon />
                 <AlertDescription>{alertText}</AlertDescription>
               </Flex>
               {undoSongEntryID !== undefined && (
                 <Button
+                  width="100%"
+                  maxWidth="20rem"
                   mt="1rem"
                   onClick={() => {
                     deleteSongbookSong(undoSongEntryID);
