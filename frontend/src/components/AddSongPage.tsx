@@ -12,15 +12,15 @@ import {
 import React, { useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useNavigate, useParams } from "react-router-dom";
+import { useInterval } from "usehooks-ts";
 import { ChakraAlertStatus } from "../models";
 import {
   addSongToSongbook,
   deleteSongbookSong,
   getCurrentSong,
 } from "../services/songs";
-import SongSearchAutocomplete from "./SongSearchAutocomplete";
 import HeartButton from "./LikeButton";
-import { useInterval } from "usehooks-ts";
+import SongSearchAutocomplete from "./SongSearchAutocomplete";
 
 const AddSongPage = () => {
   const [alertText, setAlertText] = useState("");
@@ -51,9 +51,12 @@ const AddSongPage = () => {
         align="center"
         m="1rem"
       >
-        <ArrowBackIcon /> Back to "
-        {asyncSongbook?.result?.data?.current_song_entry?.song?.title}" by{" "}
-        {asyncSongbook?.result?.data?.current_song_entry?.song?.artist}
+        <ArrowBackIcon />{" "}
+        {asyncSongbook?.result?.data?.current_song_entry?.song?.title !==
+        undefined
+          ? `Back to "${asyncSongbook?.result?.data?.current_song_entry?.song?.title}" by 
+        ${asyncSongbook?.result?.data?.current_song_entry?.song?.artist}`
+          : `Back to Songbook`}
       </Text>
       {asyncSongbook.result?.data.title ? (
         <Heading m="1rem" size="md">

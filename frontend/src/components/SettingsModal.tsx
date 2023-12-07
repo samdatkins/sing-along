@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Box,
   Flex,
   FormLabel,
   Modal,
@@ -54,7 +55,7 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
       <ModalOverlay />
       <ModalContent>
         <ModalHeader textAlign="center">
-          <Text>Settings</Text>
+          <Text>User Preferences</Text>
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
@@ -136,7 +137,12 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
                 />
               </Flex>
             </Flex>
-            <a href="redir">iOS Login</a>
+            <Box mb="2rem">
+              <a href="redir">iOS Login</a>
+            </Box>
+            <Box mb="1rem">
+              <a href="../logout">Logout</a>
+            </Box>
           </Flex>
         </ModalBody>
       </ModalContent>

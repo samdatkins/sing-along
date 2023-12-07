@@ -17,7 +17,7 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
   const [sessionKey, setSessionKey] = useState<string>("");
   const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
   const songbooks = asyncSongbooks.result?.data.results;
-  const activePowerHours = songbooks?.filter((songbook) => {
+  const activeSingalongs = songbooks?.filter((songbook) => {
     const currentTime = new Date(Date.now()).getTime();
     const songbookTime = new Date(songbook.created_at).getTime();
     return (
@@ -44,7 +44,7 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
             livepowerhour.com
           </Text>
           <Flex direction="column" mb="2rem">
-            <Heading textAlign="center">Join a Power Hour</Heading>
+            <Heading textAlign="center">Join a Sing-Along</Heading>
             <Flex direction="row">
               <Input
                 value={sessionKey}
@@ -58,8 +58,8 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
               </Button>
             </Flex>
           </Flex>
-          {activePowerHours &&
-            activePowerHours.map((songbook) => (
+          {activeSingalongs &&
+            activeSingalongs.map((songbook) => (
               <Button
                 key={songbook.session_key}
                 margin="1rem"

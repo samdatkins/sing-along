@@ -5,12 +5,6 @@ import {
   Flex,
   Heading,
   Kbd,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
   SimpleGrid,
   Skeleton,
   Tab,
@@ -28,7 +22,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { BsFillJournalBookmarkFill } from "react-icons/bs";
 import { RxLapTimer } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
-import CreateNewSongbook from "./CreateNewSongbook";
+import CreateNewSongbook from "./CreateEditSongbook";
 import WishlistForm from "./WishlistForm";
 
 export default function SongbookIndexTable({ songbooks }) {
@@ -51,8 +45,16 @@ export default function SongbookIndexTable({ songbooks }) {
       );
     } else {
       return (
-        <SimpleGrid columns={[1, 2, 3]} spacing="10px" maxW="900px">
+        <SimpleGrid
+          columns={[1, 2, 3]}
+          spacing="10px"
+          maxW="900px"
+          justifyItems="center"
+        >
           <Card
+            padding="20px"
+            width="250px"
+            height="250px"
             alignItems="center"
             justifyContent="center"
             onClick={onOpen}
@@ -83,15 +85,12 @@ export default function SongbookIndexTable({ songbooks }) {
                       <>
                         <Tooltip label="songbook">
                           <span>
-                            <BsFillJournalBookmarkFill
-                              size="30px"
-                              color="black"
-                            />
+                            <BsFillJournalBookmarkFill size="30px" />
                           </span>
                         </Tooltip>
                       </>
                     ) : (
-                      <Tooltip label="power hour">
+                      <Tooltip label="sing-along">
                         <span>
                           <RxLapTimer size="30px" />
                         </span>
@@ -171,21 +170,17 @@ export default function SongbookIndexTable({ songbooks }) {
   };
   return (
     <Flex direction="column" alignItems="center">
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader textAlign="center">Create a New Songbook</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <CreateNewSongbook />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <CreateNewSongbook
+        isOpen={isOpen}
+        onClose={onClose}
+        asyncSongbook={null}
+        is_noodle_mode={false}
+      />
       <Tabs variant="soft-rounded" colorScheme="blue">
         <TabList justifyContent="center">
           <Tab>Wishlist</Tab>
           <Tab>Songbooks</Tab>
-          <Tab>Power Hours</Tab>
+          <Tab>Sing-Alongs</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>

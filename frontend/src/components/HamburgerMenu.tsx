@@ -14,6 +14,7 @@ import {
 import { AxiosResponse } from "axios";
 import React, { useEffect, useRef } from "react";
 import { UseAsyncReturn } from "react-async-hook";
+import { BiSliderAlt } from "react-icons/bi";
 import {
   FaExclamationTriangle,
   FaExpandAlt,
@@ -45,7 +46,6 @@ import {
   setSongEntryFlagged,
 } from "../services/songs";
 import JumpSearch from "./JumpSearch";
-import SettingModal from "./SettingsModal";
 
 import {
   AlertDialog,
@@ -55,6 +55,8 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
 } from "@chakra-ui/react";
+import CreateEditSongbook from "./CreateEditSongbook";
+import SettingModal from "./SettingsModal";
 
 interface HamburgerMenuProps {
   isMobileDevice: boolean;
@@ -91,22 +93,27 @@ export default function HamburgerMenu({
   setFirstColDispIndex,
   totalColumns,
   columnsToDisplay,
-  asyncUser,
   applicationState,
   setFontScale,
   fontScale,
+  asyncUser,
 }: HamburgerMenuProps) {
   const { toggleColorMode } = useColorMode();
   const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
   const {
-    isOpen: isProfileOpen,
-    onOpen: onProfileOpen,
-    onClose: onProfileClose,
+    isOpen: isSettingsOpen,
+    onOpen: onSettingsOpen,
+    onClose: onSettingsClose,
   } = useDisclosure();
   const {
     isOpen: isAlertOpen,
     onOpen: onAlertOpen,
     onClose: onAlertClose,
+  } = useDisclosure();
+  const {
+    isOpen: isProfileOpen,
+    onOpen: onProfileOpen,
+    onClose: onProfileClose,
   } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
   const isSongbookOwner = asyncSongbook.result
@@ -143,7 +150,13 @@ export default function HamburgerMenu({
   // handle what happens on key press
   const handleKeyPress = async (event: KeyboardEvent) => {
     // if the add song drawer is open, ignore all typing
-    if (addSongModalOutlet || isJumpSearchOpen || !isSongbookOwner) return;
+    if (
+      addSongModalOutlet ||
+      isJumpSearchOpen ||
+      isSettingsOpen ||
+      !isSongbookOwner
+    )
+      return;
 
     if (event.metaKey || event.ctrlKey || event.altKey) {
       if (event.code === "Equal" || event.code === "Minus") {
@@ -302,15 +315,41 @@ export default function HamburgerMenu({
           <RouterLink to="../live/">
             <MenuItem icon={<Icon as={FaHome} />}>Home</MenuItem>
           </RouterLink>
+          {isSongbookOwner && (
+            <>
+              <MenuItem
+                onClick={() => {
+                  onSettingsOpen();
+                }}
+                cursor="pointer"
+                icon={<Icon as={SettingsIcon} />}
+              >
+                Songbook Settings
+              </MenuItem>
+              <CreateEditSongbook
+                isOpen={isSettingsOpen}
+                onClose={onSettingsClose}
+                asyncSongbook={asyncSongbook}
+                is_noodle_mode={
+                  asyncSongbook.result?.data.is_noodle_mode || false
+                }
+              />
+            </>
+          )}
           <MenuItem
             onClick={() => {
               onProfileOpen();
             }}
             cursor="pointer"
-            icon={<Icon as={SettingsIcon} />}
+            icon={<BiSliderAlt />}
           >
-            Settings
+            User Preferences
           </MenuItem>
+          <SettingModal
+            asyncUser={asyncUser}
+            isOpen={isProfileOpen}
+            onClose={onProfileClose}
+          />
           {asyncSongbook?.result?.data?.is_noodle_mode && (
             <RouterLink to="list">
               <MenuItem icon={<Icon as={GrUnorderedList} />}>
@@ -374,11 +413,6 @@ export default function HamburgerMenu({
           </MenuItem>
         </MenuList>
       </Menu>
-      <SettingModal
-        asyncUser={asyncUser}
-        isOpen={isProfileOpen}
-        onClose={onProfileClose}
-      />
     </>
   );
 }
