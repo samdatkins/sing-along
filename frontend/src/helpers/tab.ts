@@ -28,7 +28,7 @@ export function formatTab(
 const fontSizeAdjustmentMapping = {
   12: 0,
   14: 6,
-  16: 8,
+  16: 10,
   18: 12,
   20: 14,
 };
