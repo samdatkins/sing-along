@@ -14,6 +14,7 @@ import {
 import { AxiosResponse } from "axios";
 import React, { useEffect, useRef } from "react";
 import { UseAsyncReturn } from "react-async-hook";
+import { BiSliderAlt } from "react-icons/bi";
 import {
   FaExclamationTriangle,
   FaExpandAlt,
@@ -55,6 +56,7 @@ import {
   AlertDialogOverlay,
 } from "@chakra-ui/react";
 import CreateEditSongbook from "./CreateEditSongbook";
+import SettingModal from "./SettingsModal";
 
 interface HamburgerMenuProps {
   isMobileDevice: boolean;
@@ -94,6 +96,7 @@ export default function HamburgerMenu({
   applicationState,
   setFontScale,
   fontScale,
+  asyncUser,
 }: HamburgerMenuProps) {
   const { toggleColorMode } = useColorMode();
   const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
@@ -106,6 +109,11 @@ export default function HamburgerMenu({
     isOpen: isAlertOpen,
     onOpen: onAlertOpen,
     onClose: onAlertClose,
+  } = useDisclosure();
+  const {
+    isOpen: isProfileOpen,
+    onOpen: onProfileOpen,
+    onClose: onProfileClose,
   } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
   const isSongbookOwner = asyncSongbook.result
@@ -316,16 +324,32 @@ export default function HamburgerMenu({
                 cursor="pointer"
                 icon={<Icon as={SettingsIcon} />}
               >
-                Settings
+                Songbook Settings
               </MenuItem>
               <CreateEditSongbook
                 isOpen={isSettingsOpen}
                 onClose={onSettingsClose}
                 asyncSongbook={asyncSongbook}
-                is_noodle_mode={asyncSongbook.result?.data.is_noodle_mode}
+                is_noodle_mode={
+                  asyncSongbook.result?.data.is_noodle_mode || false
+                }
               />
             </>
           )}
+          <MenuItem
+            onClick={() => {
+              onProfileOpen();
+            }}
+            cursor="pointer"
+            icon={<BiSliderAlt />}
+          >
+            User Preferences
+          </MenuItem>
+          <SettingModal
+            asyncUser={asyncUser}
+            isOpen={isProfileOpen}
+            onClose={onProfileClose}
+          />
           {asyncSongbook?.result?.data?.is_noodle_mode && (
             <RouterLink to="list">
               <MenuItem icon={<Icon as={GrUnorderedList} />}>

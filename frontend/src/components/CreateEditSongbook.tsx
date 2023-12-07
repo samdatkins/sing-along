@@ -21,7 +21,7 @@ import { createNewSongbook, editSongbook } from "../services/songs";
 
 interface CreateEditSongbookProps {
   isOpen: boolean;
-  is_noodle_mode: boolean | undefined;
+  is_noodle_mode: boolean;
   onClose: () => void;
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]> | null;
 }
@@ -32,21 +32,17 @@ export default function CreateEditSongbook({
   asyncSongbook,
   is_noodle_mode,
 }: CreateEditSongbookProps) {
-  const [maxSongs, setMaxSongs] = useState<string>("");
+  const [maxSongs, setMaxSongs] = useState<number | null>(null);
   const [title, setTitle] = useState<string>("");
   const [actionVerb, setActionVerb] = useState<string>("DANCE");
-  const [isNoodleMode, setIsNoodleMode] = useState<boolean>(
-    is_noodle_mode || false
-  );
   const [theme, setTheme] = useState<string>("");
 
   useEffect(() => {
     if (isOpen && asyncSongbook && asyncSongbook.result) {
       if (asyncSongbook?.result?.data.max_active_songs !== null)
-        setMaxSongs(asyncSongbook?.result?.data.max_active_songs.toString());
+        setMaxSongs(asyncSongbook?.result?.data.max_active_songs);
       setTitle(asyncSongbook?.result?.data.title);
       setActionVerb(asyncSongbook?.result?.data.action_verb);
-      setIsNoodleMode(asyncSongbook?.result?.data.is_noodle_mode);
       setTheme(asyncSongbook?.result?.data.theme);
     }
   }, [
@@ -59,7 +55,6 @@ export default function CreateEditSongbook({
   ]);
 
   const navigate = useNavigate();
-  const parsedSongCap = parseInt(maxSongs);
 
   const handleButtonClick = async (e) => {
     e.preventDefault();
@@ -68,7 +63,7 @@ export default function CreateEditSongbook({
         maxSongs,
         title,
         actionVerb,
-        isNoodleMode,
+        is_noodle_mode,
         theme
       );
       if (result !== false) {
@@ -83,7 +78,6 @@ export default function CreateEditSongbook({
         maxSongs,
         title,
         actionVerb,
-        isNoodleMode,
         theme
       );
       if (result !== false) {
@@ -120,11 +114,17 @@ export default function CreateEditSongbook({
                 />
                 <FormLabel>Song Cap (optional):</FormLabel>
                 <Input
-                  value={maxSongs}
+                  value={maxSongs || ""}
                   width="70px"
                   mb="1rem"
                   onChange={(e) => {
-                    e.target.value.length < 4 && setMaxSongs(e.target.value);
+                    if (typeof parseInt(e.target.value) === "number") {
+                      e.target.value.length < 4 &&
+                        setMaxSongs(parseInt(e.target.value));
+                    }
+                    if (e.target.value === "") {
+                      setMaxSongs(null);
+                    }
                   }}
                 />
                 {!is_noodle_mode && (
@@ -151,10 +151,7 @@ export default function CreateEditSongbook({
                 />
                 <Flex justifyContent="center">
                   <Button
-                    disabled={
-                      title.length < 1 ||
-                      (maxSongs.length > 0 && isNaN(parsedSongCap))
-                    }
+                    disabled={title.length < 1}
                     onClick={handleButtonClick}
                     mt="1rem"
                   >

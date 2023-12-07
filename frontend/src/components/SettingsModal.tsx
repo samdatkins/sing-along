@@ -55,7 +55,7 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
       <ModalOverlay />
       <ModalContent>
         <ModalHeader textAlign="center">
-          <Text>User Settings</Text>
+          <Text>User Preferences</Text>
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
