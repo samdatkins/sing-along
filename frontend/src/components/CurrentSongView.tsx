@@ -15,6 +15,7 @@ import { useParams } from "react-router-dom";
 import { useInterval } from "usehooks-ts";
 import SongbookContext from "../contexts/SongbookContext";
 import { getCurrentSong } from "../services/songs";
+import Snowfall from "react-snowfall";
 
 const SONGBOOK_POLL_INTERVAL = 1 * 2000;
 
@@ -74,6 +75,17 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
 
   return (
     <>
+      {asyncSongbook?.result?.data?.theme?.toLowerCase() === "christmas" && (
+        <Snowfall
+          style={{
+            position: "fixed",
+            width: "100vw",
+            height: "100vh",
+          }}
+          radius={[0.5, 1.5]}
+          speed={[0.5, 1.5]}
+        />
+      )}
       <SongbookContext.Provider value={asyncSongbook?.result?.data}>
         <Flex padding="1rem" paddingTop=".5rem" flexDir="column" height="100%">
           <NavBar
