@@ -81,6 +81,7 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
             position: "fixed",
             width: "100vw",
             height: "100vh",
+            opacity: ".3",
           }}
           radius={[0.5, 1.5]}
           speed={[0.5, 1.5]}
