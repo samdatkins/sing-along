@@ -291,6 +291,7 @@ export default function NavBar({
                       asyncSongbook?.result?.data?.current_song_entry?.song
                         ?.spotify_ID
                     }
+                    timerControls={timerControls}
                   />
                   {currentSongbook?.current_song_entry?.likes_count > 0 &&
                     currentSongbook?.is_songbook_owner && (
