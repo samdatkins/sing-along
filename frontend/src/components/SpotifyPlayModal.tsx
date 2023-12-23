@@ -33,7 +33,7 @@ export default function SpotifyPlayModal({
 
   return (
     <>
-      {isOpen ? (
+      {isOpen && (
         <Modal
           isOpen={isOpen}
           onClose={toggleModal}
@@ -50,9 +50,8 @@ export default function SpotifyPlayModal({
             </ModalBody>
           </ModalContent>
         </Modal>
-      ) : (
-        <FaSpotify onClick={toggleModal} cursor="pointer" size="24" />
       )}
+      <FaSpotify onClick={toggleModal} cursor="pointer" size="24" />
     </>
   );
 }
