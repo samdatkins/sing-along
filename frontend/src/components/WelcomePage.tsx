@@ -1,9 +1,22 @@
-import { WarningIcon } from "@chakra-ui/icons";
-import { Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
+import { HamburgerIcon, WarningIcon } from "@chakra-ui/icons";
+import {
+  Button,
+  Flex,
+  Heading,
+  IconButton,
+  Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+} from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { useState } from "react";
 import { UseAsyncReturn, useAsync } from "react-async-hook";
-import { useNavigate } from "react-router-dom";
+import { BsFillJournalBookmarkFill } from "react-icons/bs";
+import { RxLapTimer } from "react-icons/rx";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { User } from "../models";
 import { getAllSongbooks } from "../services/songs";
 import UserProfile from "./AvatarProfileLink";
@@ -29,9 +42,49 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
 
   return (
     <>
+      <Menu>
+        <MenuButton
+          as={IconButton}
+          aria-label="Options"
+          icon={<HamburgerIcon />}
+          variant="outline"
+          m=".5rem"
+        />
+        <MenuList>
+          <Flex direction="column">
+            <Heading size="md" textAlign="center">
+              Join a Sing-Along
+            </Heading>
+            <Flex direction="row">
+              <Input
+                value={sessionKey}
+                width="8rem"
+                m=".5rem"
+                maxLength={4}
+                onChange={(e) => setSessionKey(e.target.value.toUpperCase())}
+              ></Input>
+              <Button
+                mt=".5rem"
+                onClick={() => navigate(`/live/${sessionKey}`)}
+              >
+                Join
+              </Button>
+            </Flex>
+          </Flex>
+          <RouterLink to="../live/songbooks/true">
+            <MenuItem icon={<BsFillJournalBookmarkFill />}>
+              My Songbooks
+            </MenuItem>
+          </RouterLink>
+          <RouterLink to="../live/songbooks/false">
+            <MenuItem icon={<RxLapTimer />}>My Sing-Alongs</MenuItem>
+          </RouterLink>
+        </MenuList>
+      </Menu>
       <Flex position="fixed" top="0" right="0">
         <UserProfile asyncUser={asyncUser} />
       </Flex>
+
       <Flex justifyContent="center" width="100%">
         <Flex alignItems="center" direction="column" width="100%">
           <Text
@@ -43,21 +96,6 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
           >
             livepowerhour.com
           </Text>
-          <Flex direction="column" mb="2rem">
-            <Heading textAlign="center">Join a Sing-Along</Heading>
-            <Flex direction="row">
-              <Input
-                value={sessionKey}
-                mr="1rem"
-                mt="1rem"
-                maxLength={4}
-                onChange={(e) => setSessionKey(e.target.value.toUpperCase())}
-              ></Input>
-              <Button mt="1rem" onClick={() => navigate(`/live/${sessionKey}`)}>
-                Join
-              </Button>
-            </Flex>
-          </Flex>
           {activeSingalongs &&
             activeSingalongs.map((songbook) => (
               <Button
