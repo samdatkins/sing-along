@@ -30,7 +30,7 @@ const WishlistForm = () => {
   return (
     <Flex direction="column">
       <Flex direction="column" mb="1.5rem" width="100%">
-        <Heading size="md" mb="10px" mt="10px">
+        <Heading size="md" mb="10px">
           Add to Wishlist:
         </Heading>
         <SongSearchAutocomplete

@@ -92,25 +92,19 @@ export default function WelcomePage({
           </MenuList>
         </Menu>
 
-        <Text
-          fontSize="2rem"
-          fontFamily="Ubuntu Mono"
-          color="blue.600"
-          pb="2rem"
-        >
+        <Text fontSize="2rem" fontFamily="Ubuntu Mono" color="blue.600">
           livepowerhour.com
         </Text>
         <UserProfile asyncUser={asyncUser} />
-        {/* This is currently where the add to wishlist lives: */}
       </Flex>
 
       <Flex direction="column" alignItems="center">
-        <Flex direction="column" mb="2rem">
-          {activeSingalongs &&
-            activeSingalongs.map((songbook) => (
+        {activeSingalongs && (
+          <Flex direction="column">
+            {activeSingalongs.map((songbook) => (
               <Button
                 key={songbook.session_key}
-                margin="1rem"
+                margin="2rem"
                 leftIcon={<WarningIcon />}
                 colorScheme="yellow"
                 textAlign="center"
@@ -120,7 +114,8 @@ export default function WelcomePage({
                 "{songbook.title}" is live!
               </Button>
             ))}
-        </Flex>
+          </Flex>
+        )}
         <Outlet />
       </Flex>
     </>
