@@ -4,12 +4,15 @@ import AddSongPage from "./components/AddSongPage";
 import CurrentSongView from "./components/CurrentSongView";
 import ViewAllSongbooks from "./components/ViewAllSongbooks";
 import WelcomePage from "./components/WelcomePage";
-import { getUserDetails } from "./services/songs";
+import WishlistForm from "./components/WishlistForm";
+import { getAllSongbooks, getUserDetails } from "./services/songs";
 
 function App() {
   const asyncUser = useAsync(getUserDetails, [], {
     setLoading: (state) => ({ ...state, loading: true }),
   });
+  const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
+  const songbooks = asyncSongbooks.result?.data.results;
 
   return (
     <BrowserRouter>
@@ -20,10 +23,19 @@ function App() {
         />
         <Route path="/live/:sessionKey/add-song" element={<AddSongPage />} />
         <Route
-          path="/live/songbooks/:is_noodle"
-          element={<ViewAllSongbooks />}
-        />
-        <Route path="/live" element={<WelcomePage asyncUser={asyncUser} />} />
+          path="/live/"
+          element={<WelcomePage asyncUser={asyncUser} songbooks={songbooks} />}
+        >
+          <Route path="/live/" element={<WishlistForm />} />
+          <Route
+            path="songbooks"
+            element={<ViewAllSongbooks is_noodle={true} />}
+          />
+          <Route
+            path="sing-alongs"
+            element={<ViewAllSongbooks is_noodle={false} />}
+          />
+        </Route>
         <Route path="/" element={<Navigate to="/live" />} />
       </Routes>
     </BrowserRouter>

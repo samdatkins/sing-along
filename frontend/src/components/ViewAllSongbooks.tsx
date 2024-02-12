@@ -17,12 +17,15 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { useAsync } from "react-async-hook";
 import { BsFillJournalBookmarkFill } from "react-icons/bs";
 import { RxLapTimer } from "react-icons/rx";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getAllSongbooks } from "../services/songs";
 import CreateEditSongbook from "./CreateEditSongbook";
 
-const ViewAllSongbooks = () => {
-  const is_noodle = useParams()["is_noodle"] === "true";
+interface ViewAllSongbooksProps {
+  is_noodle: boolean;
+}
+const ViewAllSongbooks = ({ is_noodle }: ViewAllSongbooksProps) => {
+  // const is_noodle = useParams()["is_noodle"] === "true";
   dayjs.extend(relativeTime);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
@@ -32,6 +35,7 @@ const ViewAllSongbooks = () => {
     color: useColorModeValue("white", "black"),
     bg: useColorModeValue("teal.500", "cyan.300"),
   };
+
   const renderSongbooks = (is_noodle) => {
     if (!songbooks) {
       return (

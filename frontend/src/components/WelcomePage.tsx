@@ -13,23 +13,24 @@ import {
 } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { useState } from "react";
-import { UseAsyncReturn, useAsync } from "react-async-hook";
+import { UseAsyncReturn } from "react-async-hook";
 import { BsFillJournalBookmarkFill } from "react-icons/bs";
+import { FaListUl } from "react-icons/fa";
 import { RxLapTimer } from "react-icons/rx";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Outlet, Link as RouterLink, useNavigate } from "react-router-dom";
 import { User } from "../models";
-import { getAllSongbooks } from "../services/songs";
 import UserProfile from "./AvatarProfileLink";
-import SongbookIndexTable from "./SongbookIndexTable";
 
 interface WelcomePageProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
+  songbooks;
 }
 
-export default function WelcomePage({ asyncUser }: WelcomePageProps) {
+export default function WelcomePage({
+  songbooks,
+  asyncUser,
+}: WelcomePageProps) {
   const [sessionKey, setSessionKey] = useState<string>("");
-  const asyncSongbooks = useAsync(async () => getAllSongbooks(), []);
-  const songbooks = asyncSongbooks.result?.data.results;
   const activeSingalongs = songbooks?.filter((songbook) => {
     const currentTime = new Date(Date.now()).getTime();
     const songbookTime = new Date(songbook.created_at).getTime();
@@ -42,60 +43,69 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
 
   return (
     <>
-      <Menu>
-        <MenuButton
-          as={IconButton}
-          aria-label="Options"
-          icon={<HamburgerIcon />}
-          variant="outline"
-          m=".5rem"
-        />
-        <MenuList>
-          <Flex direction="column">
-            <Heading size="md" textAlign="center">
-              Join a Sing-Along
-            </Heading>
-            <Flex direction="row">
-              <Input
-                value={sessionKey}
-                width="8rem"
-                m=".5rem"
-                maxLength={4}
-                onChange={(e) => setSessionKey(e.target.value.toUpperCase())}
-              ></Input>
-              <Button
-                mt=".5rem"
-                onClick={() => navigate(`/live/${sessionKey}`)}
-              >
-                Join
-              </Button>
+      <Flex
+        width="100%"
+        justifyContent="space-between"
+        alignItems="baseline"
+        mt="0"
+      >
+        <Menu>
+          <MenuButton
+            as={IconButton}
+            aria-label="Options"
+            icon={<HamburgerIcon />}
+            variant="outline"
+            m=".5rem"
+          />
+          <MenuList>
+            <Flex direction="column">
+              <Heading size="md" textAlign="center">
+                Join a Sing-Along
+              </Heading>
+              <Flex direction="row">
+                <Input
+                  value={sessionKey}
+                  width="8rem"
+                  m=".5rem"
+                  maxLength={4}
+                  onChange={(e) => setSessionKey(e.target.value.toUpperCase())}
+                ></Input>
+                <Button
+                  mt=".5rem"
+                  onClick={() => navigate(`/live/${sessionKey}`)}
+                >
+                  Join
+                </Button>
+              </Flex>
             </Flex>
-          </Flex>
-          <RouterLink to="../live/songbooks/true">
-            <MenuItem icon={<BsFillJournalBookmarkFill />}>
-              My Songbooks
-            </MenuItem>
-          </RouterLink>
-          <RouterLink to="../live/songbooks/false">
-            <MenuItem icon={<RxLapTimer />}>My Sing-Alongs</MenuItem>
-          </RouterLink>
-        </MenuList>
-      </Menu>
-      <Flex position="fixed" top="0" right="0">
+            <RouterLink to="/">
+              <MenuItem icon={<FaListUl />}>My Wishlist</MenuItem>
+            </RouterLink>
+            <RouterLink to="songbooks">
+              <MenuItem icon={<BsFillJournalBookmarkFill />}>
+                My Songbooks
+              </MenuItem>
+            </RouterLink>
+            <RouterLink to="sing-alongs">
+              <MenuItem icon={<RxLapTimer />}>My Sing-Alongs</MenuItem>
+            </RouterLink>
+          </MenuList>
+        </Menu>
+
+        <Text
+          fontSize="2rem"
+          fontFamily="Ubuntu Mono"
+          color="blue.600"
+          pb="2rem"
+        >
+          livepowerhour.com
+        </Text>
         <UserProfile asyncUser={asyncUser} />
+        {/* This is currently where the add to wishlist lives: */}
       </Flex>
 
-      <Flex justifyContent="center" width="100%">
-        <Flex alignItems="center" direction="column" width="100%">
-          <Text
-            fontSize="2rem"
-            fontFamily="Ubuntu Mono"
-            color="blue.600"
-            pt="2rem"
-            pb="2rem"
-          >
-            livepowerhour.com
-          </Text>
+      <Flex direction="column" alignItems="center">
+        <Flex direction="column" mb="2rem">
           {activeSingalongs &&
             activeSingalongs.map((songbook) => (
               <Button
@@ -104,13 +114,14 @@ export default function WelcomePage({ asyncUser }: WelcomePageProps) {
                 leftIcon={<WarningIcon />}
                 colorScheme="yellow"
                 textAlign="center"
+                fontSize={songbook.title.length < 21 ? "small" : "xs"}
                 onClick={() => navigate(`/live/${songbook.session_key}`)}
               >
                 "{songbook.title}" is live!
               </Button>
             ))}
-          <SongbookIndexTable songbooks={songbooks} />
         </Flex>
+        <Outlet />
       </Flex>
     </>
   );
