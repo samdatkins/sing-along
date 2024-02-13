@@ -92,7 +92,12 @@ export default function WelcomePage({
           </MenuList>
         </Menu>
 
-        <Text fontSize="2rem" fontFamily="Ubuntu Mono" color="blue.600">
+        <Text
+          fontSize="2rem"
+          fontFamily="Ubuntu Mono"
+          color="blue.600"
+          mb="1rem"
+        >
           livepowerhour.com
         </Text>
         <UserProfile asyncUser={asyncUser} />

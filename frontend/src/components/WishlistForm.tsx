@@ -29,9 +29,9 @@ const WishlistForm = () => {
 
   return (
     <Flex direction="column">
-      <Flex direction="column" mb="1.5rem" width="100%">
+      <Flex direction="column" mb="1rem" width="100%">
         <Heading size="md" mb="10px">
-          Add to Wishlist:
+          Add to My Wishlist:
         </Heading>
         <SongSearchAutocomplete
           onSubmit={handleSongSubmit}
@@ -43,7 +43,7 @@ const WishlistForm = () => {
         {asyncWishlist &&
         asyncWishlist.result &&
         asyncWishlist?.result?.data?.results?.length > 0
-          ? `Wishlist Songs:`
+          ? `My Wishlist Songs:`
           : `No Wishlist Songs`}
       </Heading>
       {asyncWishlist && asyncWishlist?.result?.data?.results ? (

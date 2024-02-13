@@ -26,7 +26,7 @@ function App() {
           path="/live/"
           element={<WelcomePage asyncUser={asyncUser} songbooks={songbooks} />}
         >
-          <Route path="/live/" element={<WishlistForm />} />
+          <Route index element={<WishlistForm />} />
           <Route
             path="songbooks"
             element={<ViewAllSongbooks is_noodle={true} />}
