@@ -20,6 +20,7 @@ import { RxLapTimer } from "react-icons/rx";
 import { Outlet, Link as RouterLink, useNavigate } from "react-router-dom";
 import { User } from "../models";
 import UserProfile from "./AvatarProfileLink";
+import { isSongbookActive } from "../helpers/time";
 
 interface WelcomePageProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
@@ -32,12 +33,7 @@ export default function WelcomePage({
 }: WelcomePageProps) {
   const [sessionKey, setSessionKey] = useState<string>("");
   const activeSingalongs = songbooks?.filter((songbook) => {
-    const currentTime = new Date(Date.now()).getTime();
-    const songbookTime = new Date(songbook.created_at).getTime();
-    return (
-      songbook.is_noodle_mode === false &&
-      (currentTime - songbookTime) / (1000 * 60 * 60) < 8
-    );
+    return songbook.is_noodle_mode === false && isSongbookActive(songbook);
   });
   const navigate = useNavigate();
 

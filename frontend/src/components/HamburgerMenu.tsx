@@ -11,6 +11,7 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
+import { FaEye } from "react-icons/fa";
 import { AxiosResponse } from "axios";
 import React, { useEffect, useRef } from "react";
 import { UseAsyncReturn } from "react-async-hook";
@@ -26,7 +27,6 @@ import {
   FaTrash,
   FaUndoAlt,
 } from "react-icons/fa";
-import { GrUnorderedList } from "react-icons/gr";
 import { MdOutlineMenuOpen } from "react-icons/md";
 import QRCode from "react-qr-code";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
@@ -350,11 +350,9 @@ export default function HamburgerMenu({
             isOpen={isProfileOpen}
             onClose={onProfileClose}
           />
-          {asyncSongbook?.result?.data?.is_noodle_mode && (
-            <RouterLink to="list">
-              <MenuItem icon={<Icon as={GrUnorderedList} />}>
-                Song List
-              </MenuItem>
+          {asyncSongbook?.result?.data?.is_songbook_owner && (
+            <RouterLink to="preview">
+              <MenuItem icon={<Icon as={FaEye} />}>Preview Mode</MenuItem>
             </RouterLink>
           )}
           <MenuItem

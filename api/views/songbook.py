@@ -66,14 +66,18 @@ class SongbookViewSet(
         queryset = self.queryset.filter(members__id=self.request.user.id)
 
         if self.action == "songbook_details":
-            return queryset.prefetch_related(
-                Prefetch(
-                    "song_entries",
-                    queryset=SongEntry.objects.order_by("created_at").prefetch_related(
-                        "song"
-                    ),
+            return (
+                queryset.prefetch_related(
+                    Prefetch(
+                        "song_entries",
+                        queryset=SongEntry.objects.order_by(
+                            "created_at"
+                        ).prefetch_related("song"),
+                    )
                 )
-            ).all()
+                .prefetch_related("song_entries__song__song_memos")
+                .all()
+            )
 
         queryset = queryset.prefetch_related("song_entries").prefetch_related(
             "membership_set__user__social_auth"

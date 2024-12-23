@@ -50,3 +50,26 @@ class SongViewSet(viewsets.GenericViewSet):
             status=status.HTTP_200_OK,
             data=SongSerializer(song_matches, many=True).data,
         )
+
+    @action(
+        methods=["patch"],
+        detail=True,
+        url_path="toggle-pending-memo",
+        url_name="toggle-pending-memo",
+    )
+    def toggle_songbook_memo(self, request, pk):
+        instance = self.get_object()
+
+        memo = instance.song_memos.filter(user=request.user).first()
+        if memo is not None and memo.text != "pending":
+            return Response(status=status.HTTP_409_CONFLICT)
+
+        if instance.song_memos.filter(user=request.user).exists():
+            instance.song_memos.filter(user=request.user).delete()
+        else:
+            instance.song_memos.create(user=request.user, text="pending")
+
+        return Response(
+            status=status.HTTP_200_OK,
+            data=SongSerializer(instance, context={"request": request}).data,
+        )

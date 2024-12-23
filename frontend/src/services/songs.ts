@@ -255,3 +255,12 @@ export async function getRecommendations(session_key) {
     `/api/recommendations/${session_key}`
   );
 }
+
+export async function toggleSongMemoPending(song_id: number) {
+  try {
+    return await axios.patch<Song>(
+      `/api/songs/${song_id}/toggle-pending-memo/`
+    );
+  } catch (error: any | AxiosError) {}
+  return "Could not toggle pending memo, please try again later.";
+}

@@ -7,6 +7,11 @@ export type Song = {
   transpose: number;
   spotify_ID: string;
   song_entry_count?: number;
+  song_memo: SongMemo;
+};
+
+export type SongMemo = {
+  text: string;
 };
 
 export type SongEntry = {
@@ -61,6 +66,8 @@ export type SongbookDetails = {
   title: string;
   is_noodle_mode: boolean;
   song_entries: SongEntry[];
+  current_song_position: number;
+  created_at: string;
 };
 
 export type SongbookListItem = {

@@ -1,5 +1,6 @@
 import Countdown from "react-countdown";
-import { Text, keyframes, useColorModeValue } from "@chakra-ui/react";
+import { Text, useColorModeValue } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
 import { useEffect, useState } from "react";
 
 interface TimerProps {

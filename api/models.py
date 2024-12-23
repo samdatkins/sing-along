@@ -143,6 +143,9 @@ class Song(SafeDeleteModel, CreatedUpdated):
     transpose = models.IntegerField(null=True, blank=True, db_column="capo")
     spotify_ID = models.CharField(max_length=120, null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.title} - {self.artist}"
+
 
 class SongEntry(SafeDeleteModel, CreatedUpdated):
     class Meta:
@@ -242,3 +245,31 @@ class Like(CreatedUpdated):
         related_name="song_entry_likes",
         related_query_name="like",
     )
+
+
+class SongMemo(CreatedUpdated):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "song"],
+                name="unique song memo",
+            )
+        ]
+
+    text = models.TextField(null=True, blank=True)
+
+    song = models.ForeignKey(
+        Song,
+        on_delete=models.CASCADE,
+        related_name="song_memos",
+        related_query_name="memo",
+    )
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="song_memos",
+        related_query_name="memo",
+    )
+
+    def __str__(self):
+        return f"Memo by {self.user.username} for {self.song}"
