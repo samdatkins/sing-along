@@ -6,12 +6,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     def remove_soft_deleted_memberships(apps, schema_editor):
-        Membership = apps.get_model('api', 'Membership')
+        Membership = apps.get_model("api", "Membership")
         Membership.objects.filter(deleted__isnull=False).delete()
 
     dependencies = [
-        ('api', '0032_add_songbook_memo'),
+        ("api", "0032_add_songbook_memo"),
     ]
 
-    operations = [migrations.RunPython(remove_soft_deleted_memberships, migrations.RunPython.noop)
+    operations = [
+        migrations.RunPython(remove_soft_deleted_memberships, migrations.RunPython.noop)
     ]
