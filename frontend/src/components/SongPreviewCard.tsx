@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { Card, Flex, Heading, Icon, Text } from "@chakra-ui/react";
+import {
+  Card,
+  Flex,
+  Heading,
+  Icon,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { FaFlag, FaRegFlag } from "react-icons/fa";
 import { toggleSongMemoPending } from "../services/songs";
 
@@ -55,31 +62,38 @@ export default function SongPreviewCard({
     ? optimisticMemo.text
     : "No memo";
 
+  const iconColor = useColorModeValue("blue.300", "blue.700");
+  const bgColor = useColorModeValue("gray.100", "gray.700");
+  const bgActiveColor = useColorModeValue("gray.50", "gray.900");
+  const textColor = useColorModeValue("black", "white");
+
   return (
     <Card
       p="4"
       m="4"
       borderRadius="lg"
-      bgColor={!isHighlighted ? "gray.100" : ""}
+      bgColor={!isHighlighted ? bgActiveColor : bgColor}
       minH={isHighlighted ? "30vh" : "16vh"}
     >
       <Flex direction={"row"} justifyContent={"space-between"}>
-        <Heading size="md" mb="4">
+        <Heading size="md" mb="4" textColor={textColor}>
           "{entry.song.title}" by {entry.song.artist}
         </Heading>
         {(!hasSongMemo || hasPendingSongMemo) && (
           <Icon
             as={hasPendingSongMemo ? FaFlag : FaRegFlag}
-            color="blue.300"
+            color={iconColor}
             fontSize={"48px"}
             onClick={handleToggleMemo}
           />
         )}
       </Flex>
       {hasSongMemo && !hasPendingSongMemo ? (
-        <Text fontSize="xl">{songMemoText}</Text>
+        <Text fontSize="xl" textColor={textColor}>
+          {songMemoText}
+        </Text>
       ) : (
-        <Text fontSize="xl" fontStyle="italic">
+        <Text fontSize="xl" fontStyle="italic" textColor={textColor}>
           {songMemoText}
         </Text>
       )}
