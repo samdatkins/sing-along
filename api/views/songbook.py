@@ -95,7 +95,7 @@ class SongbookViewSet(
 
         # Check if the request path contains "details"
         request = self.request
-        context["include_song_memos"] = "details" in request.path
+        context["include_song_memos"] = "details" in request.get_full_path()
 
         return context
 
@@ -151,7 +151,9 @@ class SongbookViewSet(
 
         return Response(
             status=status.HTTP_200_OK,
-            data=SongbookDetailSerializer(instance, context={"request": request}).data,
+            data=SongbookDetailSerializer(
+                instance, context=self.get_serializer_context()
+            ).data,
         )
 
     @action(

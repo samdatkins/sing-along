@@ -54,8 +54,10 @@ class SongSerializer(serializers.ModelSerializer):
         if not include_song_memos or request is None:
             return None
 
-        memos = obj.song_memos.filter(user=request.user).first()
-        return SongMemoSerializer(memos).data
+        memos = obj.song_memos.all()  # Access the prefetch directly
+        if memos:
+            memo = memos[0]  # Assuming you only care about the first memo
+            return SongMemoSerializer(memo).data
 
     def get_song_entry_count(self, obj):
         try:
