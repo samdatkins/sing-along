@@ -181,7 +181,7 @@ class SongEntry(SafeDeleteModel, CreatedUpdated):
     )
 
 
-class Membership(SafeDeleteModel, CreatedUpdated):
+class Membership(CreatedUpdated):
     class MemberType(models.TextChoices):
         OWNER = "OW"
         PARTICIPANT = "PT"
