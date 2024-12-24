@@ -57,8 +57,9 @@ export default function SongbookPreview() {
         <Flex flexDirection="column" justifyContent="space-between">
           {(songPreviewList || []).map((entry, idx) => {
             const isHighlighted = idx === 0;
-            const hasSongMemo = entry.song.song_memo.text !== "";
-            const hasPendingSongMemo = entry.song.song_memo.text === "pending";
+            const hasSongMemo = entry.song.song_memo !== null;
+            const hasPendingSongMemo =
+              hasSongMemo && entry.song.song_memo.text === "pending";
             const songMemoText = hasPendingSongMemo
               ? "Memo pending"
               : hasSongMemo
