@@ -7,7 +7,7 @@ from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.models import Membership, Songbook, SongEntry
+from api.models import Membership, Song, Songbook, SongEntry, SongMemo
 from api.serializers.songbook import (
     SongbookDetailSerializer,
     SongbookListSerializer,
@@ -66,18 +66,25 @@ class SongbookViewSet(
         queryset = self.queryset.filter(members__id=self.request.user.id)
 
         if self.action == "songbook_details":
-            return (
-                queryset.prefetch_related(
-                    Prefetch(
-                        "song_entries",
-                        queryset=SongEntry.objects.order_by(
-                            "created_at"
-                        ).prefetch_related("song"),
-                    )
+            return queryset.prefetch_related(
+                Prefetch(
+                    "song_entries",
+                    queryset=SongEntry.objects.order_by("created_at").prefetch_related(
+                        Prefetch(
+                            "song",
+                            queryset=Song.objects.prefetch_related(
+                                Prefetch(
+                                    "song_memos",
+                                    queryset=SongMemo.objects.filter(
+                                        user=self.request.user
+                                    ),  # Filter by the request user
+                                    to_attr="filtered_memos",  # Store in a custom attribute
+                                )
+                            ),
+                        ),
+                    ),
                 )
-                .prefetch_related("song_entries__song__song_memos")
-                .all()
-            )
+            ).all()
 
         queryset = queryset.prefetch_related("song_entries").prefetch_related(
             "membership_set__user__social_auth"
