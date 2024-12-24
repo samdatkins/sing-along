@@ -191,7 +191,6 @@ class Membership(CreatedUpdated):
             models.UniqueConstraint(
                 fields=["songbook", "user"],
                 name="unique membership entry",
-                condition=Q(deleted__isnull=True),
             )
         ]
 
