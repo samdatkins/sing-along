@@ -2,12 +2,29 @@ import spotipy
 from rest_framework import serializers
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from api.models import Song
+from api.models import Song, SongMemo
+
+
+class SongMemoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SongMemo
+        fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "text",
+            "song",
+            "user",
+        ]
+        extra_kwargs = {
+            "user": {"read_only": True},
+        }
 
 
 class SongSerializer(serializers.ModelSerializer):
     spotify_ID = serializers.SerializerMethodField()
     song_entry_count = serializers.SerializerMethodField()
+    song_memo = serializers.SerializerMethodField()
 
     class Meta:
         model = Song
@@ -26,7 +43,21 @@ class SongSerializer(serializers.ModelSerializer):
             "votes",
             "transpose",
             "song_entry_count",
+            "song_memo",
         ]
+
+    def get_song_memo(self, obj):
+        request = self.context.get("request")
+        include_song_memos = self.context.get("include_song_memos", False)
+
+        # Only include song memos if the flag is set and the request exists
+        if not include_song_memos or request is None:
+            return None
+
+        memos = obj.song_memos.all()  # Access the prefetch directly
+        if memos:
+            memo = memos[0]  # Assuming you only care about the first memo
+            return SongMemoSerializer(memo).data
 
     def get_song_entry_count(self, obj):
         try:

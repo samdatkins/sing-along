@@ -6,6 +6,7 @@ import ViewAllSongbooks from "./components/ViewAllSongbooks";
 import WelcomePage from "./components/WelcomePage";
 import WishlistForm from "./components/WishlistForm";
 import { getAllSongbooks, getUserDetails } from "./services/songs";
+import SongbookPreview from "./components/SongbookPreview";
 
 function App() {
   const asyncUser = useAsync(getUserDetails, [], {
@@ -21,6 +22,7 @@ function App() {
           path="/live/:sessionKey/"
           element={<CurrentSongView asyncUser={asyncUser} />}
         />
+        <Route path="/live/:sessionKey/preview" element={<SongbookPreview />} />
         <Route path="/live/:sessionKey/add-song" element={<AddSongPage />} />
         <Route
           path="/live/"

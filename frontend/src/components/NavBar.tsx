@@ -10,12 +10,12 @@ import {
   Portal,
   Skeleton,
   Text,
-  keyframes,
   useBoolean,
   useDisclosure,
   useMediaQuery,
   usePrevious,
 } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BsSuitHeartFill } from "react-icons/bs";
 import {

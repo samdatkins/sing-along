@@ -45,3 +45,4 @@ url = "https://pypi.python.org/simple"
 
 [tool.pyright]
 reportGeneralTypeIssues = false
+typeCheckingMode = "basic"

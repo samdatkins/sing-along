@@ -155,6 +155,7 @@ class SongbookListSerializer(serializers.ModelSerializer):
 
 class SongbookDetailSerializer(serializers.ModelSerializer):
     song_entries = SongEntrySerializer(many=True)
+    current_song_position = serializers.SerializerMethodField()
 
     class Meta:
         model = Songbook
@@ -167,6 +168,11 @@ class SongbookDetailSerializer(serializers.ModelSerializer):
             "is_noodle_mode",
             "song_entries",
             "current_song_timestamp",
+            "current_song_position",
+            "created_at",
         ]
 
         extra_kwargs = {"session_key": {"read_only": True}}
+
+    def get_current_song_position(self, obj):
+        return obj.get_current_song_position()

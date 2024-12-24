@@ -17,7 +17,7 @@ import SongbookContext from "../contexts/SongbookContext";
 import { getCurrentSong } from "../services/songs";
 import Snowfall from "react-snowfall";
 
-const SONGBOOK_POLL_INTERVAL = 1 * 2000;
+const SONGBOOK_POLL_INTERVAL = 2 * 1000;
 
 interface CurrentSongViewProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;

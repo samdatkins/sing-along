@@ -1,4 +1,5 @@
-import { Text, keyframes, useColorModeValue } from "@chakra-ui/react";
+import { Text, useColorModeValue } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
 
 interface FullScreenPromptProps {
   animate: boolean;

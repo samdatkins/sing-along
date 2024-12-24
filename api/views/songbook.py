@@ -66,14 +66,18 @@ class SongbookViewSet(
         queryset = self.queryset.filter(members__id=self.request.user.id)
 
         if self.action == "songbook_details":
-            return queryset.prefetch_related(
-                Prefetch(
-                    "song_entries",
-                    queryset=SongEntry.objects.order_by("created_at").prefetch_related(
-                        "song"
-                    ),
+            return (
+                queryset.prefetch_related(
+                    Prefetch(
+                        "song_entries",
+                        queryset=SongEntry.objects.order_by(
+                            "created_at"
+                        ).prefetch_related("song"),
+                    )
                 )
-            ).all()
+                .prefetch_related("song_entries__song__song_memos")
+                .all()
+            )
 
         queryset = queryset.prefetch_related("song_entries").prefetch_related(
             "membership_set__user__social_auth"
@@ -85,6 +89,15 @@ class SongbookViewSet(
         if self.action == "retrieve":
             return SongbookSerializer
         return SongbookListSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+
+        # Check if the request path contains "details"
+        request = self.request
+        context["include_song_memos"] = "details" in request.get_full_path()
+
+        return context
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -138,7 +151,9 @@ class SongbookViewSet(
 
         return Response(
             status=status.HTTP_200_OK,
-            data=SongbookDetailSerializer(instance, context={"request": request}).data,
+            data=SongbookDetailSerializer(
+                instance, context=self.get_serializer_context()
+            ).data,
         )
 
     @action(
