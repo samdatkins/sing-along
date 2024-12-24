@@ -181,7 +181,7 @@ class SongEntry(SafeDeleteModel, CreatedUpdated):
     )
 
 
-class Membership(SafeDeleteModel, CreatedUpdated):
+class Membership(CreatedUpdated):
     class MemberType(models.TextChoices):
         OWNER = "OW"
         PARTICIPANT = "PT"
@@ -191,7 +191,6 @@ class Membership(SafeDeleteModel, CreatedUpdated):
             models.UniqueConstraint(
                 fields=["songbook", "user"],
                 name="unique membership entry",
-                condition=Q(deleted__isnull=True),
             )
         ]
 
