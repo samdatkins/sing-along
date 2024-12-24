@@ -90,6 +90,15 @@ class SongbookViewSet(
             return SongbookSerializer
         return SongbookListSerializer
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+
+        # Check if the request path contains "details"
+        request = self.request
+        context["include_song_memos"] = "details" in request.path
+
+        return context
+
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         self._check_and_add_membership(instance, request.user)

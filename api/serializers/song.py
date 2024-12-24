@@ -48,7 +48,10 @@ class SongSerializer(serializers.ModelSerializer):
 
     def get_song_memo(self, obj):
         request = self.context.get("request")
-        if request is None:
+        include_song_memos = self.context.get("include_song_memos", False)
+
+        # Only include song memos if the flag is set and the request exists
+        if not include_song_memos or request is None:
             return None
 
         memos = obj.song_memos.filter(user=request.user).first()
