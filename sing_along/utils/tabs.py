@@ -2,14 +2,10 @@ import json
 import time
 from enum import Enum
 
-import requests
 from backoff import expo, on_exception
 from bs4 import BeautifulSoup
+from curl_cffi import requests
 from django.conf import settings
-
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
-}
 
 
 class TabType(Enum):
@@ -21,10 +17,10 @@ class ServerNotAvailable(Exception):
     pass
 
 
-@on_exception(expo, requests.exceptions.RequestException, max_tries=30)
+@on_exception(expo, requests.RequestsError, max_tries=30)
 def retry_request(url, headers=None, params=None):
     print(f"Making web request to {url}")
-    response = requests.get(url, headers=headers, params=params)
+    response = requests.get(url, headers=headers, params=params, impersonate="chrome")
     response.raise_for_status()
     return response
 
@@ -71,8 +67,8 @@ class TabSearcher(TabIndexReader):
         payload = {"search_type": "title", "value": query}
         return requests.get(
             self.search_url,
-            headers=HEADERS,
             params=payload,
+            impersonate="chrome",
         )
 
     def _get_parsed_search_results(self, search_results):
@@ -110,7 +106,6 @@ class TabIndexer(TabIndexReader):
             settings.TAB_ARTIST_SONGS_INDEX.replace("{artist_url}", artist_url).replace(
                 "{page_num}", str(page_num)
             ),
-            HEADERS,
         )
 
     def _get_band_results(self, band_index, page_num):
@@ -118,7 +113,6 @@ class TabIndexer(TabIndexReader):
             settings.TAB_BAND_INDEX.replace("{band_index}", band_index).replace(
                 "{page_num}", str(page_num)
             ),
-            HEADERS,
         )
 
     def _get_parsed_band_list_results(self, search_results):
@@ -216,7 +210,7 @@ class TabScraper(TabJSReader):
     def load_tab_from_url(self, tab_url):
         response = requests.get(
             tab_url,
-            headers=HEADERS,
+            impersonate="chrome",
         )
         data = self._load_js_store(response)
         if data is None:

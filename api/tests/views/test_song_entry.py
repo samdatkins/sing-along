@@ -1,13 +1,17 @@
+from unittest.mock import patch
+
 import factory.random
 from django.urls import reverse
 from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 
 from api.models import Membership
+from api.tests.factories.song import SongFactory
 from api.tests.factories.song_entry import SongEntryFactory
 from api.tests.factories.songbook import SongbookFactory
 from api.tests.factories.user import UserFactory
 from api.tests.helpers import get_datetime_x_seconds_ago
 from api.views.song_entry import SongEntryViewSet
+from sing_along.utils.tabs import ServerNotAvailable
 
 
 class TestSongEntry(APITestCase):
@@ -210,3 +214,54 @@ class TestSongEntry(APITestCase):
         # Assert
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(response2.status_code, 400)
+
+    @patch("api.views.song_entry.TabScraper")
+    def test_add_song_with_empty_content_scraper_unavailable(self, mock_scraper_cls):
+        # Arrange
+        mock_scraper_cls.return_value.load_tab_from_url.side_effect = (
+            ServerNotAvailable("Server responded with status code 403")
+        )
+        song_without_content = SongFactory.create(content=None)
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.post(
+            reverse("songentry-list"),
+            data={
+                "songbook_id": self.empty_songbook.pk,
+                "song_id": song_without_content.pk,
+            },
+        )
+
+        # Assert
+        self.assertEqual(response.status_code, 503)
+
+    @patch("api.views.song_entry.TabScraper")
+    def test_add_song_with_empty_content_scraper_succeeds(self, mock_scraper_cls):
+        # Arrange
+        mock_scraper_cls.return_value.load_tab_from_url.return_value = {
+            "content": "[ch]Am[/ch] Some tab content",
+            "artist": "Test Artist",
+            "title": "Test Song",
+            "url": "http://fake.com/tab/123",
+            "rating": 4.5,
+            "votes": 100,
+            "type": "Chords",
+            "difficulty": "intermediate",
+        }
+        song_without_content = SongFactory.create(content=None)
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.post(
+            reverse("songentry-list"),
+            data={
+                "songbook_id": self.empty_songbook.pk,
+                "song_id": song_without_content.pk,
+            },
+        )
+
+        # Assert
+        self.assertEqual(response.status_code, 201)
+        song_without_content.refresh_from_db()
+        self.assertEqual(song_without_content.content, "[ch]Am[/ch] Some tab content")

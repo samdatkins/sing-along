@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1
-FROM node:21 AS frontend
+FROM node:22 AS frontend
 RUN mkdir /code
 WORKDIR /code
 
 COPY frontend/ frontend-build/
 WORKDIR /code/frontend-build/
-RUN yarn install && GENERATE_SOURCEMAP=false yarn build
+RUN corepack enable && yarn install && GENERATE_SOURCEMAP=false yarn build
 
 # using 3.11 for now because 3.12 breaks things, could fix this but it would slow down
 # deploys: https://stackoverflow.com/questions/77364550/attributeerror-module-pkgutil-has-no-attribute-impimporter-did-you-mean

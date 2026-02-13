@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from api.models import Membership, Song, Songbook, SongEntry
 from api.serializers.song_entry import SongEntrySerializer
 from api.views.custom_exceptions import ConflictingStates, DuplicateValue
-from sing_along.utils.tabs import TabScraper
+from sing_along.utils.tabs import ServerNotAvailable, TabScraper
 
 
 class OnlyAllowSongbookParticipantsToModify(permissions.BasePermission):
@@ -77,7 +77,13 @@ class SongEntryViewSet(
 
         if song.content is None or song.content == "":
             tab_scraper = TabScraper()
-            tab = tab_scraper.load_tab_from_url(song.url)
+            try:
+                tab = tab_scraper.load_tab_from_url(song.url)
+            except ServerNotAvailable:
+                return Response(
+                    {"detail": "Tab source is currently unavailable"},
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
             if tab is None:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             song.content = tab["content"]

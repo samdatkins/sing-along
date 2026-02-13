@@ -2,7 +2,7 @@ from unittest.mock import Mock, PropertyMock, patch
 
 from django.test import TestCase
 
-from sing_along.utils.tabs import TabSearcher, TabType
+from sing_along.utils.tabs import ServerNotAvailable, TabScraper, TabSearcher, TabType
 
 
 class TestTabSearcher(TestCase):
@@ -35,3 +35,29 @@ class TestTabSearcher(TestCase):
 
         # Assert
         self.assertEqual(fake_tab["rating"], 4.5)  # type: ignore
+
+
+class TestTabScraper(TestCase):
+    @patch("sing_along.utils.tabs.requests")
+    def test_tab_scraper_raises_on_403(self, mock_requests):
+        # Arrange
+        status_code_mock = PropertyMock(return_value=403)
+        type(mock_requests.get.return_value).status_code = status_code_mock
+        tab_scraper = TabScraper()
+
+        # Act & Assert
+        with self.assertRaises(ServerNotAvailable):
+            tab_scraper.load_tab_from_url("http://fake.com/tab/123")
+
+    @patch("sing_along.utils.tabs.requests")
+    def test_tab_scraper_returns_none_on_404(self, mock_requests):
+        # Arrange
+        status_code_mock = PropertyMock(return_value=404)
+        type(mock_requests.get.return_value).status_code = status_code_mock
+        tab_scraper = TabScraper()
+
+        # Act
+        tab = tab_scraper.load_tab_from_url("http://fake.com/tab/123")
+
+        # Assert
+        self.assertIsNone(tab)
