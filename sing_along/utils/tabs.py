@@ -8,6 +8,10 @@ from curl_cffi import requests
 from django.conf import settings
 
 
+def _get_proxy_url():
+    return getattr(settings, "BOT_PROXY_URL", "") or None
+
+
 class TabType(Enum):
     CHORDS = "Chords"
     OFFICIAL = "Official"
@@ -20,7 +24,9 @@ class ServerNotAvailable(Exception):
 @on_exception(expo, requests.RequestsError, max_tries=30)
 def retry_request(url, headers=None, params=None):
     print(f"Making web request to {url}")
-    response = requests.get(url, headers=headers, params=params, impersonate="chrome")
+    response = requests.get(
+        url, headers=headers, params=params, impersonate="chrome", proxy=_get_proxy_url()
+    )
     response.raise_for_status()
     return response
 
@@ -69,6 +75,7 @@ class TabSearcher(TabIndexReader):
             self.search_url,
             params=payload,
             impersonate="chrome",
+            proxy=_get_proxy_url(),
         )
 
     def _get_parsed_search_results(self, search_results):
@@ -211,6 +218,7 @@ class TabScraper(TabJSReader):
         response = requests.get(
             tab_url,
             impersonate="chrome",
+            proxy=_get_proxy_url(),
         )
         data = self._load_js_store(response)
         if data is None:

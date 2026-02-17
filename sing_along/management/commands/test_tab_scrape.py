@@ -1,35 +1,37 @@
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from sing_along.utils.tabs import ServerNotAvailable, TabScraper
-
-DEFAULT_TAB_URL = ""
+from sing_along.utils.tabs import ServerNotAvailable, TabFetcher, TabType
 
 
 class Command(BaseCommand):
-    help = "Test tab scraping against a real URL to verify connectivity and parsing"
+    help = "Test tab scraping by searching for a song and fetching its content"
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "url",
+            "query",
             nargs="?",
-            default=DEFAULT_TAB_URL,
+            default="wonderwall oasis",
             type=str,
-            help=f"Tab URL to scrape (default: {DEFAULT_TAB_URL})",
+            help="Song search query (default: 'wonderwall oasis')",
         )
 
     def handle(self, *args, **options):
-        url = options["url"]
-        self.stdout.write(f"Scraping tab from: {url}")
+        query = options["query"]
+        proxy = settings.BOT_PROXY_URL
+        self.stdout.write(f"Searching for: {query}")
+        self.stdout.write(f"Search URL: {settings.TAB_SEARCH_URL}")
+        self.stdout.write(f"Proxy: {'configured' if proxy else 'none (direct)'}")
 
-        scraper = TabScraper()
+        fetcher = TabFetcher(settings.TAB_SEARCH_URL, [TabType.CHORDS])
         try:
-            tab = scraper.load_tab_from_url(url)
+            tab = fetcher.search_for_best_tab(query)
         except ServerNotAvailable as e:
             self.stderr.write(self.style.ERROR(f"FAILED: {e}"))
             return
 
         if tab is None:
-            self.stderr.write(self.style.WARNING("Tab not found (404)"))
+            self.stderr.write(self.style.WARNING("No tab found for that query"))
             return
 
         self.stdout.write(self.style.SUCCESS("SUCCESS - Tab scraped successfully"))

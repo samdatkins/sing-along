@@ -24,6 +24,7 @@ env = environ.Env(
     # in production or if you aren't using those management commands
     TAB_ARTIST_SONGS_INDEX=(str, "fake_url"),
     TAB_BAND_INDEX=(str, "fake_url"),
+    BOT_PROXY_URL=(str, ""),
 )
 
 
@@ -37,6 +38,7 @@ DJANGO_ENV = env("DJANGO_ENV")
 TAB_SEARCH_URL = env("TAB_SEARCH_URL")
 TAB_ARTIST_SONGS_INDEX = env("TAB_ARTIST_SONGS_INDEX")
 TAB_BAND_INDEX = env("TAB_BAND_INDEX")
+BOT_PROXY_URL = env("BOT_PROXY_URL")
 
 # insert these lines after the definition of BASE_DIR
 BACKEND_DIR = BASE_DIR  # rename variable for clarity
