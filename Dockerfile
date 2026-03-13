@@ -5,6 +5,8 @@ WORKDIR /code
 
 COPY frontend/ frontend-build/
 WORKDIR /code/frontend-build/
+RUN npm install -g corepack
+RUN corepack cache clean
 RUN corepack enable && yarn install && GENERATE_SOURCEMAP=false yarn build
 
 # using 3.11 for now because 3.12 breaks things, could fix this but it would slow down
