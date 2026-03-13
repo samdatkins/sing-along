@@ -5,6 +5,7 @@ WORKDIR /code
 
 COPY frontend/ frontend-build/
 WORKDIR /code/frontend-build/
+ENV NODE_OPTIONS=--max-old-space-size=1536
 RUN npm install -g corepack
 RUN corepack cache clean
 RUN corepack enable && yarn install && GENERATE_SOURCEMAP=false yarn build
