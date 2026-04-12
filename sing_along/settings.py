@@ -131,7 +131,7 @@ WSGI_APPLICATION = "sing_along.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 
-if len(sys.argv) > 0 and sys.argv[1] != "collectstatic":
+if len(sys.argv) <= 1 or sys.argv[1] != "collectstatic":
     if os.getenv("DATABASE_URL", None) is None:
         raise Exception("DATABASE_URL environment variable not defined")
     DATABASES = {
