@@ -42,6 +42,8 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
   const [previewPosition, setPreviewPosition] = useState<number | null>(null);
   const [isCommitting, setIsCommitting] = useState(false);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Latest known 1-based song index from the server or a completed commit — used when preview is null so rapid navigatePreview calls do not use stale songbook.current_song_position. */
+  const liveSongPositionRef = useRef(1);
 
   const advanceToNextAppState = () => {
     switch (applicationState) {
@@ -91,6 +93,7 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
       setIsCommitting(true);
       await setSongbookSong(sessionKey, entry.created_at);
       await asyncSongbook.execute();
+      liveSongPositionRef.current = position;
       setPreviewPosition(null);
       setIsCommitting(false);
       setFirstColDispIndex(0);
@@ -104,11 +107,11 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
       if (totalSongs === 0) return;
 
       setPreviewPosition((prev) => {
-        const current = prev ?? songbook?.current_song_position ?? 1;
+        const current = prev ?? liveSongPositionRef.current;
         return Math.max(1, Math.min(totalSongs, current + delta));
       });
     },
-    [songbook?.total_songs, songbook?.current_song_position]
+    [songbook?.total_songs]
   );
 
   // Debounce: commit preview after PREVIEW_DEBOUNCE_MS of inactivity
@@ -133,6 +136,14 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
   useEffect(() => {
     setFirstColDispIndex(0);
   }, [currentSongEntryId]);
+
+  useEffect(() => {
+    if (previewPosition !== null) return;
+    const pos = songbook?.current_song_position;
+    if (pos != null && pos >= 1) {
+      liveSongPositionRef.current = pos;
+    }
+  }, [songbook?.current_song_position, previewPosition]);
 
   useInterval(() => {
     if (!asyncSongbook.loading && !isPreviewing && !isCommitting) {

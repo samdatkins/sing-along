@@ -56,7 +56,8 @@ import {
 import CreateEditSongbook from "./CreateEditSongbook";
 import SettingModal from "./SettingsModal";
 
-const PLAIN_ARROW_LONG_PRESS_MS = 3000;
+const PLAIN_ARROW_INITIAL_HOLD_MS = 3000;
+const PLAIN_ARROW_REPEAT_MS = 1000;
 
 interface HamburgerMenuProps {
   isMobileDevice: boolean;
@@ -120,8 +121,41 @@ export default function HamburgerMenu({
     onClose: onProfileClose,
   } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
-  const plainArrowLeftDownAt = useRef<number | null>(null);
-  const plainArrowRightDownAt = useRef<number | null>(null);
+  const plainArrowLeftHoldTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const plainArrowLeftRepeatIntervalRef = useRef<ReturnType<
+    typeof setInterval
+  > | null>(null);
+  const plainArrowRightHoldTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const plainArrowRightRepeatIntervalRef = useRef<ReturnType<
+    typeof setInterval
+  > | null>(null);
+
+  const clearPlainArrowLeftSongNavTimers = () => {
+    if (plainArrowLeftHoldTimerRef.current !== null) {
+      clearTimeout(plainArrowLeftHoldTimerRef.current);
+      plainArrowLeftHoldTimerRef.current = null;
+    }
+    if (plainArrowLeftRepeatIntervalRef.current !== null) {
+      clearInterval(plainArrowLeftRepeatIntervalRef.current);
+      plainArrowLeftRepeatIntervalRef.current = null;
+    }
+  };
+
+  const clearPlainArrowRightSongNavTimers = () => {
+    if (plainArrowRightHoldTimerRef.current !== null) {
+      clearTimeout(plainArrowRightHoldTimerRef.current);
+      plainArrowRightHoldTimerRef.current = null;
+    }
+    if (plainArrowRightRepeatIntervalRef.current !== null) {
+      clearInterval(plainArrowRightRepeatIntervalRef.current);
+      plainArrowRightRepeatIntervalRef.current = null;
+    }
+  };
+
   const isSongbookOwner = asyncSongbook.result
     ? asyncSongbook.result.data.is_songbook_owner
     : false;
@@ -206,9 +240,23 @@ export default function HamburgerMenu({
     } else if (event.code === "ArrowLeft" || event.code === "ArrowRight") {
       if (!event.repeat) {
         if (event.code === "ArrowLeft") {
-          plainArrowLeftDownAt.current = Date.now();
+          clearPlainArrowLeftSongNavTimers();
+          plainArrowLeftHoldTimerRef.current = setTimeout(() => {
+            plainArrowLeftHoldTimerRef.current = null;
+            navigatePreview(-1);
+            plainArrowLeftRepeatIntervalRef.current = setInterval(() => {
+              navigatePreview(-1);
+            }, PLAIN_ARROW_REPEAT_MS);
+          }, PLAIN_ARROW_INITIAL_HOLD_MS);
         } else {
-          plainArrowRightDownAt.current = Date.now();
+          clearPlainArrowRightSongNavTimers();
+          plainArrowRightHoldTimerRef.current = setTimeout(() => {
+            plainArrowRightHoldTimerRef.current = null;
+            navigatePreview(1);
+            plainArrowRightRepeatIntervalRef.current = setInterval(() => {
+              navigatePreview(1);
+            }, PLAIN_ARROW_REPEAT_MS);
+          }, PLAIN_ARROW_INITIAL_HOLD_MS);
         }
       }
       const absoluteColumnDelta =
@@ -253,23 +301,9 @@ export default function HamburgerMenu({
       }
 
       if (event.code === "ArrowLeft" && !event.shiftKey) {
-        const start = plainArrowLeftDownAt.current;
-        plainArrowLeftDownAt.current = null;
-        if (
-          start !== null &&
-          Date.now() - start >= PLAIN_ARROW_LONG_PRESS_MS
-        ) {
-          navigatePreview(-1);
-        }
+        clearPlainArrowLeftSongNavTimers();
       } else if (event.code === "ArrowRight" && !event.shiftKey) {
-        const start = plainArrowRightDownAt.current;
-        plainArrowRightDownAt.current = null;
-        if (
-          start !== null &&
-          Date.now() - start >= PLAIN_ARROW_LONG_PRESS_MS
-        ) {
-          navigatePreview(1);
-        }
+        clearPlainArrowRightSongNavTimers();
       }
     },
     [
@@ -277,7 +311,6 @@ export default function HamburgerMenu({
       isJumpSearchOpen,
       isSettingsOpen,
       isSongbookOwner,
-      navigatePreview,
     ]
   );
 
@@ -290,6 +323,16 @@ export default function HamburgerMenu({
       document.removeEventListener("keyup", handleKeyUp);
     };
   }, [handleKeyPress, handleKeyUp]);
+
+  // Clear hold/repeat timers only on unmount. Do not clear them in the effect above:
+  // handleKeyPress changes every render (e.g. songbook poll), and clearing here was
+  // cancelling the 3s timeout before it could fire.
+  useEffect(() => {
+    return () => {
+      clearPlainArrowLeftSongNavTimers();
+      clearPlainArrowRightSongNavTimers();
+    };
+  }, []);
 
   const navigate = useNavigate();
 
