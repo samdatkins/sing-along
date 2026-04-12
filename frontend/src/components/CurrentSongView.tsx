@@ -129,6 +129,11 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     };
   }, [previewPosition, commitPreview]);
 
+  const currentSongEntryId = songbook?.current_song_entry?.id;
+  useEffect(() => {
+    setFirstColDispIndex(0);
+  }, [currentSongEntryId]);
+
   useInterval(() => {
     if (!asyncSongbook.loading && !isPreviewing && !isCommitting) {
       asyncSongbook.execute();

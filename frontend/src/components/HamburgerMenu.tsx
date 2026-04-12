@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { FaEye } from "react-icons/fa";
 import { AxiosResponse } from "axios";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { UseAsyncReturn } from "react-async-hook";
 import { BiSliderAlt } from "react-icons/bi";
 import {
@@ -55,6 +55,8 @@ import {
 } from "@chakra-ui/react";
 import CreateEditSongbook from "./CreateEditSongbook";
 import SettingModal from "./SettingsModal";
+
+const PLAIN_ARROW_LONG_PRESS_MS = 3000;
 
 interface HamburgerMenuProps {
   isMobileDevice: boolean;
@@ -118,6 +120,8 @@ export default function HamburgerMenu({
     onClose: onProfileClose,
   } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const plainArrowLeftDownAt = useRef<number | null>(null);
+  const plainArrowRightDownAt = useRef<number | null>(null);
   const isSongbookOwner = asyncSongbook.result
     ? asyncSongbook.result.data.is_songbook_owner
     : false;
@@ -200,6 +204,13 @@ export default function HamburgerMenu({
     } else if (event.code === "ArrowRight" && event.shiftKey) {
       navigatePreview(1);
     } else if (event.code === "ArrowLeft" || event.code === "ArrowRight") {
+      if (!event.repeat) {
+        if (event.code === "ArrowLeft") {
+          plainArrowLeftDownAt.current = Date.now();
+        } else {
+          plainArrowRightDownAt.current = Date.now();
+        }
+      }
       const absoluteColumnDelta =
         fontScale > MAX_FONT_ONE_COLUMN ? 1 : columnsToDisplay;
       const columnDelta =
@@ -226,15 +237,59 @@ export default function HamburgerMenu({
     event.preventDefault();
   };
 
-  useEffect(() => {
-    // attach the event listener
-    document.addEventListener("keydown", handleKeyPress);
+  const handleKeyUp = useCallback(
+    (event: KeyboardEvent) => {
+      if (
+        addSongModalOutlet ||
+        isJumpSearchOpen ||
+        isSettingsOpen ||
+        !isSongbookOwner
+      ) {
+        return;
+      }
 
-    // remove the event listener
+      if (event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+
+      if (event.code === "ArrowLeft" && !event.shiftKey) {
+        const start = plainArrowLeftDownAt.current;
+        plainArrowLeftDownAt.current = null;
+        if (
+          start !== null &&
+          Date.now() - start >= PLAIN_ARROW_LONG_PRESS_MS
+        ) {
+          navigatePreview(-1);
+        }
+      } else if (event.code === "ArrowRight" && !event.shiftKey) {
+        const start = plainArrowRightDownAt.current;
+        plainArrowRightDownAt.current = null;
+        if (
+          start !== null &&
+          Date.now() - start >= PLAIN_ARROW_LONG_PRESS_MS
+        ) {
+          navigatePreview(1);
+        }
+      }
+    },
+    [
+      addSongModalOutlet,
+      isJumpSearchOpen,
+      isSettingsOpen,
+      isSongbookOwner,
+      navigatePreview,
+    ]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyPress);
+    document.addEventListener("keyup", handleKeyUp);
+
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
+      document.removeEventListener("keyup", handleKeyUp);
     };
-  }, [handleKeyPress]);
+  }, [handleKeyPress, handleKeyUp]);
 
   const navigate = useNavigate();
 
