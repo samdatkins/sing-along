@@ -1,4 +1,4 @@
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from rest_framework import status
 from rest_framework.exceptions import APIException
 
@@ -11,9 +11,9 @@ class DuplicateValue(APIException):
         if status_code is not None:
             self.status_code = status_code
         if detail is not None:
-            self.detail = {field: force_text(detail)}
+            self.detail = {field: force_str(detail)}
         else:
-            self.detail = {"detail": force_text(self.default_detail)}
+            self.detail = {"detail": force_str(self.default_detail)}
 
 
 class ConflictingStates(APIException):
@@ -24,6 +24,6 @@ class ConflictingStates(APIException):
         if status_code is not None:
             self.status_code = status_code
         if detail is not None:
-            self.detail = {field: force_text(detail)}
+            self.detail = {field: force_str(detail)}
         else:
-            self.detail = {"detail": force_text(self.default_detail)}
+            self.detail = {"detail": force_str(self.default_detail)}
