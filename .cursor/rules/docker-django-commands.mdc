@@ -1,0 +1,25 @@
+---
+description: Run Django DB work and tests inside Docker to match CI/production
+alwaysApply: true
+---
+
+# Django: Docker-only migrations and tests
+
+Backend Python version, dependencies, and `DATABASE_URL` (`db` hostname) match **CI** ([`docker-compose-cicd.yml`](docker-compose-cicd.yml)) and **production** ([`Dockerfile`](Dockerfile)) when commands run **inside the `web` service**, not on the host with local Poetry.
+
+## Do this
+
+- **Migrations:** `docker compose run --rm web python manage.py migrate`  
+  (or `docker compose exec web python manage.py migrate` if `web` is already up.)
+- **Tests:** `docker compose run --rm web python manage.py test`  
+  Full CI-style run: [`scripts/test-backend.sh`](scripts/test-backend.sh) (compose + same entrypoint as CI).
+- **One-off shell:** `docker compose run --rm web bash` then run `manage.py` commands there.
+
+## Do not do this for migrations or tests
+
+- Do not run `poetry run python manage.py migrate` or `poetry run python manage.py test` on the host to verify behavior that should match CI/production (wrong interpreter/env, `DATABASE_URL` host `db` will not resolve on the host).
+
+## OK on the host
+
+- `poetry install` / editor tooling if you use a local venv for IDE support.
+- Frontend: `yarn` in `frontend/` as documented in the README.

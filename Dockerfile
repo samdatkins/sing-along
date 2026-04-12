@@ -10,17 +10,16 @@ RUN npm install -g corepack
 RUN corepack cache clean
 RUN corepack enable && yarn install && GENERATE_SOURCEMAP=false yarn build
 
-# using 3.11 for now because 3.12 breaks things, could fix this but it would slow down
-# deploys: https://stackoverflow.com/questions/77364550/attributeerror-module-pkgutil-has-no-attribute-impimporter-did-you-mean
-FROM python:3.11-slim-bullseye
+FROM python:3.14-slim-bookworm
 ARG YOUR_ENV
 
 ENV YOUR_ENV=${YOUR_ENV}
 ENV PYTHONUNBUFFERED=1
 
 # System deps:
-RUN apt-get update && apt-get install -y gcc musl-dev python3-dev libffi-dev cargo rustc postgresql-client
-RUN pip install "poetry==1.7.1"
+RUN apt-get update && apt-get install -y gcc musl-dev python3-dev libffi-dev cargo rustc postgresql-client \
+  && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir "poetry>=2.1.0,<3.0.0"
 
 # Copy only requirements to cache them in docker layer
 WORKDIR /code
