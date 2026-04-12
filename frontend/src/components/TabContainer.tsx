@@ -13,6 +13,7 @@ interface TabsProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
   fontScale: number;
   columnsOnScreen: number;
+  isPreviewing?: boolean;
 }
 
 function TabContainer({
@@ -22,8 +23,10 @@ function TabContainer({
   columnsOnScreen,
   asyncUser,
   fontScale,
+  isPreviewing = false,
 }: TabsProps) {
   const tab = asyncSongbook.result?.data?.current_song_entry?.song?.content;
+  const showSkeleton = !asyncSongbook?.result || isPreviewing;
 
   return (
     <>
@@ -39,19 +42,21 @@ function TabContainer({
       <Box p="1rem 1rem 0 1rem" width="100%" height="100%" overflow="hidden">
         <SkeletonText
           noOfLines={80}
-          isLoaded={!!asyncSongbook?.result}
+          isLoaded={!showSkeleton}
           spacing="4"
         />
-        <TabDisplay
-          tab={tab}
-          firstColDispIndex={firstColDispIndex}
-          columnsOnScreen={columnsOnScreen}
-          asyncUser={asyncUser}
-          fontScale={fontScale}
-          defaultTranspose={
-            asyncSongbook?.result?.data?.current_song_entry?.song?.transpose
-          }
-        />
+        {!isPreviewing && (
+          <TabDisplay
+            tab={tab}
+            firstColDispIndex={firstColDispIndex}
+            columnsOnScreen={columnsOnScreen}
+            asyncUser={asyncUser}
+            fontScale={fontScale}
+            defaultTranspose={
+              asyncSongbook?.result?.data?.current_song_entry?.song?.transpose
+            }
+          />
+        )}
       </Box>
     </>
   );

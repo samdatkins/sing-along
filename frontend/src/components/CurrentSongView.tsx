@@ -1,10 +1,11 @@
 import { Flex } from "@chakra-ui/react";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { UseAsyncReturn, useAsync } from "react-async-hook";
 import {
   ApplicationState,
   DEFAULT_FONT_SCALE,
   MAX_FONT_ONE_COLUMN,
+  SongCatalogEntry,
   User,
 } from "../models";
 import NavBar from "./NavBar";
@@ -14,10 +15,11 @@ import { AxiosResponse } from "axios";
 import { useParams } from "react-router-dom";
 import { useInterval } from "usehooks-ts";
 import SongbookContext from "../contexts/SongbookContext";
-import { getCurrentSong } from "../services/songs";
+import { getCurrentSong, setSongbookSong } from "../services/songs";
 import Snowfall from "react-snowfall";
 
 const SONGBOOK_POLL_INTERVAL = 2 * 1000;
+const PREVIEW_DEBOUNCE_MS = 200;
 
 interface CurrentSongViewProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
@@ -25,7 +27,6 @@ interface CurrentSongViewProps {
 
 function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
   const user = asyncUser.result && asyncUser.result.data;
-  // state for showing ActionPrompt component instead of lyrics
   const [applicationState, setApplicationState] = useState(
     ApplicationState.ShowSong
   );
@@ -36,6 +37,11 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     : 1;
   const columnsOnScreen =
     fontScale > MAX_FONT_ONE_COLUMN ? 1 : columnsOnScreenUserSetting;
+
+  // null = showing server's current song; number = 1-based preview position
+  const [previewPosition, setPreviewPosition] = useState<number | null>(null);
+  const [isCommitting, setIsCommitting] = useState(false);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const advanceToNextAppState = () => {
     switch (applicationState) {
@@ -67,8 +73,64 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     }
   };
 
+  const songbook = asyncSongbook?.result?.data;
+  const catalog = songbook?.song_catalog ?? [];
+
+  const effectivePosition = previewPosition ?? songbook?.current_song_position ?? 0;
+  const isPreviewing = previewPosition !== null;
+
+  const previewCatalogEntry: SongCatalogEntry | undefined =
+    isPreviewing && catalog.length > 0
+      ? catalog[previewPosition - 1]
+      : undefined;
+
+  const commitPreview = useCallback(
+    async (position: number) => {
+      const entry = catalog[position - 1];
+      if (!entry || !sessionKey) return;
+      setIsCommitting(true);
+      await setSongbookSong(sessionKey, entry.created_at);
+      await asyncSongbook.execute();
+      setPreviewPosition(null);
+      setIsCommitting(false);
+      setFirstColDispIndex(0);
+    },
+    [catalog, sessionKey, asyncSongbook]
+  );
+
+  const navigatePreview = useCallback(
+    (delta: number) => {
+      const totalSongs = songbook?.total_songs ?? 0;
+      if (totalSongs === 0) return;
+
+      setPreviewPosition((prev) => {
+        const current = prev ?? songbook?.current_song_position ?? 1;
+        return Math.max(1, Math.min(totalSongs, current + delta));
+      });
+    },
+    [songbook?.total_songs, songbook?.current_song_position]
+  );
+
+  // Debounce: commit preview after PREVIEW_DEBOUNCE_MS of inactivity
+  useEffect(() => {
+    if (previewPosition === null) return;
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      commitPreview(previewPosition);
+    }, PREVIEW_DEBOUNCE_MS);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [previewPosition, commitPreview]);
+
   useInterval(() => {
-    if (!asyncSongbook.loading) {
+    if (!asyncSongbook.loading && !isPreviewing && !isCommitting) {
       asyncSongbook.execute();
     }
   }, SONGBOOK_POLL_INTERVAL);
@@ -100,6 +162,10 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
             asyncUser={asyncUser}
             setFontScale={setFontScale}
             fontScale={fontScale}
+            navigatePreview={navigatePreview}
+            isPreviewing={isPreviewing}
+            previewCatalogEntry={previewCatalogEntry}
+            effectivePosition={effectivePosition}
           />
           {asyncSongbook?.result?.data.total_songs !== 0 && (
             <TabContainer
@@ -109,6 +175,7 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
               firstColDispIndex={firstColDispIndex}
               columnsOnScreen={columnsOnScreen}
               fontScale={fontScale}
+              isPreviewing={isPreviewing || isCommitting}
             />
           )}
         </Flex>

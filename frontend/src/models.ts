@@ -38,6 +38,13 @@ export type Recommendation = {
   title: string;
 };
 
+export type SongCatalogEntry = {
+  id: number;
+  created_at: string;
+  artist: string;
+  title: string;
+};
+
 export type Songbook = {
   id: number; // we should remove this from the API and only use session_key eventually
   session_key: string;
@@ -53,6 +60,7 @@ export type Songbook = {
   membership_set: Member[];
   theme: string;
   action_verb: string;
+  song_catalog: SongCatalogEntry[];
 };
 
 export type Member = {

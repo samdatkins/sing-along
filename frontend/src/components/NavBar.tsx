@@ -22,6 +22,7 @@ import {
   AppStateToTimerMap,
   ApplicationState,
   LINES_PER_COLUMN,
+  SongCatalogEntry,
   Songbook,
   User,
 } from "../models";
@@ -31,7 +32,7 @@ import { UseAsyncReturn } from "react-async-hook";
 import { FaFastBackward, FaFastForward } from "react-icons/fa";
 import { Link as RouterLink, useOutlet } from "react-router-dom";
 import { countTabColumns } from "../helpers/tab";
-import { nextSongbookSong, prevSongbookSong } from "../services/songs";
+import { nextSongbookSong } from "../services/songs";
 import ColumnMap from "./ColumnMap";
 import HamburgerMenu from "./HamburgerMenu";
 import MemberAvatarGroup from "./MemberAvatarGroup";
@@ -52,6 +53,10 @@ interface NavBarProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
   setFontScale: React.Dispatch<React.SetStateAction<number>>;
   fontScale: number;
+  navigatePreview: (delta: number) => void;
+  isPreviewing: boolean;
+  previewCatalogEntry?: SongCatalogEntry;
+  effectivePosition: number;
 }
 
 export default function NavBar({
@@ -65,6 +70,10 @@ export default function NavBar({
   asyncUser,
   setFontScale,
   fontScale,
+  navigatePreview,
+  isPreviewing,
+  previewCatalogEntry,
+  effectivePosition,
 }: NavBarProps) {
   // Outlet that conditionally renders the add song drawer based on URL
   const addSongModalOutlet = useOutlet();
@@ -192,14 +201,12 @@ export default function NavBar({
 50% { transform: scale(1); }
 `;
 
-  const handleNextClick = async (sessionKey) => {
-    if (asyncSongbook?.result?.data?.is_noodle_mode)
-      await nextSongbookSong(sessionKey);
+  const handleNextClick = () => {
+    if (asyncSongbook?.result?.data?.is_noodle_mode) navigatePreview(1);
   };
 
-  const handlePreviousClick = async (sessionKey) => {
-    if (asyncSongbook?.result?.data?.is_noodle_mode)
-      await prevSongbookSong(sessionKey);
+  const handlePreviousClick = () => {
+    if (asyncSongbook?.result?.data?.is_noodle_mode) navigatePreview(-1);
   };
 
   const handleSongbookClick = () => {
@@ -231,6 +238,8 @@ export default function NavBar({
             applicationState={applicationState}
             setFontScale={setFontScale}
             fontScale={fontScale}
+            navigatePreview={navigatePreview}
+            isPreviewing={isPreviewing}
           />
         </Flex>
         <Box pt=".5rem">
@@ -274,26 +283,40 @@ export default function NavBar({
                 align="center"
               >
                 <HStack spacing="8px" justifyContent="center">
-                  {currentSongbook?.current_song_entry?.is_flagged && (
-                    <WarningTwoIcon />
-                  )}{" "}
+                  {!isPreviewing &&
+                    currentSongbook?.current_song_entry?.is_flagged && (
+                      <WarningTwoIcon />
+                    )}{" "}
                   <Link
                     fontWeight="bold"
                     target="_blank"
                     rel="noopener noreferrer"
-                    href={currentSongbook.current_song_entry?.song.url}
-                  >
-                    "{currentSongbook.current_song_entry?.song.title}" by{" "}
-                    {currentSongbook.current_song_entry?.song.artist}
-                  </Link>
-                  <SpotifyPlayModal
-                    spotify_ID={
-                      asyncSongbook?.result?.data?.current_song_entry?.song
-                        ?.spotify_ID
+                    href={
+                      isPreviewing
+                        ? undefined
+                        : currentSongbook.current_song_entry?.song.url
                     }
-                    timerControls={timerControls}
-                  />
-                  {currentSongbook?.current_song_entry?.likes_count > 0 &&
+                  >
+                    "
+                    {isPreviewing && previewCatalogEntry
+                      ? previewCatalogEntry.title
+                      : currentSongbook.current_song_entry?.song.title}
+                    " by{" "}
+                    {isPreviewing && previewCatalogEntry
+                      ? previewCatalogEntry.artist
+                      : currentSongbook.current_song_entry?.song.artist}
+                  </Link>
+                  {!isPreviewing && (
+                    <SpotifyPlayModal
+                      spotify_ID={
+                        asyncSongbook?.result?.data?.current_song_entry?.song
+                          ?.spotify_ID
+                      }
+                      timerControls={timerControls}
+                    />
+                  )}
+                  {!isPreviewing &&
+                    currentSongbook?.current_song_entry?.likes_count > 0 &&
                     currentSongbook?.is_songbook_owner && (
                       <HStack spacing="4px">
                         <Icon
@@ -320,12 +343,8 @@ export default function NavBar({
                     mr="20px"
                     size="xs"
                     colorScheme="blue"
-                    isDisabled={currentSongbook.current_song_position === 1}
-                    onClick={() =>
-                      handlePreviousClick(
-                        asyncSongbook?.result?.data?.session_key
-                      )
-                    }
+                    isDisabled={effectivePosition <= 1}
+                    onClick={handlePreviousClick}
                   >
                     <FaFastBackward />
                   </Button>
@@ -340,7 +359,7 @@ export default function NavBar({
                 >
                   {currentSongbook.title}
                   {" - "} ({"song "}
-                  {currentSongbook.current_song_position} of{" "}
+                  {effectivePosition} of{" "}
                   {currentSongbook.total_songs})
                 </Text>
                 <SongbookList
@@ -354,12 +373,9 @@ export default function NavBar({
                     size="xs"
                     colorScheme="blue"
                     isDisabled={
-                      currentSongbook.current_song_position ===
-                      currentSongbook.total_songs
+                      effectivePosition >= currentSongbook.total_songs
                     }
-                    onClick={() =>
-                      handleNextClick(asyncSongbook?.result?.data?.session_key)
-                    }
+                    onClick={handleNextClick}
                   >
                     <FaFastForward />
                   </Button>

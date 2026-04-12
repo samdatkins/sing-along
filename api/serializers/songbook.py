@@ -12,6 +12,7 @@ class SongbookSerializer(serializers.ModelSerializer):
     is_songbook_owner = serializers.SerializerMethodField()
     is_current_song_liked = serializers.SerializerMethodField()
     membership_set = serializers.SerializerMethodField()
+    song_catalog = serializers.SerializerMethodField()
 
     class Meta:
         model = Songbook
@@ -30,6 +31,7 @@ class SongbookSerializer(serializers.ModelSerializer):
             "membership_set",
             "theme",
             "action_verb",
+            "song_catalog",
         ]
 
         extra_kwargs = {
@@ -88,6 +90,17 @@ class SongbookSerializer(serializers.ModelSerializer):
             return False
 
         return song_entry.likes.filter(pk=user.pk).exists()
+
+    def get_song_catalog(self, obj):
+        return [
+            {
+                "id": entry.id,
+                "created_at": entry.created_at.isoformat(),
+                "artist": entry.song.artist,
+                "title": entry.song.title,
+            }
+            for entry in obj.song_entries.all()
+        ]
 
 
 class SongbookListSerializer(serializers.ModelSerializer):
