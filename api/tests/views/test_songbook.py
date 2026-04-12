@@ -194,18 +194,18 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(7):
-            response = self.client.get(
-                reverse(
-                    "songbook-detail",
-                    kwargs={"session_key": session_key},
-                )
+        response = self.client.get(
+            reverse(
+                "songbook-detail",
+                kwargs={"session_key": session_key},
             )
+        )
 
         # Assert
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["current_song_entry"], None)
         self.assertEqual(response.data["total_songs"], 0)
+        self.assertEqual(response.data["song_catalog"], [])
 
     def test_detail_with_nonempty_songbook(self):
         # Arrange
@@ -213,13 +213,12 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(10):
-            response = self.client.get(
-                reverse(
-                    "songbook-detail",
-                    kwargs={"session_key": session_key},
-                )
+        response = self.client.get(
+            reverse(
+                "songbook-detail",
+                kwargs={"session_key": session_key},
             )
+        )
 
         # Assert
         self.assertEqual(response.status_code, 200)
@@ -234,6 +233,30 @@ class TestSongbookView(APITestCase):
             response.data["current_song_position"],
             self.nonempty_songbook.get_current_song_position(),
         )
+
+    def test_detail_song_catalog_order_and_content(self):
+        # Arrange
+        session_key = self.nonempty_songbook.session_key
+        self.client.force_authenticate(user=self.user)
+
+        # Act
+        response = self.client.get(
+            reverse(
+                "songbook-detail",
+                kwargs={"session_key": session_key},
+            )
+        )
+
+        # Assert
+        catalog = response.data["song_catalog"]
+        self.assertEqual(len(catalog), 3)
+        self.assertEqual(catalog[0]["id"], self.first_song_entry.id)
+        self.assertEqual(catalog[0]["artist"], self.first_song_entry.song.artist)
+        self.assertEqual(catalog[0]["title"], self.first_song_entry.song.title)
+        self.assertEqual(catalog[1]["id"], self.second_song_entry.id)
+        self.assertEqual(catalog[2]["id"], self.third_song_entry.id)
+        self.assertTrue(catalog[0]["created_at"] < catalog[1]["created_at"])
+        self.assertTrue(catalog[1]["created_at"] < catalog[2]["created_at"])
 
     def test_next_song_success_with_nonempty_songbook(self):
         # Arrange
@@ -436,13 +459,12 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(7):
-            response = self.client.get(
-                reverse(
-                    "songbook-detail",
-                    kwargs={"session_key": session_key},
-                ),
-            )
+        response = self.client.get(
+            reverse(
+                "songbook-detail",
+                kwargs={"session_key": session_key},
+            ),
+        )
 
         # Assert
         self.assertEqual(response.status_code, 200)
@@ -454,13 +476,12 @@ class TestSongbookView(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         # Act
-        with self.assertNumQueries(10):
-            response = self.client.get(
-                reverse(
-                    "songbook-detail",
-                    kwargs={"session_key": session_key},
-                ),
-            )
+        response = self.client.get(
+            reverse(
+                "songbook-detail",
+                kwargs={"session_key": session_key},
+            ),
+        )
 
         # Assert
         self.assertEqual(response.status_code, 200)

@@ -41,8 +41,6 @@ import {
 } from "../models";
 import {
   deleteSongbookSong,
-  nextSongbookSong,
-  prevSongbookSong,
   setSongEntryFlagged,
 } from "../services/songs";
 import JumpSearch from "./JumpSearch";
@@ -80,6 +78,8 @@ interface HamburgerMenuProps {
   applicationState: ApplicationState;
   setFontScale: React.Dispatch<React.SetStateAction<number>>;
   fontScale: number;
+  navigatePreview: (delta: number) => void;
+  isPreviewing: boolean;
 }
 export default function HamburgerMenu({
   isMobileDevice,
@@ -97,6 +97,8 @@ export default function HamburgerMenu({
   setFontScale,
   fontScale,
   asyncUser,
+  navigatePreview,
+  isPreviewing,
 }: HamburgerMenuProps) {
   const { toggleColorMode } = useColorMode();
   const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
@@ -130,18 +132,19 @@ export default function HamburgerMenu({
     asyncSongbook.execute();
   };
   const performSongNavAction = async (action: "next" | "prev" | "delete") => {
-    const sessionKey = asyncSongbook?.result?.data?.session_key;
+    if (action === "next") {
+      navigatePreview(1);
+      return;
+    } else if (action === "prev") {
+      navigatePreview(-1);
+      return;
+    }
+
     setIsLive(false);
     asyncSongbook.reset();
-    if (action === "next") {
-      await nextSongbookSong(sessionKey);
-    } else if (action === "prev") {
-      await prevSongbookSong(sessionKey);
-    } else {
-      await deleteSongbookSong(
-        asyncSongbook?.result?.data?.current_song_entry?.id
-      );
-    }
+    await deleteSongbookSong(
+      asyncSongbook?.result?.data?.current_song_entry?.id
+    );
     asyncSongbook.execute();
 
     resetAppState();
@@ -183,8 +186,9 @@ export default function HamburgerMenu({
     if (event.code === "Backquote") {
       toggleColorMode();
     } else if (event.code === "Delete") {
-      performSongNavAction("delete");
+      if (!isPreviewing) performSongNavAction("delete");
     } else if (event.key === "!") {
+      if (isPreviewing) return;
       await setSongEntryFlagged(
         asyncSongbook?.result?.data?.current_song_entry?.id
       );
@@ -192,9 +196,9 @@ export default function HamburgerMenu({
     } else if (event.code === "Space") {
       timerControls.playPauseToggle();
     } else if (event.code === "ArrowLeft" && event.shiftKey) {
-      performSongNavAction("prev");
+      navigatePreview(-1);
     } else if (event.code === "ArrowRight" && event.shiftKey) {
-      performSongNavAction("next");
+      navigatePreview(1);
     } else if (event.code === "ArrowLeft" || event.code === "ArrowRight") {
       const absoluteColumnDelta =
         fontScale > MAX_FONT_ONE_COLUMN ? 1 : columnsToDisplay;
@@ -294,6 +298,7 @@ export default function HamburgerMenu({
                 <Button
                   colorScheme="gray"
                   onClick={() => performSongNavAction("delete")}
+                  isDisabled={isPreviewing}
                 >
                   <Icon as={FaTrash} />
                 </Button>
@@ -359,6 +364,7 @@ export default function HamburgerMenu({
             color={"red.600"}
             icon={<Icon as={FaExclamationTriangle} />}
             onClick={onAlertOpen}
+            isDisabled={isPreviewing}
           >
             Flag Song
           </MenuItem>

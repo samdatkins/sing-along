@@ -58,7 +58,12 @@ class SongbookViewSet(
             # Don't filter for retrieve, users get access to all songbooks
             # when retrieving (since session key is the password)
             return (
-                self.queryset.prefetch_related("song_entries")
+                self.queryset.prefetch_related(
+                    Prefetch(
+                        "song_entries",
+                        queryset=SongEntry.objects.order_by("created_at").select_related("song"),
+                    )
+                )
                 .prefetch_related("membership_set__user")
                 .all()
             )
