@@ -14,7 +14,7 @@
     "@types/node": "^16.18.3",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
-    "axios": "^1.6.0",
+    "axios": "^1.15.0",
     "dayjs": "^1.11.8",
     "framer-motion": "^7.6.15",
     "react": "^18.2.0",
@@ -58,7 +58,10 @@
   },
   "proxy": "http://localhost:8080/",
   "resolutions": {
-    "jest": "29.2.x"
+    "jest": "29.2.x",
+    "express": "4.19.2",
+    "lodash": "4.18.1",
+    "node-forge": "1.4.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
