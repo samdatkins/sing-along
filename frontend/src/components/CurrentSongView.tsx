@@ -44,6 +44,8 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Latest known 1-based song index from the server or a completed commit — used when preview is null so rapid navigatePreview calls do not use stale songbook.current_song_position. */
   const liveSongPositionRef = useRef(1);
+  /** After PATCH + execute, we wait until songbook.current_song_position matches before clearing preview (avoids flash of stale song data). */
+  const committedPositionRef = useRef<number | null>(null);
 
   const advanceToNextAppState = () => {
     switch (applicationState) {
@@ -91,12 +93,15 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
       const entry = catalog[position - 1];
       if (!entry || !sessionKey) return;
       setIsCommitting(true);
-      await setSongbookSong(sessionKey, entry.created_at);
-      await asyncSongbook.execute();
-      liveSongPositionRef.current = position;
-      setPreviewPosition(null);
-      setIsCommitting(false);
-      setFirstColDispIndex(0);
+      try {
+        await setSongbookSong(sessionKey, entry.created_at);
+        await asyncSongbook.execute();
+        liveSongPositionRef.current = position;
+        committedPositionRef.current = position;
+      } catch {
+        committedPositionRef.current = null;
+        setIsCommitting(false);
+      }
     },
     [catalog, sessionKey, asyncSongbook]
   );
@@ -114,9 +119,22 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     [songbook?.total_songs]
   );
 
+  // Clear preview/committing only once server songbook reflects the committed position (avoids stale asyncSongbook.result flash).
+  useEffect(() => {
+    const committed = committedPositionRef.current;
+    if (committed === null) return;
+    const serverPos = songbook?.current_song_position;
+    if (serverPos === committed) {
+      committedPositionRef.current = null;
+      setPreviewPosition(null);
+      setIsCommitting(false);
+      setFirstColDispIndex(0);
+    }
+  }, [songbook?.current_song_position, asyncSongbook.result]);
+
   // Debounce: commit preview after PREVIEW_DEBOUNCE_MS of inactivity
   useEffect(() => {
-    if (previewPosition === null) return;
+    if (previewPosition === null || isCommitting) return;
 
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -130,7 +148,7 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [previewPosition, commitPreview]);
+  }, [previewPosition, isCommitting, commitPreview]);
 
   const currentSongEntryId = songbook?.current_song_entry?.id;
   useEffect(() => {
