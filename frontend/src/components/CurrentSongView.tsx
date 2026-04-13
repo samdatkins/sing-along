@@ -126,11 +126,14 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     const serverPos = songbook?.current_song_position;
     if (serverPos === committed) {
       committedPositionRef.current = null;
-      setPreviewPosition(null);
       setIsCommitting(false);
-      setFirstColDispIndex(0);
+      // Only clear preview if the user hasn't navigated to a new position during the commit
+      if (previewPosition === null || previewPosition === committed) {
+        setPreviewPosition(null);
+        setFirstColDispIndex(0);
+      }
     }
-  }, [songbook?.current_song_position, asyncSongbook.result]);
+  }, [songbook?.current_song_position, asyncSongbook.result, previewPosition]);
 
   // Debounce: commit preview after PREVIEW_DEBOUNCE_MS of inactivity
   useEffect(() => {
