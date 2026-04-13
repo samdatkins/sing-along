@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { FaEye } from "react-icons/fa";
 import { AxiosResponse } from "axios";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { UseAsyncReturn } from "react-async-hook";
 import { BiSliderAlt } from "react-icons/bi";
 import {
@@ -55,6 +55,9 @@ import {
 } from "@chakra-ui/react";
 import CreateEditSongbook from "./CreateEditSongbook";
 import SettingModal from "./SettingsModal";
+
+const PLAIN_ARROW_INITIAL_HOLD_MS = 3000;
+const PLAIN_ARROW_REPEAT_MS = 1000;
 
 interface HamburgerMenuProps {
   isMobileDevice: boolean;
@@ -118,6 +121,41 @@ export default function HamburgerMenu({
     onClose: onProfileClose,
   } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const plainArrowLeftHoldTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const plainArrowLeftRepeatIntervalRef = useRef<ReturnType<
+    typeof setInterval
+  > | null>(null);
+  const plainArrowRightHoldTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const plainArrowRightRepeatIntervalRef = useRef<ReturnType<
+    typeof setInterval
+  > | null>(null);
+
+  const clearPlainArrowLeftSongNavTimers = () => {
+    if (plainArrowLeftHoldTimerRef.current !== null) {
+      clearTimeout(plainArrowLeftHoldTimerRef.current);
+      plainArrowLeftHoldTimerRef.current = null;
+    }
+    if (plainArrowLeftRepeatIntervalRef.current !== null) {
+      clearInterval(plainArrowLeftRepeatIntervalRef.current);
+      plainArrowLeftRepeatIntervalRef.current = null;
+    }
+  };
+
+  const clearPlainArrowRightSongNavTimers = () => {
+    if (plainArrowRightHoldTimerRef.current !== null) {
+      clearTimeout(plainArrowRightHoldTimerRef.current);
+      plainArrowRightHoldTimerRef.current = null;
+    }
+    if (plainArrowRightRepeatIntervalRef.current !== null) {
+      clearInterval(plainArrowRightRepeatIntervalRef.current);
+      plainArrowRightRepeatIntervalRef.current = null;
+    }
+  };
+
   const isSongbookOwner = asyncSongbook.result
     ? asyncSongbook.result.data.is_songbook_owner
     : false;
@@ -200,6 +238,27 @@ export default function HamburgerMenu({
     } else if (event.code === "ArrowRight" && event.shiftKey) {
       navigatePreview(1);
     } else if (event.code === "ArrowLeft" || event.code === "ArrowRight") {
+      if (!event.repeat) {
+        if (event.code === "ArrowLeft") {
+          clearPlainArrowLeftSongNavTimers();
+          plainArrowLeftHoldTimerRef.current = setTimeout(() => {
+            plainArrowLeftHoldTimerRef.current = null;
+            navigatePreview(-1);
+            plainArrowLeftRepeatIntervalRef.current = setInterval(() => {
+              navigatePreview(-1);
+            }, PLAIN_ARROW_REPEAT_MS);
+          }, PLAIN_ARROW_INITIAL_HOLD_MS);
+        } else {
+          clearPlainArrowRightSongNavTimers();
+          plainArrowRightHoldTimerRef.current = setTimeout(() => {
+            plainArrowRightHoldTimerRef.current = null;
+            navigatePreview(1);
+            plainArrowRightRepeatIntervalRef.current = setInterval(() => {
+              navigatePreview(1);
+            }, PLAIN_ARROW_REPEAT_MS);
+          }, PLAIN_ARROW_INITIAL_HOLD_MS);
+        }
+      }
       const absoluteColumnDelta =
         fontScale > MAX_FONT_ONE_COLUMN ? 1 : columnsToDisplay;
       const columnDelta =
@@ -226,15 +285,54 @@ export default function HamburgerMenu({
     event.preventDefault();
   };
 
-  useEffect(() => {
-    // attach the event listener
-    document.addEventListener("keydown", handleKeyPress);
+  const handleKeyUp = useCallback(
+    (event: KeyboardEvent) => {
+      if (
+        addSongModalOutlet ||
+        isJumpSearchOpen ||
+        isSettingsOpen ||
+        !isSongbookOwner
+      ) {
+        return;
+      }
 
-    // remove the event listener
+      if (event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+
+      if (event.code === "ArrowLeft" && !event.shiftKey) {
+        clearPlainArrowLeftSongNavTimers();
+      } else if (event.code === "ArrowRight" && !event.shiftKey) {
+        clearPlainArrowRightSongNavTimers();
+      }
+    },
+    [
+      addSongModalOutlet,
+      isJumpSearchOpen,
+      isSettingsOpen,
+      isSongbookOwner,
+    ]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyPress);
+    document.addEventListener("keyup", handleKeyUp);
+
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
+      document.removeEventListener("keyup", handleKeyUp);
     };
-  }, [handleKeyPress]);
+  }, [handleKeyPress, handleKeyUp]);
+
+  // Clear hold/repeat timers only on unmount. Do not clear them in the effect above:
+  // handleKeyPress changes every render (e.g. songbook poll), and clearing here was
+  // cancelling the 3s timeout before it could fire.
+  useEffect(() => {
+    return () => {
+      clearPlainArrowLeftSongNavTimers();
+      clearPlainArrowRightSongNavTimers();
+    };
+  }, []);
 
   const navigate = useNavigate();
 
