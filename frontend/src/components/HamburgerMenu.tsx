@@ -84,6 +84,7 @@ interface HamburgerMenuProps {
   fontScale: number;
   navigatePreview: (delta: number) => void;
   isPreviewing: boolean;
+  onHelpOpen: () => void;
 }
 export default function HamburgerMenu({
   isMobileDevice,
@@ -103,6 +104,7 @@ export default function HamburgerMenu({
   asyncUser,
   navigatePreview,
   isPreviewing,
+  onHelpOpen,
 }: HamburgerMenuProps) {
   const { toggleColorMode } = useColorMode();
   const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
@@ -282,6 +284,8 @@ export default function HamburgerMenu({
       }
     } else if (event.code === "KeyF") {
       alert(`This cancels the tab view truncation AND pauses the timer.`);
+    } else if (event.key === "?") {
+      onHelpOpen();
     } else if (event.code === "Slash") {
       onOpen();
     } else {

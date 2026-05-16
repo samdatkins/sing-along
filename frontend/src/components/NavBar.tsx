@@ -1,10 +1,11 @@
-import { AddIcon, Icon, WarningTwoIcon } from "@chakra-ui/icons";
+import { AddIcon, Icon, QuestionOutlineIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
   Flex,
   HStack,
   Heading,
+  IconButton,
   Kbd,
   Link,
   Portal,
@@ -40,6 +41,7 @@ import SongbookList from "./SongbookList";
 import StatsModal from "./StatsModal";
 import Timer from "./Timer";
 import HeartButton from "./LikeButton";
+import KeyboardShortcutsModal from "./KeyboardShortcutsModal";
 import SpotifyPlayModal from "./SpotifyPlayModal";
 
 interface NavBarProps {
@@ -119,6 +121,11 @@ export default function NavBar({
     isOpen: isListOpen,
     onOpen: onListOpen,
     onClose: onListClose,
+  } = useDisclosure();
+  const {
+    isOpen: isHelpOpen,
+    onOpen: onHelpOpen,
+    onClose: onHelpClose,
   } = useDisclosure();
 
   const totalColumns = useMemo(
@@ -221,7 +228,7 @@ export default function NavBar({
         justifyContent="space-between"
         width={!isMobileDevice ? "33%" : "12%"}
       >
-        <Flex paddingRight="1rem">
+        <Flex paddingRight="1rem" gap="0.5rem" alignItems="center">
           <HamburgerMenu
             isMobileDevice={isMobileDevice}
             timerControls={timerControls}
@@ -240,6 +247,23 @@ export default function NavBar({
             fontScale={fontScale}
             navigatePreview={navigatePreview}
             isPreviewing={isPreviewing}
+            onHelpOpen={onHelpOpen}
+          />
+          <IconButton
+            aria-label="Keyboard shortcuts"
+            icon={<QuestionOutlineIcon />}
+            variant="outline"
+            size="md"
+            onClick={onHelpOpen}
+          />
+          <KeyboardShortcutsModal
+            isOpen={isHelpOpen}
+            onClose={onHelpClose}
+            isSongbookOwner={
+              asyncSongbook.result
+                ? asyncSongbook.result.data.is_songbook_owner
+                : false
+            }
           />
         </Flex>
         <Box pt=".5rem">
