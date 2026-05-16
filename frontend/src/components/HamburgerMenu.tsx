@@ -17,6 +17,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { UseAsyncReturn } from "react-async-hook";
 import { BiSliderAlt } from "react-icons/bi";
 import {
+  FaEdit,
   FaExclamationTriangle,
   FaExpandAlt,
   FaFastBackward,
@@ -159,6 +160,9 @@ export default function HamburgerMenu({
   const isSongbookOwner = asyncSongbook.result
     ? asyncSongbook.result.data.is_songbook_owner
     : false;
+  const isStaff = asyncUser.result?.data?.is_staff ?? false;
+  const currentSongId =
+    asyncSongbook.result?.data?.current_song_entry?.song?.id;
   const { sessionKey } = useParams();
   const addSongUrl = window.location.origin + `/live/${sessionKey}/add-song`;
 
@@ -457,6 +461,17 @@ export default function HamburgerMenu({
             <RouterLink to="preview">
               <MenuItem icon={<Icon as={FaEye} />}>Preview Mode</MenuItem>
             </RouterLink>
+          )}
+          {isStaff && currentSongId && (
+            <MenuItem
+              as="a"
+              href={`/admin/api/song/${currentSongId}/change/`}
+              target="_blank"
+              rel="noopener noreferrer"
+              icon={<Icon as={FaEdit} />}
+            >
+              Edit Song
+            </MenuItem>
           )}
           <MenuItem
             color={"red.600"}
