@@ -1,0 +1,23 @@
+---
+description: Verify frontend TypeScript compiles before finishing frontend changes
+alwaysApply: true
+---
+
+# Frontend: TypeScript must compile
+
+When you change code under `frontend/`, run the TypeScript compiler and fix any errors before considering the work done or checking in.
+
+## Do this
+
+From `frontend/`:
+
+```bash
+yarn tsc --noEmit
+```
+
+Fix all reported errors. Prefer patterns already used in the codebase (e.g. narrow `asyncUser.result` with `asyncUser.result && asyncUser.result.data` rather than optional chaining on a `false | AxiosResponse` union).
+
+## Do not
+
+- Leave frontend changes without running `yarn tsc --noEmit` when TypeScript types or components were touched.
+- Assume the dev server or linter alone caught type errors.

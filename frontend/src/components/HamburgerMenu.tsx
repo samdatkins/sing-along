@@ -160,7 +160,8 @@ export default function HamburgerMenu({
   const isSongbookOwner = asyncSongbook.result
     ? asyncSongbook.result.data.is_songbook_owner
     : false;
-  const isStaff = asyncUser.result?.data?.is_staff ?? false;
+  const user = asyncUser.result && asyncUser.result.data;
+  const isStaff = user ? user.is_staff : false;
   const currentSongId =
     asyncSongbook.result?.data?.current_song_entry?.song?.id;
   const { sessionKey } = useParams();
