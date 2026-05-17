@@ -85,6 +85,8 @@ interface HamburgerMenuProps {
   navigatePreview: (delta: number) => void;
   isPreviewing: boolean;
   onHelpOpen: () => void;
+  effectivePosition: number;
+  onBoundaryBump: (direction: "left" | "right") => void;
 }
 export default function HamburgerMenu({
   isMobileDevice,
@@ -105,6 +107,8 @@ export default function HamburgerMenu({
   navigatePreview,
   isPreviewing,
   onHelpOpen,
+  effectivePosition,
+  onBoundaryBump,
 }: HamburgerMenuProps) {
   const { toggleColorMode } = useColorMode();
   const { isOpen: isJumpSearchOpen, onOpen, onClose } = useDisclosure();
@@ -136,6 +140,11 @@ export default function HamburgerMenu({
   const plainArrowRightRepeatIntervalRef = useRef<ReturnType<
     typeof setInterval
   > | null>(null);
+
+  const boundaryPressCountRef = useRef(0);
+  const boundaryDirectionRef = useRef<"left" | "right" | null>(null);
+
+  const BOUNDARY_PRESSES_TO_NAV = 5;
 
   const clearPlainArrowLeftSongNavTimers = () => {
     if (plainArrowLeftHoldTimerRef.current !== null) {
@@ -227,6 +236,15 @@ export default function HamburgerMenu({
       return;
     }
 
+    // Reset boundary press counter for any key that isn't a plain arrow
+    if (
+      event.code !== "ArrowLeft" &&
+      event.code !== "ArrowRight"
+    ) {
+      boundaryPressCountRef.current = 0;
+      boundaryDirectionRef.current = null;
+    }
+
     // This first one is the only one that non-admins are allowed to use
     if (event.code === "Backquote") {
       toggleColorMode();
@@ -241,8 +259,12 @@ export default function HamburgerMenu({
     } else if (event.code === "Space") {
       timerControls.playPauseToggle();
     } else if (event.code === "ArrowLeft" && event.shiftKey) {
+      boundaryPressCountRef.current = 0;
+      boundaryDirectionRef.current = null;
       navigatePreview(-1);
     } else if (event.code === "ArrowRight" && event.shiftKey) {
+      boundaryPressCountRef.current = 0;
+      boundaryDirectionRef.current = null;
       navigatePreview(1);
     } else if (event.code === "ArrowLeft" || event.code === "ArrowRight") {
       if (!event.repeat) {
@@ -277,6 +299,34 @@ export default function HamburgerMenu({
         firstColDispIndex + columnDelta <= totalColumns - 1
       ) {
         setFirstColDispIndex(firstColDispIndex + columnDelta);
+        boundaryPressCountRef.current = 0;
+        boundaryDirectionRef.current = null;
+      } else if (!event.repeat) {
+        const direction: "left" | "right" =
+          event.code === "ArrowLeft" ? "left" : "right";
+        const totalSongs = asyncSongbook.result?.data?.total_songs ?? 0;
+
+        if (boundaryDirectionRef.current === direction) {
+          boundaryPressCountRef.current += 1;
+        } else {
+          boundaryPressCountRef.current = 1;
+          boundaryDirectionRef.current = direction;
+        }
+
+        if (boundaryPressCountRef.current >= BOUNDARY_PRESSES_TO_NAV) {
+          const atSongBoundary =
+            (direction === "left" && effectivePosition <= 1) ||
+            (direction === "right" && effectivePosition >= totalSongs);
+
+          if (atSongBoundary) {
+            onBoundaryBump(direction);
+          } else {
+            navigatePreview(direction === "left" ? -1 : 1);
+            setFirstColDispIndex(0);
+          }
+          boundaryPressCountRef.current = 0;
+          boundaryDirectionRef.current = null;
+        }
       }
     } else if (event.code === "KeyR") {
       if (applicationState === ApplicationState.ShowSong) {

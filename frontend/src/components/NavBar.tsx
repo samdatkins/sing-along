@@ -59,6 +59,7 @@ interface NavBarProps {
   isPreviewing: boolean;
   previewCatalogEntry?: SongCatalogEntry;
   effectivePosition: number;
+  onBoundaryBump: (direction: "left" | "right") => void;
 }
 
 export default function NavBar({
@@ -76,6 +77,7 @@ export default function NavBar({
   isPreviewing,
   previewCatalogEntry,
   effectivePosition,
+  onBoundaryBump,
 }: NavBarProps) {
   // Outlet that conditionally renders the add song drawer based on URL
   const addSongModalOutlet = useOutlet();
@@ -248,6 +250,8 @@ export default function NavBar({
             navigatePreview={navigatePreview}
             isPreviewing={isPreviewing}
             onHelpOpen={onHelpOpen}
+            effectivePosition={effectivePosition}
+            onBoundaryBump={onBoundaryBump}
           />
           <IconButton
             aria-label="Keyboard shortcuts"

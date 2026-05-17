@@ -38,6 +38,15 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
   const columnsOnScreen =
     fontScale > MAX_FONT_ONE_COLUMN ? 1 : columnsOnScreenUserSetting;
 
+  const [bumpDirection, setBumpDirection] = useState<"left" | "right" | null>(
+    null
+  );
+  const handleBoundaryBump = useCallback(
+    (direction: "left" | "right") => setBumpDirection(direction),
+    []
+  );
+  const clearBump = useCallback(() => setBumpDirection(null), []);
+
   // null = showing server's current song; number = 1-based preview position
   const [previewPosition, setPreviewPosition] = useState<number | null>(null);
   const [isCommitting, setIsCommitting] = useState(false);
@@ -203,6 +212,7 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
             isPreviewing={isPreviewing}
             previewCatalogEntry={previewCatalogEntry}
             effectivePosition={effectivePosition}
+            onBoundaryBump={handleBoundaryBump}
           />
           {asyncSongbook?.result?.data.total_songs !== 0 && (
             <TabContainer
@@ -213,6 +223,8 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
               columnsOnScreen={columnsOnScreen}
               fontScale={fontScale}
               isPreviewing={isPreviewing || isCommitting}
+              bumpDirection={bumpDirection}
+              clearBump={clearBump}
             />
           )}
         </Flex>

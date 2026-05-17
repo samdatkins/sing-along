@@ -1,10 +1,25 @@
-import { Flex, Text, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
+import { Box, Flex, Text, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
 import { AxiosResponse } from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { UseAsyncReturn } from "react-async-hook";
 import { formatTab, splitTabIntoColumns } from "../helpers/tab";
 import { LINES_PER_COLUMN, User } from "../models";
 import transposer from "./transposer";
+
+const bumpLeft = keyframes`
+  0% { transform: translateX(0); }
+  30% { transform: translateX(-12px); }
+  60% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+`;
+
+const bumpRight = keyframes`
+  0% { transform: translateX(0); }
+  30% { transform: translateX(12px); }
+  60% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+`;
 
 interface TabDisplayProps {
   tab: string | false | undefined;
@@ -13,6 +28,8 @@ interface TabDisplayProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
   fontScale: number;
   defaultTranspose: number | undefined;
+  bumpDirection?: "left" | "right" | null;
+  clearBump?: () => void;
 }
 
 export default function TabDisplay({
@@ -22,6 +39,8 @@ export default function TabDisplay({
   asyncUser,
   fontScale,
   defaultTranspose,
+  bumpDirection,
+  clearBump,
 }: TabDisplayProps) {
   const [toneSteps, setToneSteps] = useState(0);
   const [usesSharps, setUsesSharps] = useState(true);
@@ -86,6 +105,8 @@ export default function TabDisplay({
           <MobileChords
             tabToDisplay={formattedTabArray}
             showChords={showChords}
+            bumpDirection={bumpDirection}
+            clearBump={clearBump}
           />
         ) : (
           <DesktopChords
@@ -96,6 +117,8 @@ export default function TabDisplay({
             firstColDispIndex={firstColDispIndex}
             columnsOnScreen={columnsOnScreen}
             fontScale={fontScale}
+            bumpDirection={bumpDirection}
+            clearBump={clearBump}
           />
         ))}
     </>
@@ -110,6 +133,8 @@ type DesktopChordsProps = {
   firstColDispIndex: number;
   columnsOnScreen: number;
   fontScale: number;
+  bumpDirection?: "left" | "right" | null;
+  clearBump?: () => void;
 };
 
 function DesktopChords({
@@ -120,6 +145,8 @@ function DesktopChords({
   columnsOnScreen,
   isLoading,
   fontScale,
+  bumpDirection,
+  clearBump,
 }: DesktopChordsProps) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
   const columnsToDisplayOnScreen = Math.min(
@@ -129,6 +156,10 @@ function DesktopChords({
   const totalPercentageWidthOfScreen =
     100 * (tabToDisplay?.length / columnsToDisplayOnScreen);
 
+  const bumpAnimation = bumpDirection
+    ? `${bumpDirection === "left" ? bumpLeft : bumpRight} 0.3s ease`
+    : undefined;
+
   return (
     <Flex
       direction="row"
@@ -136,6 +167,8 @@ function DesktopChords({
       width={`${totalPercentageWidthOfScreen}%`}
       position="relative"
       transition={isLoading ? "left 0.4s ease" : ""}
+      animation={bumpAnimation}
+      onAnimationEnd={clearBump}
     >
       {tabToDisplay &&
         tabToDisplay.map((column, idx) => (
@@ -174,9 +207,13 @@ function DesktopChords({
 function MobileChords({
   tabToDisplay,
   showChords,
+  bumpDirection,
+  clearBump,
 }: {
   tabToDisplay: string[];
   showChords: boolean;
+  bumpDirection?: "left" | "right" | null;
+  clearBump?: () => void;
 }) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
   const fontStyles = showChords
@@ -187,8 +224,17 @@ function MobileChords({
         whiteSpace: "pre-wrap",
         wordWrap: "break-word",
       };
+  const mobileBumpAnimation = bumpDirection
+    ? `${bumpDirection === "left" ? bumpLeft : bumpRight} 0.3s ease`
+    : undefined;
+
   return (
-    <pre style={fontStyles as any}>
+    <Box
+      as="pre"
+      sx={fontStyles as any}
+      animation={mobileBumpAnimation}
+      onAnimationEnd={clearBump}
+    >
       {tabToDisplay &&
         tabToDisplay.map((tabLine: string) => {
           if (tabLine.includes("[ch]")) {
@@ -212,6 +258,6 @@ function MobileChords({
           }
           return;
         })}
-    </pre>
+    </Box>
   );
 }
