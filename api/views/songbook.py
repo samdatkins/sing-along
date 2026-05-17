@@ -7,7 +7,7 @@ from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.models import Membership, Song, Songbook, SongEntry, SongMemo
+from api.models import Membership, Song, Songbook, SongbookUserPosition, SongEntry, SongMemo
 from api.serializers.songbook import (
     SongbookDetailSerializer,
     SongbookListSerializer,
@@ -30,6 +30,13 @@ class OnlyAllowSongbookOwnersToModify(permissions.BasePermission):
             return False
 
         if request.method in permissions.SAFE_METHODS:
+            return True
+
+        if obj.is_noodle_mode and view.action in (
+            "next_song",
+            "previous_song",
+            "partial_update",
+        ):
             return True
 
         if membership.type != Membership.MemberType.OWNER.value:
@@ -118,19 +125,51 @@ class SongbookViewSet(
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
+    def _get_or_create_user_position(self, songbook, user):
+        """For noodle-mode songbooks, return the user's position row, creating
+        it from the songbook's current_song_timestamp if it doesn't exist yet.
+        Returns None for non-noodle songbooks."""
+        if not songbook.is_noodle_mode:
+            return None
+        pos, _ = SongbookUserPosition.objects.get_or_create(
+            songbook=songbook,
+            user=user,
+            defaults={"current_song_timestamp": songbook.current_song_timestamp},
+        )
+        return pos
+
+    def perform_update(self, serializer):
+        instance = serializer.instance
+        if instance.is_noodle_mode:
+            ts = serializer.validated_data.pop("current_song_timestamp", None)
+            if ts is not None:
+                SongbookUserPosition.objects.update_or_create(
+                    songbook=instance,
+                    user=self.request.user,
+                    defaults={"current_song_timestamp": ts},
+                )
+        serializer.save()
+
     @action(methods=["patch"], detail=True, url_path="next-song", url_name="next-song")
     def next_song(self, request, session_key=None):
         instance = self.get_object()
+        user_pos = self._get_or_create_user_position(instance, request.user)
+        user_ts = user_pos.current_song_timestamp if user_pos else None
 
-        next_song_entry = instance.get_next_song_entry()
+        next_song_entry = instance.get_next_song_entry(timestamp_override=user_ts)
         if next_song_entry is None:
             return Response(status=status.HTTP_409_CONFLICT)
 
-        instance.current_song_timestamp = next_song_entry.created_at
-        instance.last_nav_action_taken_at = datetime.datetime.now(
-            tz=timezone.get_current_timezone()
-        )
-        instance.save()
+        if user_pos:
+            user_pos.current_song_timestamp = next_song_entry.created_at
+            user_pos.save(update_fields=["current_song_timestamp", "updated_at"])
+        else:
+            instance.current_song_timestamp = next_song_entry.created_at
+            instance.last_nav_action_taken_at = datetime.datetime.now(
+                tz=timezone.get_current_timezone()
+            )
+            instance.save()
+
         return Response(status=status.HTTP_200_OK)
 
     @action(
@@ -141,16 +180,25 @@ class SongbookViewSet(
     )
     def previous_song(self, request, session_key=None):
         instance = self.get_object()
+        user_pos = self._get_or_create_user_position(instance, request.user)
+        user_ts = user_pos.current_song_timestamp if user_pos else None
 
-        previous_song_entry = instance.get_previous_song_entry()
+        previous_song_entry = instance.get_previous_song_entry(
+            timestamp_override=user_ts
+        )
         if previous_song_entry is None:
             return Response(status=status.HTTP_409_CONFLICT)
 
-        instance.current_song_timestamp = previous_song_entry.created_at
-        instance.last_nav_action_taken_at = datetime.datetime.now(
-            tz=timezone.get_current_timezone()
-        )
-        instance.save()
+        if user_pos:
+            user_pos.current_song_timestamp = previous_song_entry.created_at
+            user_pos.save(update_fields=["current_song_timestamp", "updated_at"])
+        else:
+            instance.current_song_timestamp = previous_song_entry.created_at
+            instance.last_nav_action_taken_at = datetime.datetime.now(
+                tz=timezone.get_current_timezone()
+            )
+            instance.save()
+
         return Response(status=status.HTTP_200_OK)
 
     @action(

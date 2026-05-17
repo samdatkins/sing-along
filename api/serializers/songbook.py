@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.models import Membership, Songbook
+from api.models import Membership, Songbook, SongbookUserPosition
 from api.serializers.membership import MembershipSerializer
 from api.serializers.song_entry import SongEntrySerializer
 
@@ -59,14 +59,32 @@ class SongbookSerializer(serializers.ModelSerializer):
 
         return membership[0].type == Membership.MemberType.OWNER.value
 
+    def _get_user_timestamp(self, obj):
+        """For noodle mode, get-or-create the user's position and return their
+        timestamp. For non-noodle mode, return None so model methods use the
+        songbook's default."""
+        if not obj.is_noodle_mode:
+            return None
+        request = self.context.get("request")
+        if not request or not hasattr(request, "user"):
+            return None
+        pos, _ = SongbookUserPosition.objects.get_or_create(
+            songbook=obj,
+            user=request.user,
+            defaults={"current_song_timestamp": obj.current_song_timestamp},
+        )
+        return pos.current_song_timestamp
+
     def get_total_songs(self, obj):
         return obj.get_total_song_count()
 
     def get_current_song_position(self, obj):
-        return obj.get_current_song_position()
+        ts = self._get_user_timestamp(obj)
+        return obj.get_current_song_position(timestamp_override=ts)
 
     def get_current_song_entry(self, obj):
-        song_entry = obj.get_current_song_entry()
+        ts = self._get_user_timestamp(obj)
+        song_entry = obj.get_current_song_entry(timestamp_override=ts)
         if song_entry is None:
             return None
         return SongEntrySerializer(song_entry).data
@@ -85,7 +103,8 @@ class SongbookSerializer(serializers.ModelSerializer):
         if request and hasattr(request, "user"):
             user = request.user
 
-        song_entry = obj.get_current_song_entry()
+        ts = self._get_user_timestamp(obj)
+        song_entry = obj.get_current_song_entry(timestamp_override=ts)
         if song_entry is None or user is None:
             return False
 
@@ -188,4 +207,16 @@ class SongbookDetailSerializer(serializers.ModelSerializer):
         extra_kwargs = {"session_key": {"read_only": True}}
 
     def get_current_song_position(self, obj):
-        return obj.get_current_song_position()
+        if not obj.is_noodle_mode:
+            return obj.get_current_song_position()
+        request = self.context.get("request")
+        if not request or not hasattr(request, "user"):
+            return obj.get_current_song_position()
+        pos, _ = SongbookUserPosition.objects.get_or_create(
+            songbook=obj,
+            user=request.user,
+            defaults={"current_song_timestamp": obj.current_song_timestamp},
+        )
+        return obj.get_current_song_position(
+            timestamp_override=pos.current_song_timestamp
+        )

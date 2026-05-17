@@ -53,8 +53,10 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
         max_length=8, null=False, blank=False, default="DANCE"
     )
 
-    def get_next_song_entry(self):
-        current_song_entry = self.get_current_song_entry()
+    def get_next_song_entry(self, timestamp_override=None):
+        current_song_entry = self.get_current_song_entry(
+            timestamp_override=timestamp_override
+        )
         if current_song_entry is None:
             return None
         next_songs = [
@@ -64,11 +66,16 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
         ]
         return min(next_songs, key=attrgetter("created_at"), default=None)
 
-    def get_current_song_entry(self):
+    def get_current_song_entry(self, timestamp_override=None):
+        timestamp = (
+            timestamp_override
+            if timestamp_override is not None
+            else self.current_song_timestamp
+        )
         current_and_next_songs = [
             entry
             for entry in self.song_entries.all()
-            if entry.created_at >= self.current_song_timestamp
+            if entry.created_at >= timestamp
         ]
         current_song_entry = min(
             current_and_next_songs, key=attrgetter("created_at"), default=None
@@ -79,8 +86,10 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
             )
         return current_song_entry
 
-    def get_previous_song_entry(self):
-        current_song_entry = self.get_current_song_entry()
+    def get_previous_song_entry(self, timestamp_override=None):
+        current_song_entry = self.get_current_song_entry(
+            timestamp_override=timestamp_override
+        )
         if current_song_entry is None:
             return None
 
@@ -94,8 +103,10 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
     def get_total_song_count(self):
         return len(self.song_entries.all())
 
-    def get_current_song_position(self):
-        current_song_entry = self.get_current_song_entry()
+    def get_current_song_position(self, timestamp_override=None):
+        current_song_entry = self.get_current_song_entry(
+            timestamp_override=timestamp_override
+        )
         if current_song_entry is None:
             return 0
         return len(
@@ -199,6 +210,22 @@ class Membership(CreatedUpdated):
     type = models.CharField(
         max_length=2, choices=MemberType.choices, default=MemberType.PARTICIPANT
     )
+
+
+class SongbookUserPosition(CreatedUpdated):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["songbook", "user"],
+                name="unique songbook user position",
+            )
+        ]
+
+    songbook = models.ForeignKey(
+        Songbook, on_delete=models.CASCADE, related_name="user_positions"
+    )
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    current_song_timestamp = models.DateTimeField(null=False)
 
 
 class UserProfile(SafeDeleteModel, CreatedUpdated):
