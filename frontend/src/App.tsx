@@ -2,9 +2,7 @@ import { useAsync } from "react-async-hook";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import AddSongPage from "./components/AddSongPage";
 import CurrentSongView from "./components/CurrentSongView";
-import ViewAllSongbooks from "./components/ViewAllSongbooks";
 import WelcomePage from "./components/WelcomePage";
-import WishlistForm from "./components/WishlistForm";
 import { getAllSongbooks, getUserDetails } from "./services/songs";
 import SongbookPreview from "./components/SongbookPreview";
 
@@ -27,17 +25,7 @@ function App() {
         <Route
           path="/live/"
           element={<WelcomePage asyncUser={asyncUser} songbooks={songbooks} />}
-        >
-          <Route index element={<WishlistForm />} />
-          <Route
-            path="songbooks"
-            element={<ViewAllSongbooks is_noodle={true} />}
-          />
-          <Route
-            path="sing-alongs"
-            element={<ViewAllSongbooks is_noodle={false} />}
-          />
-        </Route>
+        />
         <Route path="/" element={<Navigate to="/live" />} />
       </Routes>
     </BrowserRouter>

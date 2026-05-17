@@ -49,7 +49,7 @@ class SongbookViewSet(
     API endpoint that allows all standard interactions with Songbooks except deletes.
     """
 
-    queryset = Songbook.objects.all().order_by("-created_at")
+    queryset = Songbook.objects.all().order_by("-updated_at")
     lookup_field = "session_key"
     permission_classes = [OnlyAllowSongbookOwnersToModify]
 
@@ -114,6 +114,7 @@ class SongbookViewSet(
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         self._check_and_add_membership(instance, request.user)
+        instance.save(update_fields=["updated_at"])
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 

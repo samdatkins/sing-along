@@ -1,6 +1,7 @@
 import { HamburgerIcon, WarningIcon } from "@chakra-ui/icons";
 import {
   Button,
+  Divider,
   Flex,
   Heading,
   IconButton,
@@ -10,21 +11,22 @@ import {
   MenuItem,
   MenuList,
   Text,
+  useColorMode,
 } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { useState } from "react";
 import { UseAsyncReturn } from "react-async-hook";
-import { BsFillJournalBookmarkFill } from "react-icons/bs";
-import { FaListUl } from "react-icons/fa";
-import { RxLapTimer } from "react-icons/rx";
-import { Outlet, Link as RouterLink, useNavigate } from "react-router-dom";
-import { User } from "../models";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { SongbookListItem, User } from "../models";
 import UserProfile from "./AvatarProfileLink";
+import ViewAllSongbooks from "./ViewAllSongbooks";
+import WishlistForm from "./WishlistForm";
 import { isSongbookActive } from "../helpers/time";
 
 interface WelcomePageProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
-  songbooks;
+  songbooks: SongbookListItem[] | undefined;
 }
 
 export default function WelcomePage({
@@ -32,6 +34,7 @@ export default function WelcomePage({
   asyncUser,
 }: WelcomePageProps) {
   const [sessionKey, setSessionKey] = useState<string>("");
+  const { colorMode, toggleColorMode } = useColorMode();
   const activeSingalongs = songbooks?.filter((songbook) => {
     return songbook.is_noodle_mode === false && isSongbookActive(songbook);
   });
@@ -54,7 +57,7 @@ export default function WelcomePage({
             m=".5rem"
           />
           <MenuList>
-            <Flex direction="column">
+            <Flex direction="column" p=".5rem">
               <Heading size="md" textAlign="center">
                 Join a Sing-Along
               </Heading>
@@ -65,7 +68,7 @@ export default function WelcomePage({
                   m=".5rem"
                   maxLength={4}
                   onChange={(e) => setSessionKey(e.target.value.toUpperCase())}
-                ></Input>
+                />
                 <Button
                   mt=".5rem"
                   onClick={() => navigate(`/live/${sessionKey}`)}
@@ -74,17 +77,12 @@ export default function WelcomePage({
                 </Button>
               </Flex>
             </Flex>
-            <RouterLink to="/">
-              <MenuItem icon={<FaListUl />}>My Wishlist</MenuItem>
-            </RouterLink>
-            <RouterLink to="songbooks">
-              <MenuItem icon={<BsFillJournalBookmarkFill />}>
-                My Songbooks
-              </MenuItem>
-            </RouterLink>
-            <RouterLink to="sing-alongs">
-              <MenuItem icon={<RxLapTimer />}>My Sing-Alongs</MenuItem>
-            </RouterLink>
+            <MenuItem
+              icon={colorMode === "light" ? <MdDarkMode /> : <MdLightMode />}
+              onClick={toggleColorMode}
+            >
+              {colorMode === "light" ? "Dark Mode" : "Light Mode"}
+            </MenuItem>
           </MenuList>
         </Menu>
 
@@ -99,13 +97,13 @@ export default function WelcomePage({
         <UserProfile asyncUser={asyncUser} />
       </Flex>
 
-      <Flex direction="column" alignItems="center">
-        {activeSingalongs && (
+      <Flex direction="column" alignItems="center" width="100%">
+        {activeSingalongs && activeSingalongs.length > 0 && (
           <Flex direction="column">
             {activeSingalongs.map((songbook) => (
               <Button
                 key={songbook.session_key}
-                margin="2rem"
+                margin="1rem"
                 leftIcon={<WarningIcon />}
                 colorScheme="yellow"
                 textAlign="center"
@@ -117,7 +115,9 @@ export default function WelcomePage({
             ))}
           </Flex>
         )}
-        <Outlet />
+        <WishlistForm />
+        <Divider my="1rem" />
+        <ViewAllSongbooks />
       </Flex>
     </>
   );
