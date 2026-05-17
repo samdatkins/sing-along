@@ -4,7 +4,7 @@ import { UseAsyncReturn } from "react-async-hook";
 import { ApplicationState, Songbook, User } from "../models";
 
 import ActionPrompt from "./ActionPrompt";
-import TabDisplay from "./TabDisplay";
+import TabDisplay, { useBumpAnimation } from "./TabDisplay";
 
 interface TabsProps {
   asyncSongbook: UseAsyncReturn<AxiosResponse<Songbook, any>, never[]>;
@@ -33,6 +33,7 @@ function TabContainer({
 }: TabsProps) {
   const tab = asyncSongbook.result?.data?.current_song_entry?.song?.content;
   const showSkeleton = !asyncSongbook?.result || isPreviewing;
+  const bumpRef = useBumpAnimation(bumpDirection, bumpKey, clearBump);
 
   return (
     <>
@@ -45,7 +46,7 @@ function TabContainer({
       {applicationState === ApplicationState.PrepForSong && (
         <ActionPrompt text="¡GET READY!" animate={false} />
       )}
-      <Box p="1rem 1rem 0 1rem" width="100%" height="100%" overflow="hidden">
+      <Box ref={bumpRef} p="1rem 1rem 0 1rem" width="100%" height="100%" overflow="hidden">
         <SkeletonText
           noOfLines={80}
           isLoaded={!showSkeleton}
@@ -61,9 +62,6 @@ function TabContainer({
             defaultTranspose={
               asyncSongbook?.result?.data?.current_song_entry?.song?.transpose
             }
-            bumpDirection={bumpDirection}
-            bumpKey={bumpKey}
-            clearBump={clearBump}
           />
         )}
       </Box>

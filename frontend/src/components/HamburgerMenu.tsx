@@ -309,11 +309,9 @@ export default function HamburgerMenu({
           (direction === "left" && effectivePosition <= 1) ||
           (direction === "right" && effectivePosition >= totalSongs);
 
-        if (atSongBoundary) {
-          onBoundaryBump(direction);
-          boundaryPressCountRef.current = 0;
-          boundaryDirectionRef.current = null;
-        } else {
+        onBoundaryBump(direction);
+
+        if (!atSongBoundary) {
           if (boundaryDirectionRef.current === direction) {
             boundaryPressCountRef.current += 1;
           } else {

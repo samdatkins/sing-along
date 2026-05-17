@@ -6,7 +6,7 @@ import { formatTab, splitTabIntoColumns } from "../helpers/tab";
 import { LINES_PER_COLUMN, User } from "../models";
 import transposer from "./transposer";
 
-function useBumpAnimation(
+export function useBumpAnimation(
   bumpDirection: "left" | "right" | null | undefined,
   bumpKey: number | undefined,
   clearBump: (() => void) | undefined
@@ -14,14 +14,17 @@ function useBumpAnimation(
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!bumpDirection || !ref.current) return;
-    const offset = bumpDirection === "left" ? -12 : 12;
-    const animation = ref.current.animate(
+    if (!bumpDirection || !ref.current) {
+      return;
+    }
+    const el = ref.current;
+    const offset = bumpDirection === "left" ? -20 : 20;
+    const animation = el.animate(
       [
-        { transform: "translateX(0)" },
-        { transform: `translateX(${offset}px)`, offset: 0.3 },
-        { transform: `translateX(${-offset / 3}px)`, offset: 0.6 },
-        { transform: "translateX(0)" },
+        { transform: "translateX(0)", opacity: 1 },
+        { transform: `translateX(${offset}px)`, opacity: 0.7, offset: 0.3 },
+        { transform: `translateX(${-offset / 3}px)`, opacity: 0.9, offset: 0.6 },
+        { transform: "translateX(0)", opacity: 1 },
       ],
       { duration: 300, easing: "ease-out" }
     );
@@ -39,9 +42,6 @@ interface TabDisplayProps {
   asyncUser: UseAsyncReturn<false | AxiosResponse<User, any>, never[]>;
   fontScale: number;
   defaultTranspose: number | undefined;
-  bumpDirection?: "left" | "right" | null;
-  bumpKey?: number;
-  clearBump?: () => void;
 }
 
 export default function TabDisplay({
@@ -51,9 +51,6 @@ export default function TabDisplay({
   asyncUser,
   fontScale,
   defaultTranspose,
-  bumpDirection,
-  bumpKey,
-  clearBump,
 }: TabDisplayProps) {
   const [toneSteps, setToneSteps] = useState(0);
   const [usesSharps, setUsesSharps] = useState(true);
@@ -118,9 +115,6 @@ export default function TabDisplay({
           <MobileChords
             tabToDisplay={formattedTabArray}
             showChords={showChords}
-            bumpDirection={bumpDirection}
-            bumpKey={bumpKey}
-            clearBump={clearBump}
           />
         ) : (
           <DesktopChords
@@ -131,9 +125,6 @@ export default function TabDisplay({
             firstColDispIndex={firstColDispIndex}
             columnsOnScreen={columnsOnScreen}
             fontScale={fontScale}
-            bumpDirection={bumpDirection}
-            bumpKey={bumpKey}
-            clearBump={clearBump}
           />
         ))}
     </>
@@ -148,9 +139,6 @@ type DesktopChordsProps = {
   firstColDispIndex: number;
   columnsOnScreen: number;
   fontScale: number;
-  bumpDirection?: "left" | "right" | null;
-  bumpKey?: number;
-  clearBump?: () => void;
 };
 
 function DesktopChords({
@@ -161,9 +149,6 @@ function DesktopChords({
   columnsOnScreen,
   isLoading,
   fontScale,
-  bumpDirection,
-  bumpKey,
-  clearBump,
 }: DesktopChordsProps) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
   const columnsToDisplayOnScreen = Math.min(
@@ -173,11 +158,8 @@ function DesktopChords({
   const totalPercentageWidthOfScreen =
     100 * (tabToDisplay?.length / columnsToDisplayOnScreen);
 
-  const bumpRef = useBumpAnimation(bumpDirection, bumpKey, clearBump);
-
   return (
     <Flex
-      ref={bumpRef}
       direction="row"
       left={`-${50 * firstColDispIndex}%`}
       width={`${totalPercentageWidthOfScreen}%`}
@@ -221,15 +203,9 @@ function DesktopChords({
 function MobileChords({
   tabToDisplay,
   showChords,
-  bumpDirection,
-  bumpKey,
-  clearBump,
 }: {
   tabToDisplay: string[];
   showChords: boolean;
-  bumpDirection?: "left" | "right" | null;
-  bumpKey?: number;
-  clearBump?: () => void;
 }) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
   const fontStyles = showChords
@@ -241,10 +217,8 @@ function MobileChords({
         wordWrap: "break-word",
       };
 
-  const bumpRef = useBumpAnimation(bumpDirection, bumpKey, clearBump);
-
   return (
-    <Box ref={bumpRef} as="pre" sx={fontStyles as any}>
+    <Box as="pre" sx={fontStyles as any}>
       {tabToDisplay &&
         tabToDisplay.map((tabLine: string) => {
           if (tabLine.includes("[ch]")) {
