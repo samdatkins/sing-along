@@ -1,16 +1,17 @@
 import {
-  Box,
   Button,
+  ButtonGroup,
   Flex,
+  FormControl,
   FormLabel,
   Input,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
+  VStack,
 } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
@@ -36,14 +37,22 @@ export default function CreateEditSongbook({
   const [title, setTitle] = useState<string>("");
   const [actionVerb, setActionVerb] = useState<string>("DANCE");
   const [theme, setTheme] = useState<string>("");
+  const [isNoodle, setIsNoodle] = useState<boolean>(is_noodle_mode);
+
+  const isCreating = asyncSongbook === null;
 
   useEffect(() => {
-    if (isOpen && asyncSongbook && asyncSongbook.result) {
-      if (asyncSongbook?.result?.data.max_active_songs !== null)
-        setMaxSongs(asyncSongbook?.result?.data.max_active_songs);
-      setTitle(asyncSongbook?.result?.data.title);
-      setActionVerb(asyncSongbook?.result?.data.action_verb);
-      setTheme(asyncSongbook?.result?.data.theme);
+    if (isOpen) {
+      if (asyncSongbook && asyncSongbook.result) {
+        if (asyncSongbook.result.data.max_active_songs !== null)
+          setMaxSongs(asyncSongbook.result.data.max_active_songs);
+        setTitle(asyncSongbook.result.data.title);
+        setActionVerb(asyncSongbook.result.data.action_verb);
+        setTheme(asyncSongbook.result.data.theme);
+        setIsNoodle(asyncSongbook.result.data.is_noodle_mode);
+      } else {
+        setIsNoodle(is_noodle_mode);
+      }
     }
   }, [
     isOpen,
@@ -52,27 +61,25 @@ export default function CreateEditSongbook({
     asyncSongbook?.result?.data.theme,
     asyncSongbook?.result?.data.is_noodle_mode,
     asyncSongbook?.result?.data.action_verb,
+    is_noodle_mode,
   ]);
 
   const navigate = useNavigate();
 
-  const handleButtonClick = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (asyncSongbook === null) {
+    if (isCreating) {
       const result = await createNewSongbook(
         maxSongs,
         title,
         actionVerb,
-        is_noodle_mode,
+        isNoodle,
         theme
       );
       if (result !== false) {
         navigate(`/live/${result.data.session_key}`);
-      } else {
-        console.log("Couldn't create new songbook.");
       }
-    }
-    if (asyncSongbook && asyncSongbook.result) {
+    } else if (asyncSongbook && asyncSongbook.result) {
       const result = await editSongbook(
         asyncSongbook.result.data.session_key,
         maxSongs,
@@ -82,41 +89,67 @@ export default function CreateEditSongbook({
       );
       if (result !== false) {
         onClose();
-      } else {
-        console.log("Couldn't edit songbook details.");
       }
     }
   };
 
-  const bookType = is_noodle_mode ? "Songbook" : "Sing-Along";
+  const bookType = isNoodle ? "Songbook" : "Sing-Along";
 
   return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
-            {asyncSongbook !== null
-              ? `Settings for ${asyncSongbook.result?.data.title || bookType}`
-              : `Create ${bookType}`}
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box padding="1rem">
-              <form>
-                <FormLabel>{bookType} Title:</FormLabel>
+    <Modal isOpen={isOpen} onClose={onClose} isCentered>
+      <ModalOverlay />
+      <ModalContent mx="1rem" borderRadius="xl">
+        <ModalHeader textAlign="center" pb="0">
+          {isCreating ? "" : `Settings for ${asyncSongbook?.result?.data.title || bookType}`}
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody pb="2rem" pt="1rem">
+          <form onSubmit={handleSubmit}>
+            <VStack spacing="1rem" align="stretch">
+              {isCreating && (
+                <FormControl>
+                  <Flex justifyContent="center">
+                    <ButtonGroup size="sm" isAttached>
+                      <Button
+                        onClick={() => setIsNoodle(false)}
+                        variant={!isNoodle ? "solid" : "outline"}
+                        colorScheme={!isNoodle ? "blue" : "gray"}
+                      >
+                        Sing-Along
+                      </Button>
+                      <Button
+                        onClick={() => setIsNoodle(true)}
+                        variant={isNoodle ? "solid" : "outline"}
+                        colorScheme={isNoodle ? "blue" : "gray"}
+                      >
+                        Songbook
+                      </Button>
+                    </ButtonGroup>
+                  </Flex>
+                </FormControl>
+              )}
+
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="medium">
+                  Title
+                </FormLabel>
                 <Input
                   value={title}
-                  mb="1rem"
+                  placeholder={`My ${bookType}`}
                   onChange={(e) =>
                     e.target.value.length <= 40 && setTitle(e.target.value)
                   }
                 />
-                <FormLabel>Song Cap (optional):</FormLabel>
+              </FormControl>
+
+              <FormControl isDisabled={isNoodle}>
+                <FormLabel fontSize="sm" fontWeight="medium">
+                  Song Cap (optional)
+                </FormLabel>
                 <Input
                   value={maxSongs || ""}
-                  width="70px"
-                  mb="1rem"
+                  width="80px"
+                  placeholder="--"
                   onChange={(e) => {
                     if (typeof parseInt(e.target.value) === "number") {
                       e.target.value.length < 4 &&
@@ -127,43 +160,49 @@ export default function CreateEditSongbook({
                     }
                   }}
                 />
-                {!is_noodle_mode && (
-                  <>
-                    <FormLabel>Action Verb:</FormLabel>
-                    <Input
-                      mb="1rem"
-                      value={actionVerb}
-                      onChange={(e) => {
-                        if (e.target.value.length < 9) {
-                          setActionVerb(e.target.value.toUpperCase());
-                        }
-                      }}
-                    />
-                  </>
-                )}
-                <FormLabel>Theme:</FormLabel>
+              </FormControl>
+
+              <FormControl isDisabled={isNoodle}>
+                <FormLabel fontSize="sm" fontWeight="medium">
+                  Action Verb
+                </FormLabel>
                 <Input
-                  mb="1rem"
+                  value={actionVerb}
+                  placeholder="DANCE"
+                  onChange={(e) => {
+                    if (e.target.value.length < 9) {
+                      setActionVerb(e.target.value.toUpperCase());
+                    }
+                  }}
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="medium">
+                  Theme
+                </FormLabel>
+                <Input
                   value={theme}
+                  placeholder="Optional"
                   onChange={(e) => {
                     e.target.value.length <= 40 && setTheme(e.target.value);
                   }}
                 />
-                <Flex justifyContent="center">
-                  <Button
-                    disabled={title.length < 1}
-                    onClick={handleButtonClick}
-                    mt="1rem"
-                  >
-                    {asyncSongbook !== null ? `Update` : `Create`}
-                  </Button>
-                </Flex>
-              </form>
-            </Box>
-          </ModalBody>
-          <ModalFooter></ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
+              </FormControl>
+
+              <Button
+                type="submit"
+                colorScheme="blue"
+                width="100%"
+                mt="0.5rem"
+                isDisabled={title.length < 1}
+              >
+                {isCreating ? `Create ${bookType}` : "Update"}
+              </Button>
+            </VStack>
+          </form>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }

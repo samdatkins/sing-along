@@ -1,7 +1,6 @@
 import { HamburgerIcon, WarningIcon } from "@chakra-ui/icons";
 import {
   Button,
-  Divider,
   Flex,
   Heading,
   IconButton,
@@ -10,6 +9,11 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
   useColorMode,
 } from "@chakra-ui/react";
@@ -115,9 +119,22 @@ export default function WelcomePage({
             ))}
           </Flex>
         )}
-        <WishlistForm />
-        <Divider my="1rem" />
-        <ViewAllSongbooks />
+        <Tabs width="100%" defaultIndex={0} isFitted>
+          <TabList>
+            <Tab>Wishlist</Tab>
+            <Tab>Songbooks</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <Flex direction="column" alignItems="center">
+                <WishlistForm />
+              </Flex>
+            </TabPanel>
+            <TabPanel>
+              <ViewAllSongbooks />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Flex>
     </>
   );
