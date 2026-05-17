@@ -29,6 +29,7 @@ interface TabDisplayProps {
   fontScale: number;
   defaultTranspose: number | undefined;
   bumpDirection?: "left" | "right" | null;
+  bumpKey?: number;
   clearBump?: () => void;
 }
 
@@ -40,6 +41,7 @@ export default function TabDisplay({
   fontScale,
   defaultTranspose,
   bumpDirection,
+  bumpKey,
   clearBump,
 }: TabDisplayProps) {
   const [toneSteps, setToneSteps] = useState(0);
@@ -106,6 +108,7 @@ export default function TabDisplay({
             tabToDisplay={formattedTabArray}
             showChords={showChords}
             bumpDirection={bumpDirection}
+            bumpKey={bumpKey}
             clearBump={clearBump}
           />
         ) : (
@@ -118,6 +121,7 @@ export default function TabDisplay({
             columnsOnScreen={columnsOnScreen}
             fontScale={fontScale}
             bumpDirection={bumpDirection}
+            bumpKey={bumpKey}
             clearBump={clearBump}
           />
         ))}
@@ -134,6 +138,7 @@ type DesktopChordsProps = {
   columnsOnScreen: number;
   fontScale: number;
   bumpDirection?: "left" | "right" | null;
+  bumpKey?: number;
   clearBump?: () => void;
 };
 
@@ -146,6 +151,7 @@ function DesktopChords({
   isLoading,
   fontScale,
   bumpDirection,
+  bumpKey,
   clearBump,
 }: DesktopChordsProps) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
@@ -162,6 +168,7 @@ function DesktopChords({
 
   return (
     <Flex
+      key={bumpKey || 0}
       direction="row"
       left={`-${50 * firstColDispIndex}%`}
       width={`${totalPercentageWidthOfScreen}%`}
@@ -208,11 +215,13 @@ function MobileChords({
   tabToDisplay,
   showChords,
   bumpDirection,
+  bumpKey,
   clearBump,
 }: {
   tabToDisplay: string[];
   showChords: boolean;
   bumpDirection?: "left" | "right" | null;
+  bumpKey?: number;
   clearBump?: () => void;
 }) {
   const chordColor = useColorModeValue("teal.500", "cyan.300");
@@ -230,6 +239,7 @@ function MobileChords({
 
   return (
     <Box
+      key={bumpKey || 0}
       as="pre"
       sx={fontStyles as any}
       animation={mobileBumpAnimation}

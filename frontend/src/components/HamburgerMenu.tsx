@@ -305,27 +305,28 @@ export default function HamburgerMenu({
         const direction: "left" | "right" =
           event.code === "ArrowLeft" ? "left" : "right";
         const totalSongs = asyncSongbook.result?.data?.total_songs ?? 0;
+        const atSongBoundary =
+          (direction === "left" && effectivePosition <= 1) ||
+          (direction === "right" && effectivePosition >= totalSongs);
 
-        if (boundaryDirectionRef.current === direction) {
-          boundaryPressCountRef.current += 1;
-        } else {
-          boundaryPressCountRef.current = 1;
-          boundaryDirectionRef.current = direction;
-        }
-
-        if (boundaryPressCountRef.current >= BOUNDARY_PRESSES_TO_NAV) {
-          const atSongBoundary =
-            (direction === "left" && effectivePosition <= 1) ||
-            (direction === "right" && effectivePosition >= totalSongs);
-
-          if (atSongBoundary) {
-            onBoundaryBump(direction);
-          } else {
-            navigatePreview(direction === "left" ? -1 : 1);
-            setFirstColDispIndex(0);
-          }
+        if (atSongBoundary) {
+          onBoundaryBump(direction);
           boundaryPressCountRef.current = 0;
           boundaryDirectionRef.current = null;
+        } else {
+          if (boundaryDirectionRef.current === direction) {
+            boundaryPressCountRef.current += 1;
+          } else {
+            boundaryPressCountRef.current = 1;
+            boundaryDirectionRef.current = direction;
+          }
+
+          if (boundaryPressCountRef.current >= BOUNDARY_PRESSES_TO_NAV) {
+            navigatePreview(direction === "left" ? -1 : 1);
+            setFirstColDispIndex(0);
+            boundaryPressCountRef.current = 0;
+            boundaryDirectionRef.current = null;
+          }
         }
       }
     } else if (event.code === "KeyR") {

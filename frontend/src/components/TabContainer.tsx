@@ -15,6 +15,7 @@ interface TabsProps {
   columnsOnScreen: number;
   isPreviewing?: boolean;
   bumpDirection?: "left" | "right" | null;
+  bumpKey?: number;
   clearBump?: () => void;
 }
 
@@ -27,6 +28,7 @@ function TabContainer({
   fontScale,
   isPreviewing = false,
   bumpDirection,
+  bumpKey,
   clearBump,
 }: TabsProps) {
   const tab = asyncSongbook.result?.data?.current_song_entry?.song?.content;
@@ -60,6 +62,7 @@ function TabContainer({
               asyncSongbook?.result?.data?.current_song_entry?.song?.transpose
             }
             bumpDirection={bumpDirection}
+            bumpKey={bumpKey}
             clearBump={clearBump}
           />
         )}

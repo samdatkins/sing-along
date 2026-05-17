@@ -38,14 +38,16 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
   const columnsOnScreen =
     fontScale > MAX_FONT_ONE_COLUMN ? 1 : columnsOnScreenUserSetting;
 
-  const [bumpDirection, setBumpDirection] = useState<"left" | "right" | null>(
-    null
-  );
-  const handleBoundaryBump = useCallback(
-    (direction: "left" | "right") => setBumpDirection(direction),
-    []
-  );
-  const clearBump = useCallback(() => setBumpDirection(null), []);
+  const [bump, setBump] = useState<{
+    direction: "left" | "right";
+    key: number;
+  } | null>(null);
+  const bumpCounterRef = useRef(0);
+  const handleBoundaryBump = useCallback((direction: "left" | "right") => {
+    bumpCounterRef.current += 1;
+    setBump({ direction, key: bumpCounterRef.current });
+  }, []);
+  const clearBump = useCallback(() => setBump(null), []);
 
   // null = showing server's current song; number = 1-based preview position
   const [previewPosition, setPreviewPosition] = useState<number | null>(null);
@@ -223,7 +225,8 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
               columnsOnScreen={columnsOnScreen}
               fontScale={fontScale}
               isPreviewing={isPreviewing || isCommitting}
-              bumpDirection={bumpDirection}
+              bumpDirection={bump?.direction ?? null}
+              bumpKey={bump?.key ?? 0}
               clearBump={clearBump}
             />
           )}
