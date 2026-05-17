@@ -16,6 +16,8 @@ services:
       retries: 5
     ports:
       - 5432
+  redis:
+    image: redis:7-alpine
   web:
     build: .
     command: sh -c "scripts/docker-cicd-entrypoint.sh"
@@ -23,8 +25,10 @@ services:
       - .:/code
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - REDIS_URL=redis://redis:6379/0
     ports:
       - "8080:8080"
       - "5678:5678"
     depends_on:
       - db
+      - redis

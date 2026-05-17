@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 
+from api.broadcast import broadcast_songbook_update
 from api.models import Membership, Song, Songbook, SongEntry
 from api.serializers.song_entry import SongEntrySerializer
 from api.views.custom_exceptions import ConflictingStates, DuplicateValue
@@ -90,6 +91,7 @@ class SongEntryViewSet(
             song.save()
 
         self.perform_create(serializer)
+        broadcast_songbook_update(songbook.session_key)
         headers = self.get_success_headers(serializer.data)
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
@@ -98,6 +100,11 @@ class SongEntryViewSet(
     def perform_create(self, serializer):
         serializer.save(requested_by=self.request.user)
 
+    def perform_destroy(self, instance):
+        session_key = instance.songbook.session_key
+        super().perform_destroy(instance)
+        broadcast_songbook_update(session_key)
+
     @action(methods=["put", "delete"], detail=True, url_path="like", url_name="like")
     def like(self, request, pk):
         user = request.user
@@ -105,9 +112,11 @@ class SongEntryViewSet(
 
         if request.method == "PUT":
             instance.likes.add(user)
+            broadcast_songbook_update(instance.songbook.session_key)
             return Response(status=status.HTTP_201_CREATED)
         elif request.method == "DELETE":
             instance.likes.remove(user)
+            broadcast_songbook_update(instance.songbook.session_key)
             return Response(status=status.HTTP_202_ACCEPTED)
 
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -5,6 +5,7 @@ import {
   ApplicationState,
   DEFAULT_FONT_SCALE,
   MAX_FONT_ONE_COLUMN,
+  Songbook,
   SongCatalogEntry,
   User,
 } from "../models";
@@ -13,12 +14,11 @@ import TabContainer from "./TabContainer";
 
 import { AxiosResponse } from "axios";
 import { useParams } from "react-router-dom";
-import { useInterval } from "usehooks-ts";
 import SongbookContext from "../contexts/SongbookContext";
+import { useSongbookWebSocket } from "../hooks/useSongbookWebSocket";
 import { getCurrentSong, setSongbookSong } from "../services/songs";
 import Snowfall from "react-snowfall";
 
-const SONGBOOK_POLL_INTERVAL = 2 * 1000;
 const PREVIEW_DEBOUNCE_MS = 200;
 
 interface CurrentSongViewProps {
@@ -177,11 +177,14 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     }
   }, [songbook?.current_song_position, previewPosition]);
 
-  useInterval(() => {
-    if (!asyncSongbook.loading && !isPreviewing && !isCommitting) {
-      asyncSongbook.execute();
-    }
-  }, SONGBOOK_POLL_INTERVAL);
+  useSongbookWebSocket<Songbook>({
+    sessionKey,
+    onMessage: (data) => {
+      if (!isPreviewing && !isCommitting) {
+        asyncSongbook.merge({ result: { data } as AxiosResponse<Songbook> });
+      }
+    },
+  });
 
   return (
     <>

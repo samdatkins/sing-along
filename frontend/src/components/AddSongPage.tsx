@@ -12,8 +12,8 @@ import {
 import React, { useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useNavigate, useParams } from "react-router-dom";
-import { useInterval } from "usehooks-ts";
-import { ChakraAlertStatus } from "../models";
+import { ChakraAlertStatus, Songbook } from "../models";
+import { useSongbookWebSocket } from "../hooks/useSongbookWebSocket";
 import {
   addSongToSongbook,
   deleteSongbookSong,
@@ -34,11 +34,12 @@ const AddSongPage = () => {
     setLoading: (state) => ({ ...state, loading: true }),
   });
 
-  useInterval(() => {
-    if (!asyncSongbook.loading) {
-      asyncSongbook.execute();
-    }
-  }, 5000);
+  useSongbookWebSocket<Songbook>({
+    sessionKey,
+    onMessage: (data) => {
+      asyncSongbook.merge({ result: { data } as any });
+    },
+  });
 
   const songRequestInput = React.useRef(null);
 

@@ -9,11 +9,9 @@ import {
 import { getSongbookDetails } from "../services/songs";
 import { useAsync } from "react-async-hook";
 import { useParams } from "react-router-dom";
-import { useInterval } from "usehooks-ts";
+import { useSongbookWebSocket } from "../hooks/useSongbookWebSocket";
 import { isSongbookActive } from "../helpers/time";
 import SongPreviewCard from "./SongPreviewCard";
-
-const POLL_INTERVAL = 5 * 1000;
 
 export default function SongbookPreview() {
   const toast = useToast();
@@ -31,11 +29,14 @@ export default function SongbookPreview() {
       )
     : songbook?.song_entries;
 
-  useInterval(() => {
-    if (!asyncSongbookDetails.loading) {
-      asyncSongbookDetails.execute(sessionKey);
-    }
-  }, POLL_INTERVAL);
+  useSongbookWebSocket({
+    sessionKey,
+    onMessage: () => {
+      if (!asyncSongbookDetails.loading) {
+        asyncSongbookDetails.execute(sessionKey);
+      }
+    },
+  });
 
   return (
     <Container maxW="container.lg">

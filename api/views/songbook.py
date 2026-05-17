@@ -7,6 +7,7 @@ from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from api.broadcast import broadcast_songbook_update
 from api.models import Membership, Song, Songbook, SongbookUserPosition, SongEntry, SongMemo
 from api.serializers.songbook import (
     SongbookDetailSerializer,
@@ -149,6 +150,7 @@ class SongbookViewSet(
                     defaults={"current_song_timestamp": ts},
                 )
         serializer.save()
+        broadcast_songbook_update(instance.session_key)
 
     @action(methods=["patch"], detail=True, url_path="next-song", url_name="next-song")
     def next_song(self, request, session_key=None):
@@ -170,6 +172,7 @@ class SongbookViewSet(
             )
             instance.save()
 
+        broadcast_songbook_update(instance.session_key)
         return Response(status=status.HTTP_200_OK)
 
     @action(
@@ -199,6 +202,7 @@ class SongbookViewSet(
             )
             instance.save()
 
+        broadcast_songbook_update(instance.session_key)
         return Response(status=status.HTTP_200_OK)
 
     @action(

@@ -7,4 +7,4 @@ echo "Apply database migrations"
 python manage.py migrate
 
 echo "Starting prod server"
-gunicorn sing_along.wsgi:application --bind 0.0.0.0:8080 --workers 2 --preload --log-level=info --capture-output
+daphne -b 0.0.0.0 -p 8080 --proxy-headers sing_along.asgi:application

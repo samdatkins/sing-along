@@ -1,0 +1,22 @@
+---
+description: Keep poetry.lock in sync when dependencies change
+globs: pyproject.toml
+alwaysApply: false
+---
+
+# Poetry: Update the lock file after dependency changes
+
+When you add, remove, or change dependencies in `pyproject.toml`, you **must** run `poetry lock` before the work is considered done. The Docker build copies both `pyproject.toml` and `poetry.lock` into the image and runs `poetry install`, so a stale lock file will cause build failures.
+
+## Do this
+
+```bash
+poetry lock
+```
+
+Run this on the host (not inside Docker) immediately after editing `pyproject.toml`.
+
+## Do not
+
+- Skip the lock step and leave it for the Docker build to discover.
+- Run `poetry install` on the host just to update the lock — `poetry lock` is sufficient and faster.
