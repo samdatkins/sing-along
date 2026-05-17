@@ -21,12 +21,12 @@ class TestSong(APITestCase):
         self.user = UserFactory.create()
         self.empty_songbook = SongbookFactory.create()
 
-        self.first_song_entry = SongEntryFactory.create()
+        self.first_song_entry = SongEntryFactory.create(position=1)
         self.first_song_entry.created_at = get_datetime_x_seconds_ago(5)
         self.first_song_entry.save()
 
         self.nonempty_songbook = self.first_song_entry.songbook
-        self.nonempty_songbook.current_song_timestamp = get_datetime_x_seconds_ago(60)
+        self.nonempty_songbook.current_song_position = 1
         self.nonempty_songbook.save()
 
     def test_authed_requests_succeed(self):

@@ -21,12 +21,12 @@ class TestSongbookView(APITestCase):
             type=Membership.MemberType.OWNER.value,
         )
 
-        self.first_song_entry = SongEntryFactory.create(requested_by=self.user)
+        self.first_song_entry = SongEntryFactory.create(requested_by=self.user, position=1)
         self.first_song_entry.created_at = get_datetime_x_seconds_ago(5)
         self.first_song_entry.save()
 
         self.nonempty_songbook = self.first_song_entry.songbook
-        self.nonempty_songbook.current_song_timestamp = get_datetime_x_seconds_ago(60)
+        self.nonempty_songbook.current_song_position = 1
         self.nonempty_songbook.save()
         Membership.objects.create(
             user=self.user,
@@ -36,7 +36,7 @@ class TestSongbookView(APITestCase):
 
         self.not_my_songbook = SongbookFactory.create(session_key="nome")
 
-        self.participant_songbook = SongbookFactory.create(session_key="part")
+        self.participant_songbook = SongbookFactory.create(session_key="part", is_noodle_mode=False)
         Membership.objects.create(
             user=self.user,
             songbook=self.participant_songbook,
@@ -44,13 +44,13 @@ class TestSongbookView(APITestCase):
         )
 
         self.second_song_entry = SongEntryFactory.create(
-            songbook=self.nonempty_songbook, requested_by=self.user
+            songbook=self.nonempty_songbook, requested_by=self.user, position=2
         )
         self.second_song_entry.created_at = get_datetime_x_seconds_ago(3)
         self.second_song_entry.save()
 
         self.third_song_entry = SongEntryFactory.create(
-            songbook=self.nonempty_songbook, requested_by=self.user
+            songbook=self.nonempty_songbook, requested_by=self.user, position=3
         )
         self.third_song_entry.created_at = get_datetime_x_seconds_ago(1)
         self.third_song_entry.save()
@@ -255,8 +255,8 @@ class TestSongbookView(APITestCase):
         self.assertEqual(catalog[0]["title"], self.first_song_entry.song.title)
         self.assertEqual(catalog[1]["id"], self.second_song_entry.id)
         self.assertEqual(catalog[2]["id"], self.third_song_entry.id)
-        self.assertTrue(catalog[0]["created_at"] < catalog[1]["created_at"])
-        self.assertTrue(catalog[1]["created_at"] < catalog[2]["created_at"])
+        self.assertTrue(catalog[0]["position"] < catalog[1]["position"])
+        self.assertTrue(catalog[1]["position"] < catalog[2]["position"])
 
     def test_next_song_success_with_nonempty_songbook(self):
         # Arrange
@@ -280,7 +280,7 @@ class TestSongbookView(APITestCase):
 
     def test_previous_song_success_with_nonempty_songbook(self):
         # Arrange
-        self.nonempty_songbook.current_song_timestamp = self.third_song_entry.created_at
+        self.nonempty_songbook.current_song_position = 3
         self.nonempty_songbook.save()
         self.assertEqual(
             self.nonempty_songbook.get_current_song_entry(), self.third_song_entry

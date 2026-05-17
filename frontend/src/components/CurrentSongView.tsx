@@ -96,16 +96,16 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
 
   const previewCatalogEntry: SongCatalogEntry | undefined =
     isPreviewing && catalog.length > 0
-      ? catalog[previewPosition - 1]
+      ? catalog.find((e) => e.position === previewPosition)
       : undefined;
 
   const commitPreview = useCallback(
     async (position: number) => {
-      const entry = catalog[position - 1];
+      const entry = catalog.find((e) => e.position === position);
       if (!entry || !sessionKey) return;
       setIsCommitting(true);
       try {
-        await setSongbookSong(sessionKey, entry.created_at);
+        await setSongbookSong(sessionKey, entry.position);
         await asyncSongbook.execute();
         liveSongPositionRef.current = position;
         committedPositionRef.current = position;

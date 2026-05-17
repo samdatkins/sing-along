@@ -76,7 +76,7 @@ class SongbookConsumer(AsyncJsonWebsocketConsumer):
                     Prefetch(
                         "song_entries",
                         queryset=SongEntry.objects.order_by(
-                            "created_at"
+                            "position"
                         ).select_related("song"),
                     )
                 )

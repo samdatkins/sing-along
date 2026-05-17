@@ -1,7 +1,8 @@
 import datetime
 
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Prefetch, Q
+from django.db import transaction
+from django.db.models import Count, Max, Prefetch, Q
 from django.utils import timezone
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -69,7 +70,7 @@ class SongbookViewSet(
                 self.queryset.prefetch_related(
                     Prefetch(
                         "song_entries",
-                        queryset=SongEntry.objects.order_by("created_at").select_related("song"),
+                        queryset=SongEntry.objects.order_by("position").select_related("song"),
                     )
                 )
                 .prefetch_related("membership_set__user")
@@ -82,7 +83,7 @@ class SongbookViewSet(
             return queryset.prefetch_related(
                 Prefetch(
                     "song_entries",
-                    queryset=SongEntry.objects.order_by("created_at").prefetch_related(
+                    queryset=SongEntry.objects.order_by("position").prefetch_related(
                         Prefetch(
                             "song",
                             queryset=Song.objects.prefetch_related(
@@ -128,26 +129,26 @@ class SongbookViewSet(
 
     def _get_or_create_user_position(self, songbook, user):
         """For noodle-mode songbooks, return the user's position row, creating
-        it from the songbook's current_song_timestamp if it doesn't exist yet.
+        it from the songbook's current_song_position if it doesn't exist yet.
         Returns None for non-noodle songbooks."""
         if not songbook.is_noodle_mode:
             return None
         pos, _ = SongbookUserPosition.objects.get_or_create(
             songbook=songbook,
             user=user,
-            defaults={"current_song_timestamp": songbook.current_song_timestamp},
+            defaults={"current_song_position": songbook.current_song_position},
         )
         return pos
 
     def perform_update(self, serializer):
         instance = serializer.instance
         if instance.is_noodle_mode:
-            ts = serializer.validated_data.pop("current_song_timestamp", None)
-            if ts is not None:
+            song_pos = serializer.validated_data.pop("current_song_position", None)
+            if song_pos is not None:
                 SongbookUserPosition.objects.update_or_create(
                     songbook=instance,
                     user=self.request.user,
-                    defaults={"current_song_timestamp": ts},
+                    defaults={"current_song_position": song_pos},
                 )
         serializer.save()
         broadcast_songbook_update(instance.session_key)
@@ -156,17 +157,17 @@ class SongbookViewSet(
     def next_song(self, request, session_key=None):
         instance = self.get_object()
         user_pos = self._get_or_create_user_position(instance, request.user)
-        user_ts = user_pos.current_song_timestamp if user_pos else None
+        pos_override = user_pos.current_song_position if user_pos else None
 
-        next_song_entry = instance.get_next_song_entry(timestamp_override=user_ts)
+        next_song_entry = instance.get_next_song_entry(position_override=pos_override)
         if next_song_entry is None:
             return Response(status=status.HTTP_409_CONFLICT)
 
         if user_pos:
-            user_pos.current_song_timestamp = next_song_entry.created_at
-            user_pos.save(update_fields=["current_song_timestamp", "updated_at"])
+            user_pos.current_song_position = next_song_entry.position
+            user_pos.save(update_fields=["current_song_position", "updated_at"])
         else:
-            instance.current_song_timestamp = next_song_entry.created_at
+            instance.current_song_position = next_song_entry.position
             instance.last_nav_action_taken_at = datetime.datetime.now(
                 tz=timezone.get_current_timezone()
             )
@@ -184,23 +185,43 @@ class SongbookViewSet(
     def previous_song(self, request, session_key=None):
         instance = self.get_object()
         user_pos = self._get_or_create_user_position(instance, request.user)
-        user_ts = user_pos.current_song_timestamp if user_pos else None
+        pos_override = user_pos.current_song_position if user_pos else None
 
         previous_song_entry = instance.get_previous_song_entry(
-            timestamp_override=user_ts
+            position_override=pos_override
         )
         if previous_song_entry is None:
             return Response(status=status.HTTP_409_CONFLICT)
 
         if user_pos:
-            user_pos.current_song_timestamp = previous_song_entry.created_at
-            user_pos.save(update_fields=["current_song_timestamp", "updated_at"])
+            user_pos.current_song_position = previous_song_entry.position
+            user_pos.save(update_fields=["current_song_position", "updated_at"])
         else:
-            instance.current_song_timestamp = previous_song_entry.created_at
+            instance.current_song_position = previous_song_entry.position
             instance.last_nav_action_taken_at = datetime.datetime.now(
                 tz=timezone.get_current_timezone()
             )
             instance.save()
+
+        broadcast_songbook_update(instance.session_key)
+        return Response(status=status.HTTP_200_OK)
+
+    @action(methods=["post"], detail=True, url_path="reorder", url_name="reorder")
+    def reorder(self, request, session_key=None):
+        instance = self.get_object()
+        entry_ids = request.data.get("entry_ids", [])
+
+        entries = {e.id: e for e in instance.song_entries.all()}
+        if set(entry_ids) != set(entries.keys()):
+            return Response(
+                {"detail": "entry_ids must contain exactly the songbook's entry IDs."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with transaction.atomic():
+            for new_position, entry_id in enumerate(entry_ids, start=1):
+                entries[entry_id].position = new_position
+            SongEntry.objects.bulk_update(entries.values(), ["position"])
 
         broadcast_songbook_update(instance.session_key)
         return Response(status=status.HTTP_200_OK)

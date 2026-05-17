@@ -19,6 +19,7 @@ export type SongEntry = {
   created_at: string;
   updated_at: string;
   play_time: string;
+  position: number;
   song: Song;
   is_flagged: boolean;
   likes_count: number;
@@ -40,7 +41,7 @@ export type Recommendation = {
 
 export type SongCatalogEntry = {
   id: number;
-  created_at: string;
+  position: number;
   artist: string;
   title: string;
 };
@@ -54,7 +55,6 @@ export type Songbook = {
   total_songs: number;
   current_song_position: number;
   current_song_entry: SongEntry;
-  current_song_timestamp: string;
   is_songbook_owner: boolean;
   is_current_song_liked: boolean;
   membership_set: Member[];
@@ -83,7 +83,7 @@ export type SongbookListItem = {
   max_active_songs?: number;
   title: string;
   is_noodle_mode: boolean;
-  current_song_timestamp: string;
+  current_song_position: number;
   created_at: string;
   updated_at: string;
   total_songs: number;

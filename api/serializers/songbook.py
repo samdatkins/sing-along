@@ -25,7 +25,6 @@ class SongbookSerializer(serializers.ModelSerializer):
             "current_song_position",
             "current_song_entry",
             "id",
-            "current_song_timestamp",
             "is_songbook_owner",
             "is_current_song_liked",
             "membership_set",
@@ -59,9 +58,9 @@ class SongbookSerializer(serializers.ModelSerializer):
 
         return membership[0].type == Membership.MemberType.OWNER.value
 
-    def _get_user_timestamp(self, obj):
+    def _get_user_position(self, obj):
         """For noodle mode, get-or-create the user's position and return their
-        timestamp. For non-noodle mode, return None so model methods use the
+        song position. For non-noodle mode, return None so model methods use the
         songbook's default."""
         if not obj.is_noodle_mode:
             return None
@@ -71,20 +70,20 @@ class SongbookSerializer(serializers.ModelSerializer):
         pos, _ = SongbookUserPosition.objects.get_or_create(
             songbook=obj,
             user=request.user,
-            defaults={"current_song_timestamp": obj.current_song_timestamp},
+            defaults={"current_song_position": obj.current_song_position},
         )
-        return pos.current_song_timestamp
+        return pos.current_song_position
 
     def get_total_songs(self, obj):
         return obj.get_total_song_count()
 
     def get_current_song_position(self, obj):
-        ts = self._get_user_timestamp(obj)
-        return obj.get_current_song_position(timestamp_override=ts)
+        user_pos = self._get_user_position(obj)
+        return obj.get_current_song_position(position_override=user_pos)
 
     def get_current_song_entry(self, obj):
-        ts = self._get_user_timestamp(obj)
-        song_entry = obj.get_current_song_entry(timestamp_override=ts)
+        user_pos = self._get_user_position(obj)
+        song_entry = obj.get_current_song_entry(position_override=user_pos)
         if song_entry is None:
             return None
         return SongEntrySerializer(song_entry).data
@@ -103,8 +102,8 @@ class SongbookSerializer(serializers.ModelSerializer):
         if request and hasattr(request, "user"):
             user = request.user
 
-        ts = self._get_user_timestamp(obj)
-        song_entry = obj.get_current_song_entry(timestamp_override=ts)
+        user_pos = self._get_user_position(obj)
+        song_entry = obj.get_current_song_entry(position_override=user_pos)
         if song_entry is None or user is None:
             return False
 
@@ -114,7 +113,7 @@ class SongbookSerializer(serializers.ModelSerializer):
         return [
             {
                 "id": entry.id,
-                "created_at": entry.created_at.isoformat(),
+                "position": entry.position,
                 "artist": entry.song.artist,
                 "title": entry.song.title,
             }
@@ -123,7 +122,7 @@ class SongbookSerializer(serializers.ModelSerializer):
 
 
 class SongbookListSerializer(serializers.ModelSerializer):
-    current_song_timestamp = serializers.DateTimeField(read_only=False, required=False)
+    current_song_position = serializers.IntegerField(read_only=False, required=False)
     total_songs = serializers.SerializerMethodField()
     is_songbook_owner = serializers.SerializerMethodField()
     membership_set = serializers.SerializerMethodField()
@@ -137,7 +136,7 @@ class SongbookListSerializer(serializers.ModelSerializer):
             "theme",
             "action_verb",
             "is_noodle_mode",
-            "current_song_timestamp",
+            "current_song_position",
             "created_at",
             "updated_at",
             "total_songs",
@@ -199,7 +198,6 @@ class SongbookDetailSerializer(serializers.ModelSerializer):
             "action_verb",
             "is_noodle_mode",
             "song_entries",
-            "current_song_timestamp",
             "current_song_position",
             "created_at",
         ]
@@ -215,8 +213,8 @@ class SongbookDetailSerializer(serializers.ModelSerializer):
         pos, _ = SongbookUserPosition.objects.get_or_create(
             songbook=obj,
             user=request.user,
-            defaults={"current_song_timestamp": obj.current_song_timestamp},
+            defaults={"current_song_position": obj.current_song_position},
         )
         return obj.get_current_song_position(
-            timestamp_override=pos.current_song_timestamp
+            position_override=pos.current_song_position
         )

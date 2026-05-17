@@ -1,7 +1,6 @@
 import random
 import secrets
 import string
-from operator import attrgetter
 
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.indexes import GinIndex
@@ -37,8 +36,8 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
     session_key = models.CharField(
         max_length=4, null=False, blank=True, default=_generate_session_key
     )
-    current_song_timestamp = models.DateTimeField(
-        null=False, blank=True, auto_now_add=True
+    current_song_position = models.PositiveIntegerField(
+        null=False, blank=True, default=1
     )
     max_active_songs = models.IntegerField(null=True, blank=True)
     title = models.CharField(max_length=40, null=False, blank=False)
@@ -53,69 +52,56 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
         max_length=8, null=False, blank=False, default="DANCE"
     )
 
-    def get_next_song_entry(self, timestamp_override=None):
-        current_song_entry = self.get_current_song_entry(
-            timestamp_override=timestamp_override
-        )
-        if current_song_entry is None:
-            return None
-        next_songs = [
-            entry
-            for entry in self.song_entries.all()
-            if entry.created_at > current_song_entry.created_at
-        ]
-        return min(next_songs, key=attrgetter("created_at"), default=None)
+    def _resolve_entry_at_position(self, position):
+        """Return the song entry at *position*, clamping to the nearest valid
+        entry when the stored position is stale (e.g. songs were deleted).
 
-    def get_current_song_entry(self, timestamp_override=None):
-        timestamp = (
-            timestamp_override
-            if timestamp_override is not None
-            else self.current_song_timestamp
-        )
-        current_and_next_songs = [
-            entry
-            for entry in self.song_entries.all()
-            if entry.created_at >= timestamp
-        ]
-        current_song_entry = min(
-            current_and_next_songs, key=attrgetter("created_at"), default=None
-        )
-        if current_song_entry is None:
-            return max(
-                self.song_entries.all(), key=attrgetter("created_at"), default=None
-            )
-        return current_song_entry
-
-    def get_previous_song_entry(self, timestamp_override=None):
-        current_song_entry = self.get_current_song_entry(
-            timestamp_override=timestamp_override
-        )
-        if current_song_entry is None:
+        Returns ``None`` only when the songbook has no entries at all.
+        """
+        entries = list(self.song_entries.all())
+        if not entries:
             return None
 
-        previous_songs = [
-            entry
-            for entry in self.song_entries.all()
-            if entry.created_at < current_song_entry.created_at
+        exact = [e for e in entries if e.position == position]
+        if exact:
+            return exact[0]
+
+        # Clamp: largest position <= requested, else smallest overall
+        at_or_before = [e for e in entries if e.position <= position]
+        if at_or_before:
+            return max(at_or_before, key=lambda e: e.position)
+        return min(entries, key=lambda e: e.position)
+
+    def get_current_song_entry(self, position_override=None):
+        effective = position_override if position_override is not None else self.current_song_position
+        return self._resolve_entry_at_position(effective)
+
+    def get_next_song_entry(self, position_override=None):
+        current = self.get_current_song_entry(position_override=position_override)
+        if current is None:
+            return None
+        candidates = [
+            e for e in self.song_entries.all() if e.position > current.position
         ]
-        return max(previous_songs, key=attrgetter("created_at"), default=None)
+        return min(candidates, key=lambda e: e.position, default=None)
+
+    def get_previous_song_entry(self, position_override=None):
+        current = self.get_current_song_entry(position_override=position_override)
+        if current is None:
+            return None
+        candidates = [
+            e for e in self.song_entries.all() if e.position < current.position
+        ]
+        return max(candidates, key=lambda e: e.position, default=None)
 
     def get_total_song_count(self):
         return len(self.song_entries.all())
 
-    def get_current_song_position(self, timestamp_override=None):
-        current_song_entry = self.get_current_song_entry(
-            timestamp_override=timestamp_override
-        )
-        if current_song_entry is None:
+    def get_current_song_position(self, position_override=None):
+        current = self.get_current_song_entry(position_override=position_override)
+        if current is None:
             return 0
-        return len(
-            [
-                entry
-                for entry in self.song_entries.all()
-                if entry.created_at <= current_song_entry.created_at
-            ]
-        )
+        return current.position
 
 
 class Song(SafeDeleteModel, CreatedUpdated):
@@ -187,6 +173,7 @@ class SongEntry(SafeDeleteModel, CreatedUpdated):
     requested_by = models.ForeignKey(
         get_user_model(), null=True, blank=True, on_delete=models.DO_NOTHING
     )
+    position = models.PositiveIntegerField(null=False, blank=True, default=1)
     likes = models.ManyToManyField(
         get_user_model(), blank=True, related_name="song_entries", through="Like"
     )
@@ -225,7 +212,9 @@ class SongbookUserPosition(CreatedUpdated):
         Songbook, on_delete=models.CASCADE, related_name="user_positions"
     )
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    current_song_timestamp = models.DateTimeField(null=False)
+    current_song_position = models.PositiveIntegerField(
+        null=False, blank=True, default=1
+    )
 
 
 class UserProfile(SafeDeleteModel, CreatedUpdated):

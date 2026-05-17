@@ -56,7 +56,7 @@ export default function JumpSearch({
 
     setIsSubmitting.on();
     asyncSongbook.reset();
-    const success = await setSongbookSong(sessionKey, song.created_at);
+    const success = await setSongbookSong(sessionKey, song.position);
     if (success) {
       setSearchText("");
       onClose();
@@ -66,9 +66,9 @@ export default function JumpSearch({
   };
 
   const filteredSongs = asyncSongbookDetails?.result?.data?.song_entries
-    ?.map((songEntry, index) => ({
+    ?.map((songEntry) => ({
       ...songEntry,
-      displayIndex: index + 1,
+      displayIndex: songEntry.position,
     }))
     ?.filter((songEntry) => {
       if (searchText.length < 1) return false;

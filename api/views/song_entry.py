@@ -1,3 +1,5 @@
+from django.db.models import Max
+
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, PermissionDenied
@@ -98,11 +100,27 @@ class SongEntryViewSet(
         )
 
     def perform_create(self, serializer):
-        serializer.save(requested_by=self.request.user)
+        songbook_id = serializer.validated_data["songbook_id"]
+        max_pos = (
+            SongEntry.objects.filter(songbook_id=songbook_id).aggregate(
+                m=Max("position")
+            )["m"]
+            or 0
+        )
+        serializer.save(requested_by=self.request.user, position=max_pos + 1)
 
     def perform_destroy(self, instance):
-        session_key = instance.songbook.session_key
+        songbook = instance.songbook
+        session_key = songbook.session_key
         super().perform_destroy(instance)
+
+        # Renumber remaining entries to keep positions contiguous.
+        remaining = list(songbook.song_entries.order_by("position"))
+        for idx, entry in enumerate(remaining, start=1):
+            if entry.position != idx:
+                entry.position = idx
+        SongEntry.objects.bulk_update(remaining, ["position"])
+
         broadcast_songbook_update(session_key)
 
     @action(methods=["put", "delete"], detail=True, url_path="like", url_name="like")

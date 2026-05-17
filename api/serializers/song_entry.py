@@ -19,6 +19,7 @@ class SongEntrySerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "play_time",
+            "position",
             "song",
             "songbook_id",
             "song_id",

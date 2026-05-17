@@ -114,18 +114,33 @@ export async function editSongbook(
 
 export async function setSongbookSong(
   sessionKey: string | undefined,
-  songCreatedTime: string | undefined
+  position: number | undefined
 ) {
-  if (!sessionKey || !songCreatedTime) return;
+  if (!sessionKey || position === undefined) return;
 
   try {
     await axios.patch<Songbook>(`/api/songbooks/${sessionKey}/`, {
-      current_song_timestamp: songCreatedTime,
+      current_song_position: position,
     });
 
     return true;
   } catch (error) {
     console.error(`Couldn't set new song: ${error}`);
+    return false;
+  }
+}
+
+export async function reorderSongEntries(
+  sessionKey: string,
+  entryIds: number[]
+) {
+  try {
+    await axios.post(`/api/songbooks/${sessionKey}/reorder/`, {
+      entry_ids: entryIds,
+    });
+    return true;
+  } catch (error) {
+    console.error(`Couldn't reorder songs: ${error}`);
     return false;
   }
 }

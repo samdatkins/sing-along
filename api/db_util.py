@@ -29,7 +29,6 @@ def load_songbooks_and_entries(filename, tries=10):
             session_key=song_entry["session_key"],
             defaults={
                 "created_at": song_entry["songbook_created_at"],
-                "current_song_timestamp": song_entry["current_song_timestamp"],
                 "max_active_songs": song_entry["max_active_songs"],
                 "title": song_entry["songbook_title"][0:40],
                 "last_nav_action_taken_at": song_entry["last_nav_action_taken_at"],

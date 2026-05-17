@@ -14,31 +14,31 @@ class TestSongbook(TestCase):
         self.user = UserFactory.create()
         self.empty_songbook = SongbookFactory.create()
 
-        self.first_song_entry = SongEntryFactory.create()
+        self.first_song_entry = SongEntryFactory.create(position=1)
         self.first_song_entry.created_at = get_datetime_x_seconds_ago(5)
         self.first_song_entry.save()
 
         self.nonempty_songbook = self.first_song_entry.songbook
-        self.nonempty_songbook.current_song_timestamp = get_datetime_x_seconds_ago(60)
+        self.nonempty_songbook.current_song_position = 1
         self.nonempty_songbook.save()
 
         self.second_song_entry = SongEntryFactory.create(
-            songbook=self.nonempty_songbook
+            songbook=self.nonempty_songbook, position=2
         )
         self.second_song_entry.created_at = get_datetime_x_seconds_ago(3)
         self.second_song_entry.save()
 
-        self.third_song_entry = SongEntryFactory.create(songbook=self.nonempty_songbook)
+        self.third_song_entry = SongEntryFactory.create(
+            songbook=self.nonempty_songbook, position=3
+        )
         self.third_song_entry.created_at = get_datetime_x_seconds_ago(1)
         self.third_song_entry.save()
 
-        self.deleted_song_entry = SongEntryFactory.create()
+        self.deleted_song_entry = SongEntryFactory.create(position=1)
         self.deleted_song_entry.created_at = get_datetime_x_seconds_ago(5)
         self.deleted_song_entry.save()
         self.empty_from_deletion_songbook = self.deleted_song_entry.songbook
-        self.empty_from_deletion_songbook.current_song_timestamp = (
-            get_datetime_x_seconds_ago(60)
-        )
+        self.empty_from_deletion_songbook.current_song_position = 1
         self.empty_from_deletion_songbook.save()
         self.deleted_song_entry.delete()
 
@@ -92,7 +92,7 @@ class TestSongbook(TestCase):
         self.assertEqual(next_song, self.second_song_entry)
 
     def test_get_previous_song_entry_on_nonempty_songbook(self):
-        self.nonempty_songbook.current_song_timestamp = self.third_song_entry.created_at
+        self.nonempty_songbook.current_song_position = 3
         previous_song = self.nonempty_songbook.get_previous_song_entry()
         self.assertEqual(previous_song, self.second_song_entry)
 
@@ -103,9 +103,7 @@ class TestSongbook(TestCase):
     def test_get_current_song_position_on_nonempty_songbook(self):
         current_song_position = self.nonempty_songbook.get_current_song_position()
         self.assertEqual(current_song_position, 1)
-        self.nonempty_songbook.current_song_timestamp = (
-            self.second_song_entry.created_at
-        )
+        self.nonempty_songbook.current_song_position = 2
         current_song_position = self.nonempty_songbook.get_current_song_position()
         self.assertEqual(current_song_position, 2)
 
@@ -115,7 +113,7 @@ class TestSongbook(TestCase):
 
     # Test non-happy path nav
     def test_get_next_song_entry_at_end_on_nonempty_songbook(self):
-        self.nonempty_songbook.current_song_timestamp = self.third_song_entry.created_at
+        self.nonempty_songbook.current_song_position = 3
         next_song = self.nonempty_songbook.get_next_song_entry()
         self.assertEqual(next_song, None)
 
@@ -127,36 +125,26 @@ class TestSongbook(TestCase):
     # (could happen if a bunch of songs get deleted)
 
     def test_get_next_song_entry_on_nonempty_songbook_past_end(self):
-        self.nonempty_songbook.current_song_timestamp = get_datetime_x_seconds_ago(
-            -6000000
-        )
+        self.nonempty_songbook.current_song_position = 999
         next_song = self.nonempty_songbook.get_next_song_entry()
         self.assertEqual(next_song, None)
 
     def test_get_previous_song_entry_on_nonempty_songbook_when_past_end(self):
-        self.nonempty_songbook.current_song_timestamp = get_datetime_x_seconds_ago(
-            -6000000
-        )
+        self.nonempty_songbook.current_song_position = 999
         previous_song = self.nonempty_songbook.get_previous_song_entry()
         self.assertEqual(previous_song, self.second_song_entry)
 
     def test_get_current_song_entry_when_past_end(self):
-        self.nonempty_songbook.current_song_timestamp = get_datetime_x_seconds_ago(
-            -6000000
-        )
+        self.nonempty_songbook.current_song_position = 999
         current_song = self.nonempty_songbook.get_current_song_entry()
         self.assertEqual(current_song, self.third_song_entry)
 
     def test_get_current_song_position_when_past_end(self):
-        self.nonempty_songbook.current_song_timestamp = get_datetime_x_seconds_ago(
-            -6000000
-        )
+        self.nonempty_songbook.current_song_position = 999
         current_song_position = self.nonempty_songbook.get_current_song_position()
         self.assertEqual(current_song_position, 3)
 
     def test_get_total_song_count_on_nonempty_songbook_when_past_end(self):
-        self.nonempty_songbook.current_song_timestamp = get_datetime_x_seconds_ago(
-            -6000000
-        )
+        self.nonempty_songbook.current_song_position = 999
         soung_count = self.nonempty_songbook.get_total_song_count()
         self.assertEqual(soung_count, 3)

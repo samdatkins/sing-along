@@ -14,18 +14,18 @@ class TestRecommendation(APITestCase):
     def setUp(self):
         factory.random.reseed_random("lol so random")
         self.user = UserFactory.create()
-        self.first_song_entry = SongEntryFactory.create()
+        self.first_song_entry = SongEntryFactory.create(position=1)
         self.first_song_entry.created_at = get_datetime_x_seconds_ago(5)
         self.first_song_entry.save()
 
         self.unthemed_songbook = self.first_song_entry.songbook
 
-        self.unthemed_songbook.current_song_timestamp = get_datetime_x_seconds_ago(60)
+        self.unthemed_songbook.current_song_position = 1
         self.unthemed_songbook.save()
 
         self.unthemed_songbook_2 = SongbookFactory()
 
-        self.unthemed_songbook_2.current_song_timestamp = get_datetime_x_seconds_ago(60)
+        self.unthemed_songbook_2.current_song_position = 1
         self.unthemed_songbook_2.save()
 
         self.client.force_authenticate(user=self.user)
