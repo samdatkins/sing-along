@@ -1,25 +1,36 @@
 import { Box, Flex, Text, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
-import { keyframes } from "@emotion/react";
 import { AxiosResponse } from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { UseAsyncReturn } from "react-async-hook";
 import { formatTab, splitTabIntoColumns } from "../helpers/tab";
 import { LINES_PER_COLUMN, User } from "../models";
 import transposer from "./transposer";
 
-const bumpLeft = keyframes`
-  0% { transform: translateX(0); }
-  30% { transform: translateX(-12px); }
-  60% { transform: translateX(4px); }
-  100% { transform: translateX(0); }
-`;
+function useBumpAnimation(
+  bumpDirection: "left" | "right" | null | undefined,
+  bumpKey: number | undefined,
+  clearBump: (() => void) | undefined
+) {
+  const ref = useRef<HTMLDivElement>(null);
 
-const bumpRight = keyframes`
-  0% { transform: translateX(0); }
-  30% { transform: translateX(12px); }
-  60% { transform: translateX(-4px); }
-  100% { transform: translateX(0); }
-`;
+  useEffect(() => {
+    if (!bumpDirection || !ref.current) return;
+    const offset = bumpDirection === "left" ? -12 : 12;
+    const animation = ref.current.animate(
+      [
+        { transform: "translateX(0)" },
+        { transform: `translateX(${offset}px)`, offset: 0.3 },
+        { transform: `translateX(${-offset / 3}px)`, offset: 0.6 },
+        { transform: "translateX(0)" },
+      ],
+      { duration: 300, easing: "ease-out" }
+    );
+    animation.onfinish = () => clearBump?.();
+    return () => animation.cancel();
+  }, [bumpDirection, bumpKey, clearBump]);
+
+  return ref;
+}
 
 interface TabDisplayProps {
   tab: string | false | undefined;
@@ -162,20 +173,16 @@ function DesktopChords({
   const totalPercentageWidthOfScreen =
     100 * (tabToDisplay?.length / columnsToDisplayOnScreen);
 
-  const bumpAnimation = bumpDirection
-    ? `${bumpDirection === "left" ? bumpLeft : bumpRight} 0.3s ease`
-    : undefined;
+  const bumpRef = useBumpAnimation(bumpDirection, bumpKey, clearBump);
 
   return (
     <Flex
-      key={bumpKey || 0}
+      ref={bumpRef}
       direction="row"
       left={`-${50 * firstColDispIndex}%`}
       width={`${totalPercentageWidthOfScreen}%`}
       position="relative"
       transition={isLoading ? "left 0.4s ease" : ""}
-      animation={bumpAnimation}
-      onAnimationEnd={clearBump}
     >
       {tabToDisplay &&
         tabToDisplay.map((column, idx) => (
@@ -233,18 +240,11 @@ function MobileChords({
         whiteSpace: "pre-wrap",
         wordWrap: "break-word",
       };
-  const mobileBumpAnimation = bumpDirection
-    ? `${bumpDirection === "left" ? bumpLeft : bumpRight} 0.3s ease`
-    : undefined;
+
+  const bumpRef = useBumpAnimation(bumpDirection, bumpKey, clearBump);
 
   return (
-    <Box
-      key={bumpKey || 0}
-      as="pre"
-      sx={fontStyles as any}
-      animation={mobileBumpAnimation}
-      onAnimationEnd={clearBump}
-    >
+    <Box ref={bumpRef} as="pre" sx={fontStyles as any}>
       {tabToDisplay &&
         tabToDisplay.map((tabLine: string) => {
           if (tabLine.includes("[ch]")) {
