@@ -9,7 +9,6 @@ package-mode = false
 python = ">=3.10,<3.15"
 Django = ">=5.2.8,<5.3"
 psycopg = {extras = ["binary"], version = ">=3.1.8"}
-debugpy = "^1.8.0"
 whitenoise = "^6.6.0"
 django-safedelete = "^1.4.0"
 djangorestframework = "^3.15.0"
@@ -29,6 +28,7 @@ spotipy = "^2.23.0"
 curl_cffi = "^0.7"
 
 [tool.poetry.group.dev.dependencies]
+debugpy = "^1.8.0"
 factory-boy = "^3.3.0"
 black = "^24.0.0"
 coverage = "^7.0.0"

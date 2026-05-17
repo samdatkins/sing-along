@@ -1,0 +1,14 @@
+.git
+data/
+frontend/node_modules/
+frontend/.pnp.*
+frontend/.yarn/cache
+__pycache__
+*.pyc
+.env
+.venv
+*.egg-info
+.mypy_cache
+.pytest_cache
+.coverage
+htmlcov/
