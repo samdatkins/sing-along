@@ -27,9 +27,6 @@ interface Shortcut {
   description: string;
 }
 
-const isMac =
-  typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
-const modKey = isMac ? "Cmd" : "Ctrl";
 
 function ShortcutSection({
   title,
@@ -131,7 +128,7 @@ export default function KeyboardShortcutsModal({
     {
       keys: (
         <>
-          <Kbd>{modKey}</Kbd> + <Kbd>=</Kbd>
+          <Kbd>Ctrl</Kbd> + <Kbd>=</Kbd>
         </>
       ),
       description: "Increase font size",
@@ -139,7 +136,7 @@ export default function KeyboardShortcutsModal({
     {
       keys: (
         <>
-          <Kbd>{modKey}</Kbd> + <Kbd>-</Kbd>
+          <Kbd>Ctrl</Kbd> + <Kbd>-</Kbd>
         </>
       ),
       description: "Decrease font size",
