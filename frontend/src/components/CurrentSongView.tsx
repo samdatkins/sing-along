@@ -117,17 +117,28 @@ function CurrentSongView({ asyncUser }: CurrentSongViewProps) {
     [catalog, sessionKey, asyncSongbook]
   );
 
+  const sortedPositions = catalog.map((e) => e.position).sort((a, b) => a - b);
+
   const navigatePreview = useCallback(
     (delta: number) => {
-      const totalSongs = songbook?.total_songs ?? 0;
-      if (totalSongs === 0) return;
+      if (sortedPositions.length === 0) return;
 
       setPreviewPosition((prev) => {
         const current = prev ?? liveSongPositionRef.current;
-        return Math.max(1, Math.min(totalSongs, current + delta));
+        let idx = sortedPositions.indexOf(current);
+        if (idx === -1) {
+          // Current position not in catalog; find the nearest entry
+          idx = sortedPositions.findIndex((p) => p >= current);
+          if (idx === -1) idx = sortedPositions.length - 1;
+        }
+        const newIdx = Math.max(
+          0,
+          Math.min(sortedPositions.length - 1, idx + delta)
+        );
+        return sortedPositions[newIdx];
       });
     },
-    [songbook?.total_songs]
+    [sortedPositions]
   );
 
   // Clear preview/committing only once server songbook reflects the committed position (avoids stale asyncSongbook.result flash).
