@@ -4440,6 +4440,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@svgdotjs/svg.js@npm:^3.0.12":
+  version: 3.2.5
+  resolution: "@svgdotjs/svg.js@npm:3.2.5"
+  checksum: 10c0/c0b3b801166a3a99a6a451ccbb1230f47b6e1533697a36c3d366d6a828bffd076fa318e75a6165912f58687dc796492ce1138e350b61da7270d96d4d034cd044
+  languageName: node
+  linkType: hard
+
 "@svgr/babel-plugin-add-jsx-attribute@npm:^5.4.0":
   version: 5.4.0
   resolution: "@svgr/babel-plugin-add-jsx-attribute@npm:5.4.0"
@@ -4626,6 +4633,13 @@ __metadata:
   peerDependencies:
     "@testing-library/dom": ">=7.21.4"
   checksum: 10c0/ff57edaeab31322c80c3f01d55404b4cebb907b9ec7672b96a1a14d053f172046b01c5f27b45677927ebee8ed91bce695a7d09edec9a48875cfacabe39d0426a
+  languageName: node
+  linkType: hard
+
+"@tombatossals/chords-db@npm:^0.5.1":
+  version: 0.5.1
+  resolution: "@tombatossals/chords-db@npm:0.5.1"
+  checksum: 10c0/00da8c253c0f25c2dc258dd21b169bea408ed93efe43c11826a1d9193f940aa92aef2b3b987a7a2568d61b09c0ab925a8b21dfef1ff75334852b473b3aa73b06
   languageName: node
   linkType: hard
 
@@ -13968,6 +13982,7 @@ __metadata:
     "@testing-library/jest-dom": "npm:^5.16.5"
     "@testing-library/react": "npm:^13.4.0"
     "@testing-library/user-event": "npm:^13.5.0"
+    "@tombatossals/chords-db": "npm:^0.5.1"
     "@types/jest": "npm:29.2.x"
     "@types/node": "npm:^16.18.3"
     "@types/react": "npm:^18.0.25"
@@ -13992,6 +14007,7 @@ __metadata:
     reconnecting-websocket: "npm:^4.4.0"
     typescript: "npm:^4.9.3"
     usehooks-ts: "npm:^2.9.1"
+    vexchords: "npm:^1.2.0"
     web-vitals: "npm:^2.1.4"
   languageName: unknown
   linkType: soft
@@ -15078,6 +15094,15 @@ __metadata:
   version: 1.1.2
   resolution: "vary@npm:1.1.2"
   checksum: 10c0/f15d588d79f3675135ba783c91a4083dcd290a2a5be9fcb6514220a1634e23df116847b1cc51f66bfb0644cf9353b2abb7815ae499bab06e46dd33c1a6bf1f4f
+  languageName: node
+  linkType: hard
+
+"vexchords@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "vexchords@npm:1.2.0"
+  dependencies:
+    "@svgdotjs/svg.js": "npm:^3.0.12"
+  checksum: 10c0/c37598e8db48f416d51731a5d6834fce6b35c552259f794b8c43fdd61eda37063ed01236e999b497806332fe2e0e9a708d7d53055eccc1e55d1f7110fac35d46
   languageName: node
   linkType: hard
 

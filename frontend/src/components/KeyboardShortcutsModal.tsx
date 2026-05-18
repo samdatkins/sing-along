@@ -27,7 +27,6 @@ interface Shortcut {
   description: string;
 }
 
-
 function ShortcutSection({
   title,
   shortcuts,
@@ -155,6 +154,10 @@ export default function KeyboardShortcutsModal({
     {
       keys: <Kbd>#</Kbd>,
       description: "Toggle sharps / flats",
+    },
+    {
+      keys: <Kbd>c</Kbd>,
+      description: "Toggle chord diagrams at top of song",
     },
   ];
 

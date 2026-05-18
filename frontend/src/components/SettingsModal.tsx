@@ -19,6 +19,10 @@ import { useEffect, useState } from "react";
 import { UseAsyncReturn } from "react-async-hook";
 import { User } from "../models";
 import {
+  getShowChordDiagrams,
+  setShowChordDiagrams,
+} from "../helpers/chordDiagramSettings";
+import {
   setUserColumnsDisplay,
   toggleUserChordsDisplay,
 } from "../services/songs";
@@ -44,6 +48,9 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
   const [showingChords, setShowingChords] = useState<boolean>(false);
   const [columns, setColumns] = useState<number>(1);
+  const [showChordDiagrams, setShowChordDiagramsState] = useState(
+    getShowChordDiagrams
+  );
 
   const avatarBackgroundStyle = {
     color: useColorModeValue("white", "black"),
@@ -116,6 +123,25 @@ const SettingModal = ({ asyncUser, isOpen, onClose }: SettingsModalProps) => {
                     setColumns(newColumns);
                     await setUserColumnsDisplay(newColumns);
                     asyncUser.execute();
+                  }}
+                />
+              </Flex>
+              <Flex
+                direction="row"
+                margin="1rem"
+                justifyContent="space-between"
+              >
+                <FormLabel htmlFor="chord-diagrams" mb="0">
+                  Chord Diagrams
+                </FormLabel>
+                <Switch
+                  id="chord-diagrams"
+                  isChecked={showChordDiagrams}
+                  onChange={() => {
+                    const newVal = !showChordDiagrams;
+                    setShowChordDiagramsState(newVal);
+                    setShowChordDiagrams(newVal);
+                    window.dispatchEvent(new Event("storage"));
                   }}
                 />
               </Flex>

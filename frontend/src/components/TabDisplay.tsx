@@ -3,8 +3,14 @@ import { AxiosResponse } from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { UseAsyncReturn } from "react-async-hook";
 import { formatTab, splitTabIntoColumns } from "../helpers/tab";
+import {
+  getShowChordDiagrams,
+  setShowChordDiagrams,
+} from "../helpers/chordDiagramSettings";
 import { LINES_PER_COLUMN, User } from "../models";
 import transposer from "./transposer";
+import ChordHeader from "./ChordHeader";
+import ChordTooltipLine from "./ChordTooltip";
 
 export function useBumpAnimation(
   bumpDirection: "left" | "right" | null | undefined,
@@ -54,9 +60,16 @@ export default function TabDisplay({
 }: TabDisplayProps) {
   const [toneSteps, setToneSteps] = useState(0);
   const [usesSharps, setUsesSharps] = useState(true);
+  const [showDiagrams, setShowDiagrams] = useState(getShowChordDiagrams);
 
   const user = asyncUser.result && asyncUser.result.data;
   const showChords = user ? user.userprofile.is_showing_chords : false;
+
+  useEffect(() => {
+    const handleStorage = () => setShowDiagrams(getShowChordDiagrams());
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   function handleTransposeChange(num) {
     let newTone = toneSteps + num;
@@ -68,13 +81,18 @@ export default function TabDisplay({
 
   const handleKeyPress = useCallback(
     (event: any) => {
-      // This first one is the only one that non-admins are allowed to use
       if (event.key === "+") {
         handleTransposeChange(1);
       } else if (event.key === "-") {
         handleTransposeChange(-1);
       } else if (event.key === "#") {
         setUsesSharps(!usesSharps);
+      } else if (event.key === "c" && !event.metaKey && !event.ctrlKey) {
+        setShowDiagrams((prev) => {
+          const next = !prev;
+          setShowChordDiagrams(next);
+          return next;
+        });
       }
     },
     [handleTransposeChange, usesSharps, setUsesSharps]
@@ -110,6 +128,7 @@ export default function TabDisplay({
 
   return (
     <>
+      <ChordHeader tab={tab} show={showDiagrams} />
       {tabColumns &&
         (isMobileDevice ? (
           <MobileChords
@@ -150,7 +169,6 @@ function DesktopChords({
   isLoading,
   fontScale,
 }: DesktopChordsProps) {
-  const chordColor = useColorModeValue("teal.500", "cyan.300");
   const columnsToDisplayOnScreen = Math.min(
     columnsOnScreen,
     tabToDisplay.length
@@ -182,9 +200,12 @@ function DesktopChords({
             {column.map((tabLine) => {
               if (tabLine.includes("[ch]")) {
                 return (
-                  <Text color={chordColor} key={window.crypto.randomUUID()}>
-                    {transposer(tabLine, toneSteps, usesSharps)}
-                  </Text>
+                  <ChordTooltipLine
+                    key={window.crypto.randomUUID()}
+                    tabLine={tabLine}
+                    toneSteps={toneSteps}
+                    usesSharps={usesSharps}
+                  />
                 );
               } else {
                 return (
