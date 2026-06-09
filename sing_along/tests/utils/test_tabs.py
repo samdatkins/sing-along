@@ -1,3 +1,4 @@
+import json
 from unittest.mock import Mock, PropertyMock, patch
 
 from django.test import TestCase
@@ -61,3 +62,52 @@ class TestTabScraper(TestCase):
 
         # Assert
         self.assertIsNone(tab)
+
+    def test_load_tab_from_html_parses_content(self):
+        js_data = {
+            "store": {
+                "page": {
+                    "data": {
+                        "tab": {
+                            "artist_name": "Test Artist",
+                            "song_name": "Test Song",
+                            "tab_url": "http://example.com/tab/1",
+                            "rating": 4.5,
+                            "votes": 100,
+                            "type": "Chords",
+                            "difficulty": "intermediate",
+                        },
+                        "tab_view": {
+                            "wiki_tab": {
+                                "content": "[ch]Am[/ch] Hello [ch]G[/ch] World",
+                            },
+                            "meta": {
+                                "capo": 2,
+                                "tonality": "Am",
+                                "tuning": {"value": "Standard"},
+                            },
+                        },
+                    }
+                }
+            }
+        }
+        encoded = json.dumps(js_data).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+        html = f'<html><body><div class="js-store" data-content="{encoded}"></div></body></html>'
+
+        tab_scraper = TabScraper()
+        tab = tab_scraper.load_tab_from_html(html)
+
+        self.assertEqual(tab["content"], "[ch]Am[/ch] Hello [ch]G[/ch] World")
+        self.assertEqual(tab["artist"], "Test Artist")
+        self.assertEqual(tab["title"], "Test Song")
+        self.assertEqual(tab["url"], "http://example.com/tab/1")
+        self.assertEqual(tab["capo"], 2)
+        self.assertEqual(tab["key"], "Am")
+        self.assertEqual(tab["tuning"], "Standard")
+
+    def test_load_tab_from_html_raises_on_missing_js_store(self):
+        html = "<html><body><div>No tab here</div></body></html>"
+        tab_scraper = TabScraper()
+
+        with self.assertRaises(ServerNotAvailable):
+            tab_scraper.load_tab_from_html(html)

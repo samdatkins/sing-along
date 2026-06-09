@@ -9,11 +9,15 @@ from .models import Like, Membership, Song, Songbook, SongEntry, SongMemo
 
 
 class SongForm(forms.ModelForm):
-    # Adding a custom field for user input
     tab_url = forms.CharField(
         required=False,
         widget=forms.TextInput,
         help_text="Enter a URL to load to overwrite the current tab with an updated version (optional and DANGEROUS)",
+    )
+    tab_html = forms.CharField(
+        required=False,
+        widget=forms.Textarea,
+        help_text="Paste the full HTML source of an Ultimate Guitar tab page to parse the tab directly (use when URL scraping is blocked).",
     )
 
     class Meta:
@@ -44,13 +48,16 @@ class SongAdmin(admin.ModelAdmin):
     inlines = [SongMemoInline]  # Add the SongMemoInline here
 
     def save_model(self, request, obj, form, change):
+        tab_html = form.cleaned_data.get("tab_html")
         tab_url = form.cleaned_data.get("tab_url")
 
-        if tab_url:
-            scraper = TabScraper()
+        scraper = TabScraper()
+        if tab_html:
+            tab = scraper.load_tab_from_html(tab_html)
+            obj.content = tab["content"]
+            obj.url = tab["url"]
+        elif tab_url:
             tab = scraper.load_tab_from_url(tab_url)
-
-            # Write the result to a specific field
             obj.content = tab["content"]
             obj.url = tab_url
 

@@ -12,6 +12,13 @@ def _get_proxy_url():
     return getattr(settings, "BOT_PROXY_URL", "") or None
 
 
+def _ug_get(url, headers=None, params=None):
+    return requests.get(
+        url, headers=headers, params=params,
+        impersonate="chrome", proxy=_get_proxy_url(),
+    )
+
+
 class TabType(Enum):
     CHORDS = "Chords"
     OFFICIAL = "Official"
@@ -24,14 +31,20 @@ class ServerNotAvailable(Exception):
 @on_exception(expo, requests.RequestsError, max_tries=30)
 def retry_request(url, headers=None, params=None):
     print(f"Making web request to {url}")
-    response = requests.get(
-        url, headers=headers, params=params, impersonate="chrome", proxy=_get_proxy_url()
-    )
+    response = _ug_get(url, headers=headers, params=params)
     response.raise_for_status()
     return response
 
 
 class TabJSReader:
+    @staticmethod
+    def _parse_js_store(html):
+        soup = BeautifulSoup(html, "html.parser")
+        js_store = soup.find_all("div", {"class": "js-store"})
+        if not js_store:
+            raise ServerNotAvailable("No tab data found in HTML")
+        return json.loads(js_store[0]["data-content"])
+
     @staticmethod
     def _load_js_store(response):
         if response.status_code == 404:
@@ -40,11 +53,7 @@ class TabJSReader:
             raise ServerNotAvailable(
                 f"Server responded with status code {response.status_code}"
             )
-
-        soup = BeautifulSoup(response.content, "html.parser")
-        js_store = soup.find_all("div", {"class": "js-store"})
-
-        return json.loads(js_store[0]["data-content"])
+        return TabJSReader._parse_js_store(response.content)
 
 
 class TabIndexReader(TabJSReader):
@@ -71,12 +80,7 @@ class TabSearcher(TabIndexReader):
 
     def _get_search_results(self, query):
         payload = {"search_type": "title", "value": query}
-        return requests.get(
-            self.search_url,
-            params=payload,
-            impersonate="chrome",
-            proxy=_get_proxy_url(),
-        )
+        return _ug_get(self.search_url, params=payload)
 
     def _get_parsed_search_results(self, search_results):
         data = self._load_js_store(search_results)
@@ -215,17 +219,18 @@ class TabScraper(TabJSReader):
         return tab_dict
 
     def load_tab_from_url(self, tab_url):
-        response = requests.get(
-            tab_url,
-            impersonate="chrome",
-            proxy=_get_proxy_url(),
-        )
+        response = _ug_get(tab_url)
         data = self._load_js_store(response)
         if data is None:
             return None
 
         results = data["store"]["page"]["data"]
 
+        return self._build_single_tab_dict(results)
+
+    def load_tab_from_html(self, html):
+        data = self._parse_js_store(html)
+        results = data["store"]["page"]["data"]
         return self._build_single_tab_dict(results)
 
 
