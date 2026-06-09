@@ -187,6 +187,47 @@ class TestTabScraper(TestCase):
         self.assertIn("darkness & my old friend", tab["content"])
         self.assertIn("&bar=2", tab["url"])
 
+    def test_load_tab_from_html_with_qquot_typo(self):
+        """UG has a known typo where &qquot; appears instead of &quot; in their HTML."""
+        js_data = {
+            "store": {
+                "page": {
+                    "data": {
+                        "tab": {
+                            "artist_name": "The Smashing Pumpkins",
+                            "song_name": "Here Is No Why",
+                            "tab_url": "http://tabs.example.com/tab/123",
+                            "rating": 4.8,
+                            "votes": 25,
+                            "type": "Chords",
+                            "difficulty": "intermediate",
+                        },
+                        "tab_view": {
+                            "wiki_tab": {
+                                "content": "[ch]Am[/ch] Test",
+                            },
+                            "meta": {
+                                "tonality": "Eb",
+                                "tuning": {"value": "E A D G B E"},
+                            },
+                        },
+                    }
+                }
+            }
+        }
+        raw_json = json.dumps(js_data)
+        # Simulate UG's encoding with the &qquot; typo
+        entity_encoded = html.escape(raw_json, quote=True)
+        # Introduce the typo: replace one &quot; with &qquot;
+        entity_encoded = entity_encoded.replace("&quot;Chords&quot;", "&qquot;Chords&quot;", 1)
+        page_html = f'<div class="js-store" data-content="{entity_encoded}"></div>'
+
+        tab_scraper = TabScraper()
+        tab = tab_scraper.load_tab_from_html(page_html)
+
+        self.assertEqual(tab["artist"], "The Smashing Pumpkins")
+        self.assertEqual(tab["type"], "Chords")
+
     def test_load_tab_from_html_raises_on_missing_js_store(self):
         page_html = "<html><body><div>No tab here</div></body></html>"
         tab_scraper = TabScraper()

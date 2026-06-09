@@ -4,7 +4,6 @@ import time
 from enum import Enum
 
 from backoff import expo, on_exception
-from bs4 import BeautifulSoup
 from curl_cffi import requests
 from django.conf import settings
 
@@ -40,15 +39,24 @@ def retry_request(url, headers=None, params=None):
 class TabJSReader:
     @staticmethod
     def _parse_js_store(html):
-        soup = BeautifulSoup(html, "html.parser")
-        js_store = soup.find_all("div", {"class": "js-store"})
-        if not js_store:
+        if isinstance(html, bytes):
+            html = html.decode("utf-8", errors="replace")
+
+        marker = 'data-content="'
+        start = html.find(marker)
+        if start == -1:
             raise ServerNotAvailable("No tab data found in HTML")
-        raw_content = js_store[0]["data-content"]
-        # BS4 usually decodes HTML entities, but edge cases with large attributes
-        # or non-standard entities can leave remnants. Explicit unescape as safety net.
-        decoded_content = html_module.unescape(raw_content)
-        return json.loads(decoded_content)
+        start += len(marker)
+        end = html.find('"', start)
+        if end == -1:
+            raise ServerNotAvailable("No tab data found in HTML (unterminated attribute)")
+        raw_content = html[start:end]
+
+        # UG has known typos in their entity encoding (e.g. &qquot; instead of &quot;)
+        raw_content = raw_content.replace("&qquot;", "&quot;")
+
+        decoded = html_module.unescape(raw_content)
+        return json.loads(decoded)
 
     @staticmethod
     def _load_js_store(response):
