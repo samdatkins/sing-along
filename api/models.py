@@ -4,7 +4,7 @@ import string
 
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.indexes import GinIndex
-from django.db import models
+from django.db import IntegrityError, models
 from django.db.models import Q
 from safedelete.config import SOFT_DELETE_CASCADE
 from safedelete.models import SafeDeleteModel
@@ -51,6 +51,17 @@ class Songbook(SafeDeleteModel, CreatedUpdated):
     action_verb = models.CharField(
         max_length=8, null=False, blank=False, default="DANCE"
     )
+
+    def save(self, *args, **kwargs):
+        for _ in range(10):
+            try:
+                return super().save(*args, **kwargs)
+            except IntegrityError as e:
+                if "unique songbook session key" in str(e) and not self.pk:
+                    self.session_key = _generate_session_key()
+                else:
+                    raise
+        return super().save(*args, **kwargs)
 
     def _resolve_entry_at_position(self, position):
         """Return the song entry at *position*, clamping to the nearest valid
