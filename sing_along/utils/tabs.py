@@ -1,3 +1,4 @@
+import html as html_module
 import json
 import time
 from enum import Enum
@@ -43,7 +44,11 @@ class TabJSReader:
         js_store = soup.find_all("div", {"class": "js-store"})
         if not js_store:
             raise ServerNotAvailable("No tab data found in HTML")
-        return json.loads(js_store[0]["data-content"])
+        raw_content = js_store[0]["data-content"]
+        # BS4 usually decodes HTML entities, but edge cases with large attributes
+        # or non-standard entities can leave remnants. Explicit unescape as safety net.
+        decoded_content = html_module.unescape(raw_content)
+        return json.loads(decoded_content)
 
     @staticmethod
     def _load_js_store(response):

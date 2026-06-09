@@ -1,3 +1,4 @@
+import html
 import json
 from unittest.mock import Mock, PropertyMock, patch
 
@@ -105,9 +106,90 @@ class TestTabScraper(TestCase):
         self.assertEqual(tab["key"], "Am")
         self.assertEqual(tab["tuning"], "Standard")
 
+    def test_load_tab_from_html_with_entity_encoded_json(self):
+        """Simulates real UG page source where data-content is HTML-entity-encoded."""
+        js_data = {
+            "store": {
+                "page": {
+                    "data": {
+                        "tab": {
+                            "artist_name": "Smashing Pumpkins",
+                            "song_name": "Today",
+                            "tab_url": "http://tabs.example.com/tab/today?ver=2&type=chords",
+                            "rating": 4.8,
+                            "votes": 500,
+                            "type": "Chords",
+                            "difficulty": "novice",
+                        },
+                        "tab_view": {
+                            "wiki_tab": {
+                                "content": "[ch]E[/ch] [ch]B[/ch]\nToday is the greatest\n[ch]A[/ch]\nDay I've ever known",
+                            },
+                            "meta": {
+                                "capo": 0,
+                                "tonality": "E",
+                                "tuning": {"value": "E A D G B E"},
+                            },
+                        },
+                    }
+                }
+            }
+        }
+        # Simulate how it appears in raw page source: JSON is HTML-entity-encoded
+        raw_json = json.dumps(js_data)
+        entity_encoded = html.escape(raw_json, quote=True)
+        page_html = (
+            '<!DOCTYPE html><html><head><title>Test</title></head><body>'
+            f'<div class="js-store" data-content="{entity_encoded}"></div>'
+            '</body></html>'
+        )
+
+        tab_scraper = TabScraper()
+        tab = tab_scraper.load_tab_from_html(page_html)
+
+        self.assertEqual(tab["artist"], "Smashing Pumpkins")
+        self.assertEqual(tab["title"], "Today")
+        self.assertIn("&type=chords", tab["url"])
+        self.assertIn("[ch]E[/ch]", tab["content"])
+        self.assertIn("Day I've ever known", tab["content"])
+
+    def test_load_tab_from_html_with_ampersands_in_content(self):
+        """Verifies JSON with & characters in values survives entity encoding/decoding."""
+        js_data = {
+            "store": {
+                "page": {
+                    "data": {
+                        "tab": {
+                            "artist_name": "Simon & Garfunkel",
+                            "song_name": "Sound of Silence",
+                            "tab_url": "http://tabs.example.com/tab/123?foo=1&bar=2",
+                            "rating": 4.9,
+                            "votes": 1000,
+                            "type": "Chords",
+                        },
+                        "tab_view": {
+                            "wiki_tab": {
+                                "content": "[ch]Am[/ch] Hello darkness & my old friend",
+                            },
+                        },
+                    }
+                }
+            }
+        }
+        raw_json = json.dumps(js_data)
+        entity_encoded = html.escape(raw_json, quote=True)
+        page_html = f'<div class="js-store" data-content="{entity_encoded}"></div>'
+
+        tab_scraper = TabScraper()
+        tab = tab_scraper.load_tab_from_html(page_html)
+
+        self.assertEqual(tab["artist"], "Simon & Garfunkel")
+        self.assertIn("darkness & my old friend", tab["content"])
+        self.assertIn("&bar=2", tab["url"])
+
     def test_load_tab_from_html_raises_on_missing_js_store(self):
-        html = "<html><body><div>No tab here</div></body></html>"
+        page_html = "<html><body><div>No tab here</div></body></html>"
         tab_scraper = TabScraper()
 
         with self.assertRaises(ServerNotAvailable):
-            tab_scraper.load_tab_from_html(html)
+            tab_scraper.load_tab_from_html(page_html)
